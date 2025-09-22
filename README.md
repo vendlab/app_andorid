@@ -36,9 +36,14 @@ git init
 # Vincular tu proyecto local inicializado con git a un repositorio el la nube (GitHub)/ Tienes que tener creado el repositorio en GitHub
 git remote add origin https://github.com/usuario/mi-proyecto.git
 
-
 ## Clonar un proyecto de un repositorio remoto (Esto ya trae git inicializado en el proyecto)
 git clone https://github.com/usuario/este-es-un-repositorio-remoto.git
+
+## Verificar si ya tienes vinculada tu rama a alguna rama en la nube 
+git remote -v
+    
+## Si quieres desvincular la rama actual con la que esté vinculada en GitHub (en este caso eliminamos la vinculación de la rama main)
+git remote remove origin
 
 
 
