@@ -152,6 +152,9 @@ git push         # Envía tus cambios que hiciste en tu rama al la nube (Esto ac
 git pull         # Jalar los cambios de la rama remota del repositorio de GitHub a tu rama local.
 #git push, funciona si eres administrador del repositorio su estas colaborando no funcionara, tienes que solicitar un PR (Pull Request)
 
+git pull origin main --rebase  #Si tienes commits locales  que no tienes en remoto y commits remotos que no tienes en locales (Si quieres mantener un historial limpio, usa rebase)
+git push origin main #Luego, si no hubo conflictos, haz push de tus cambios:
+
 #Lista ramas existentes
 git branch        # ramas que tienes en tu repositorio local (Dispositivo)
 git branch -r     # ramas que tienes en tu repositorio en remoto (GitHub)
