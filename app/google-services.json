@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1069447864899",
+    "project_id": "app-android-kaphiy",
+    "storage_bucket": "app-android-kaphiy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069447864899:android:76df32140a7ee456706af6",
+        "android_client_info": {
+          "package_name": "com.marlodev.app_android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7mu4r4i51wFbFGeAqB0EvCzhc5pzDPP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

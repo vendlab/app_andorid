@@ -142,6 +142,7 @@ git switch -c nombre-nueva-rama a1b2c3d4
 ##------------------------------------------------------------------------
 git switch -c feature/nueva-funcionalidad   # Crear y moverte a la rama feature/nueva-funcionalidad en tu git local
 git push -u origin feature/nueva-funcionalidad  # Subir la rama local a remoto, esto ya enlaza automáticamente para que luego puedas solo utilizar git push o git pull y ya no especifiques la rama nuevamente.
+git push -u origin main # Ejemplo en este caso estoy haciendo push a la rama principal
 git push         # Envía tus cambios que hiciste en tu rama al la nube (Esto actualizar los cambios de tu repositorio de GitHub)
 git pull         # Jalar los cambios de la rama remota del repositorio de GitHub a tu rama local.
 #git push, funciona si eres administrador del repositorio su estas colaborando no funcionara, tienes que solicitar un PR (Pull Request)

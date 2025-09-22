@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    Solo acepta múltiplos de 45° (0, 45, 90, 135, 180, 225, 270, 315).-->
+    <gradient
+        android:startColor="@color/colorGreen1"
+        android:endColor="@color/colorGreen2"
+        android:angle="270"
+        android:type="linear" />
+</shape>
+
