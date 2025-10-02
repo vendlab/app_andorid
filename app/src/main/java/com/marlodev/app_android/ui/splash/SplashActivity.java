@@ -1,4 +1,4 @@
-package com.marlodev.app_android;
+package com.marlodev.app_android.ui.splash;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,9 +6,12 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.os.HandlerCompat;
 
+import com.marlodev.app_android.MainActivity;
+import com.marlodev.app_android.R;
+
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int splash_duration = 0000; // 2 segundos
+    private static final int splash_duration = 2000; // 2 segundos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

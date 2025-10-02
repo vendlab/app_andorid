@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_home"
+        android:icon="@drawable/icon_home"
+        android:title="Inicio"
+        app:cnb_backgroundColor="@color/colorPrimary"
+        app:cnb_iconColor="@color/colorWhite"/>
+
+    <item
+        android:id="@+id/menu_car"
+        android:icon="@drawable/icon_car"
+        android:title="Carrito"
+        app:cnb_backgroundColor="@color/colorPrimary"
+        app:cnb_iconColor="@color/colorWhite"/>
+
+    <item
+        android:id="@+id/menu_search"
+        android:icon="@drawable/icon_search"
+        android:title="Buscar"
+        app:cnb_iconColor="@color/colorWhite"
+        app:cnb_backgroundColor="@color/colorPrimary"/>
+
+    <item
+        android:id="@+id/menu_delivery"
+        android:icon="@drawable/icon_delivery"
+        android:title="Delivery"
+        app:cnb_iconColor="@color/colorWhite"
+        app:cnb_backgroundColor="@color/colorPrimary"/>
+
+    <item
+        android:id="@+id/menu_perfil"
+        android:icon="@drawable/icon_perfil"
+        android:title="Perfil"
+        app:cnb_iconColor="@color/colorWhite"
+        app:cnb_backgroundColor="@color/colorPrimary" />
+</menu>
