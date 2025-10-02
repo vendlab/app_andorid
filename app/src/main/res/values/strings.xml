@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Kaphiy</string>
+    <string name="welcome_customer">
+    Buen día, <font color="#000000"><b>Hugo</b></font>
+    </string>
+    <string name="user_address">Cajamarca, Santiago 123</string>
+    <string name="hint_search">¿Qué estás buscando?</string>
+
 </resources>

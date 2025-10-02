@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources  xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Tema base -->
-    <style name="Base.Theme.AppAndroid" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="Base.Theme.app_android" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorSecondary</item>
+        <item name="colorPrimaryDark">@color/colorGreen2</item>
+        <item name="colorOnPrimary">@color/colorGrey400</item>
+        <item name="android:statusBarColor">@color/colorGreen2</item>
+        <item name="android:windowLightStatusBar">true</item> <!-- íconos oscuros -->
+        <item name="android:navigationBarColor">@color/colorGrey100</item>
+
+
+
+    </style>
 
     <!-- Tema principal de la app -->
-    <style name="Theme.MyApp.Main" parent="Base.Theme.AppAndroid" />
+    <style name="Theme.app_android" parent="Base.Theme.app_android" />
+
+
+
 
     <!-- Tema para SplashActivity -->
     <style name="Theme.MyApp.Splash" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowLightStatusBar">true</item>
-<!--        <item name="android:windowBackground">@drawable/color_green_gradient</item>-->
-        <item name="android:windowBackground">@color/colorWhite</item>
+        <item name="android:windowBackground">@drawable/color_green_gradient</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="circleImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">10dp</item>
     </style>
 
 </resources>

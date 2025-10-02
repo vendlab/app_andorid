@@ -42,15 +42,21 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.database)
+    implementation(libs.recyclerview)
+    implementation(libs.viewpager2)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+
 
     //Nuevas dependencias (1)
     //Principales
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation ("com.google.code.gson:gson:2.9.1")
-    implementation ("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
+    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
+    //Para el Splash
     //Para el Splash
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.5")
 }

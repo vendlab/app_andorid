@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+android:color="?attr/colorControlHighlight"> <!-- color del ripple -->
+
+<!-- Contenido del botón -->
+<item>
+    <shape android:shape="rectangle">
+        <solid android:color="@color/colorWhiteOpacity50"/> <!-- fondo sólido -->
+        <corners android:radius="50dp"/>  <!-- bordes redondeados -->
+    </shape>
+</item>
+</ripple>
