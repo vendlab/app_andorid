@@ -62,27 +62,6 @@ public class MainRepository {
         return listData;
     }
 
-    public LiveData<ArrayList<Product>> loadPopular(){
-        MutableLiveData<ArrayList<Product>> listData = new MutableLiveData<>();
-        DatabaseReference ref = firebaseDatabase.getReference("products");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<Product> list = new ArrayList<>();
-                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    Product item = childSnapshot.getValue(Product.class);
-                    if (item != null)  list.add(item);
-                }
-                listData.setValue(list);
 
-            }
-
-            @Override
-            public  void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        return listData;
-    }
 
 }

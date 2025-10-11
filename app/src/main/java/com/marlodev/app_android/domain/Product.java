@@ -1,18 +1,40 @@
 package com.marlodev.app_android.domain;
 import com.google.firebase.database.PropertyName;
+import com.marlodev.app_android.model.ProductWebSocketEvent;
 //import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Product {
-    private int id;
+    private Long id;
+
     private int categoryId;
     private String createdAt;
     private int store;
 
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+    public List<String> getImagePublicIds() {
+        return imagePublicIds;
+    }
+
+    public void setImagePublicIds(List<String> imagePublicIds) {
+        this.imagePublicIds = imagePublicIds;
+    }
+
+    private List<String> imageUrls;
+    private List<String> imagePublicIds;
+
 
     private String updatedAt;
-    private String title;
+    private String name;
     private String description;
     private double price;
     private double oldPrice;
@@ -43,7 +65,7 @@ public class Product {
 
 
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -57,7 +79,7 @@ public class Product {
 
 
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -85,12 +107,24 @@ public class Product {
         this.updatedAt = updatedAt;
     }
 
-    public String getTitle() {
-        return title;
+    public void setNew(boolean aNew) {
+        isNew = aNew;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setTitle(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -182,7 +216,20 @@ public class Product {
     }
 
 
-              
+
+
+
+    // Método de utilidad para convertir de evento WebSocket
+    public static Product fromWebSocketEvent(ProductWebSocketEvent event) {
+        Product p = new Product();
+        p.setId(event.id); // event.id debe ser Long
+        p.setName(event.name);
+        p.setPrice(event.price);
+        p.setImageUrls(List.of(event.imageUrl)); // si tienes solo 1 imagen en el evento
+        return p;
+    }
+
+
 
 
 
