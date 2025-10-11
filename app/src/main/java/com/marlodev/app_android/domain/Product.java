@@ -18,6 +18,7 @@ public class Product {
     }
 
     public void setImageUrls(List<String> imageUrls) {
+
         this.imageUrls = imageUrls;
     }
 
@@ -219,16 +220,22 @@ public class Product {
 
 
 
-    // Método de utilidad para convertir de evento WebSocket
-    public static Product fromWebSocketEvent(ProductWebSocketEvent event) {
-        Product p = new Product();
-        p.setId(event.id); // event.id debe ser Long
-        p.setName(event.name);
-        p.setPrice(event.price);
-        p.setImageUrls(List.of(event.imageUrl)); // si tienes solo 1 imagen en el evento
-        return p;
-    }
 
+
+    // 🔁 Si tienes un método estático como fromWebSocketEvent:
+    public static Product fromWebSocketEvent(com.marlodev.app_android.model.ProductWebSocketEvent event) {
+        Product product = new Product();
+        product.id = event.id;
+        product.name = event.name;
+        product.price = event.price;
+        product.isNew = event.isNew;
+        if (event.imageUrl != null && !event.imageUrl.trim().isEmpty()) {
+            product.imageUrls = List.of(event.imageUrl);
+        } else {
+            product.imageUrls = new ArrayList<>(); // ← evita null
+        }
+        return product;
+    }
 
 
 

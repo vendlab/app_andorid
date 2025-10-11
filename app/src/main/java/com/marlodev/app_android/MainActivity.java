@@ -126,6 +126,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.CompositePageTransformer;
+import androidx.viewpager2.widget.MarginPageTransformer;
+
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.marlodev.app_android.adapter.PopularAdapter;
 import com.marlodev.app_android.adapter.SliderAdapter;
@@ -175,12 +178,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
     private void setupBannerSlider(ArrayList<BannerModel> banners) {
         binding.viewPagerSlider.setAdapter(new SliderAdapter(banners, binding.viewPagerSlider));
         binding.viewPagerSlider.setClipToPadding(false);
         binding.viewPagerSlider.setClipChildren(false);
         binding.viewPagerSlider.setOffscreenPageLimit(3);
         binding.viewPagerSlider.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
+        CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
+        compositePageTransformer.addTransformer(new MarginPageTransformer(30));
+        binding.viewPagerSlider.setPageTransformer(compositePageTransformer);
     }
 
     private void initTag() {

@@ -14,23 +14,6 @@ public class ProductViewModel extends ViewModel {
 
 
 
-//
-//
-//
-//    private final ProductRepository repository = new ProductRepository();
-//    private final MutableLiveData<ArrayList<Product>> productsLiveData = new MutableLiveData<>();
-//
-//    public ProductViewModel() {
-//        loadProducts();
-//    }
-//
-//    public LiveData<ArrayList<Product>> getProducts() {
-//        return productsLiveData;
-//    }
-//
-//    private void loadProducts() {
-//        repository.getProducts().observeForever(products -> productsLiveData.setValue(products));
-//    }
 
 
 
