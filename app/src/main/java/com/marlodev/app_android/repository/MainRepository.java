@@ -28,12 +28,9 @@ public class MainRepository {
                     if (item != null)  list.add(item);
                 }
                 listData.setValue(list);
-
             }
-
             @Override
             public  void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
         return listData;
