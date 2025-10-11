@@ -9,11 +9,7 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity"
     android:background="@color/colorSecondary"
-
-
     >
-
-
        <!-- Scrollable content -->
     <ScrollView
         android:id="@+id/scrollViewMain"
@@ -332,12 +328,8 @@
                     android:textStyle="bold"
                     />
             </LinearLayout>
-
-
         </LinearLayout>
     </ScrollView>
-
-
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
@@ -353,10 +345,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-
-
-
         />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.marlodev.app_android.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,9 +26,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.viewHolder> {
         this.items = items;
     }
 
-
-
-      @NonNull
+    @NonNull
     @Override
     public TagAdapter.viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
@@ -36,7 +35,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.viewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TagAdapter.viewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull TagAdapter.viewHolder holder, @SuppressLint("RecyclerView") int position) {
         holder.binding.titleTxt.setText(items.get(position).getTitle());
         holder.binding.getRoot().setOnClickListener(new View.OnClickListener() {
             @Override

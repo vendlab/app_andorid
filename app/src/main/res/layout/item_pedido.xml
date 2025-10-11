@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:background="@drawable/bg_btn_white_50_opacity"
+    android:elevation="3dp"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Nombre del cliente -->
+    <TextView
+        android:id="@+id/txtCliente"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cliente: Juan Pérez"
+        android:textColor="#212121"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- Dirección -->
+    <TextView
+        android:id="@+id/txtDireccion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Av. Los Álamos 123, Miraflores"
+        android:textColor="#DEAB29"
+        android:textSize="14sp" />
+
+    <!-- Distancia -->
+    <TextView
+        android:id="@+id/txtDistancia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Distancia: 2.3 km"
+        android:textColor="#676767"
+        android:textSize="13sp" />
+
+    <!-- Botones de acción -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <!-- Botón Aceptar -->
+        <Button
+            android:id="@+id/btnAceptar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#004D40"
+            android:elevation="2dp"
+            android:padding="8dp"
+            android:text="Aceptar pedido"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" />
+
+        <!-- Espaciador -->
+        <View
+            android:layout_width="12dp"
+            android:layout_height="match_parent" />
+
+        <!-- Botón Ver Detalle -->
+        <Button
+            android:id="@+id/btnDetalle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FFFFFF"
+            android:elevation="2dp"
+            android:padding="8dp"
+            android:text="Ver detalle"
+            android:textAllCaps="false"
+            android:textColor="#070707" />
+    </LinearLayout>
+</LinearLayout>
