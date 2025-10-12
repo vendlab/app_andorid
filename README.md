@@ -173,6 +173,8 @@ git branch -m nombre-antiguo nuevo-nombre
 ## ❌ 🌿 Eliminar ramas
 ##------------------------------------------------------------------------
 ## Eliminar rama local
+x+d
+
 git branch -d feature/nueva-funcionalidad
 
 # Eliminar rama remota
