@@ -6,4 +6,104 @@
     <string name="user_address">Cajamarca, Santiago 123</string>
     <string name="hint_search">¿Qué estás buscando?</string>
 
+    <string name="welcome_admin">
+        <font color="#000000"><b> Buenas tardes, Carla</b></font>
+    </string>
+
+    <string name="description_admin">Administradora Kaphiy Perú</string>
+
+    <string name="boton_resumen">
+        <font color="#000000"><b>Resumen</b></font>
+    </string>
+
+    <string name="boton_pedidos">
+         <font color="#000000"><b>Pedidos</b></font>
+    </string>
+
+    <string name="boton_productos">
+        <font color="#000000"><b>Productos</b></font>
+    </string>
+
+    <string name="boton_categorias">
+        <font color="#000000"><b>Categorias</b></font>
+    </string>
+
+    <string name="boton_usuarios">
+        <font color="#000000"><b>Usuarios</b></font>
+    </string>
+
+    <string name="boton_inventario">
+        <font color="#000000"><b>Inventario</b></font>
+    </string>
+
+    <string name="text_hoy">
+        <font color="#FF9800"><b>S/.Hoy</b></font>
+    </string>
+    <string name="hoy_soles">
+        <font color="#000000"><b>S/.1240</b></font>
+    </string>
+    <string name="hoy_pedidos">
+        <font color="#B0B4B4"><b>120 Pedidos</b></font>
+    </string>
+
+    <string name="hoy_porcentajes">
+        <font color="#4CAF50"><b>+12.5%</b></font>
+    </string>
+
+
+
+    <string name="text_semanal">
+        <font color="#35629A"><b>S/.Esta Semana</b></font>
+    </string>
+
+    <string name="semanal_soles">
+        <font color="#000000"><b>S/.11.350</b></font>
+    </string>
+    <string name="semanal_pedidos">
+        <font color="#B0B4B4"><b>800 Pedidos</b></font>
+    </string>
+
+    <string name="semanal_porcentajes">
+        <font color="#4CAF50"><b>+8.7%</b></font>
+    </string>
+
+
+
+    <string name="text_mes">
+        <font color="#493E95"><b>S/.Este Mes</b></font>
+    </string>
+    <string name="mes_soles">
+        <font color="#000000"><b>S/.42.350</b></font>
+    </string>
+    <string name="mes_pedidos">
+        <font color="#B0B4B4"><b>3100 Pedidos</b></font>
+    </string>
+
+    <string name="mes_porcentajes">
+        <font color="#4CAF50"><b>+15.3%</b></font>
+    </string>
+
+
+
+
+    <string name="ventas_hora">
+        <font color="#000000"><b>Ventas por Hora</b></font>
+    </string>
+
+    <string name="ventas_categoria">
+        <font color="#000000"><b>Ventas por Categoría</b></font>
+    </string>
+
+    <string name="productos_vendidos">
+        <font color="#000000"><b>Productos Más Vendidos</b></font>
+    </string>
+
+    <string name="hoy">
+        <font color="#000000"><b>Hoy</b></font>
+    </string>
+
+    <string name="stock">Stock Productos</string>
+
+
+
 </resources>
