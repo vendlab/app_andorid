@@ -33,4 +33,10 @@
         <item name="cornerSize">10dp</item>
     </style>
 
+    <!-- Estilo la barra de búsqueda -->
+    <style name="CustomSearchInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="hintTextColor">#212121</item>
+    </style>
+
+
 </resources>
