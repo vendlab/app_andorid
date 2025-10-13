@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         productViewModel.getProducts().observe(this, products -> {
             binding.preogresBarPopular.setVisibility(View.GONE);
             popularAdapter.setProducts(products);
+
         });
     }
 }

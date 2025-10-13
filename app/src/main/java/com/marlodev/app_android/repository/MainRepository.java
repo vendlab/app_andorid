@@ -28,7 +28,6 @@ public class MainRepository {
                     if (item != null)  list.add(item);
                 }
                 listData.setValue(list);
-
             }
 
             @Override
@@ -38,7 +37,6 @@ public class MainRepository {
         });
         return listData;
     }
-
     public LiveData<ArrayList<BannerModel>> loadBanners(){
         MutableLiveData<ArrayList<BannerModel>> listData = new MutableLiveData<>();
         DatabaseReference ref = firebaseDatabase.getReference("banners");
@@ -53,7 +51,6 @@ public class MainRepository {
                 listData.setValue(list);
 
             }
-
             @Override
             public  void onCancelled(@NonNull DatabaseError error) {
 
@@ -61,7 +58,5 @@ public class MainRepository {
         });
         return listData;
     }
-
-
 
 }

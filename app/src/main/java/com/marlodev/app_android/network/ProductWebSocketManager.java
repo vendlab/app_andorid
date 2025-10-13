@@ -12,10 +12,8 @@ import ua.naiksoftware.stomp.dto.LifecycleEvent;
 import ua.naiksoftware.stomp.dto.StompMessage;
 
 public class ProductWebSocketManager {
-
     private static final String TAG = "ProductWebSocket";
     private static final String WS_URL = "ws://10.0.2.2:5050/ws-products/websocket";
-
     private StompClient stompClient;
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     public final MutableLiveData<ProductWebSocketEvent> productEventLiveData = new MutableLiveData<>();
@@ -52,7 +50,6 @@ public class ProductWebSocketManager {
         });
         compositeDisposable.add(topicDisposable);
     }
-
     public void disconnect() {
         if (stompClient != null && stompClient.isConnected()) {
             stompClient.disconnect();
