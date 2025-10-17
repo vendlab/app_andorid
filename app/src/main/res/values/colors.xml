@@ -18,6 +18,7 @@
     <color name="colorGrey100">#F5F5F5</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorWhiteOpacity50">#8CFFFFFF</color>
+    <color name="colorWhiteOpacity30">#4AFFFFFF</color>
     <color name="colorTransparent">#00FFFFFF</color>
 
     <!--    Utility-->

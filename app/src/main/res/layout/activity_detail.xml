@@ -21,24 +21,34 @@
                 android:layout_height="450dp"
                 >
 
+
                 <ImageView
                     android:id="@+id/imageView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:adjustViewBounds="true"
                     android:background="@color/colorGrey400"
-                    android:padding="48dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+
+                <View
+                    android:id="@+id/statusBarGradient"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:background="@drawable/bg_status_bar_gradient"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageButton
                     android:id="@+id/btn_arrow_left"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginStart="25dp"
-                    android:layout_marginTop="25dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="60dp"
                     android:background="@drawable/bg_btn_white_50_opacity"
                     android:padding="8dp"
                     android:src="@drawable/icon_left_arrow"
@@ -51,7 +61,7 @@
                     android:id="@+id/btn_share"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginEnd="25dp"
+                    android:layout_marginEnd="15dp"
                     android:background="@drawable/bg_btn_white_50_opacity"
                     android:padding="8dp"
                     android:src="@drawable/icon_share"
@@ -74,6 +84,8 @@
                 android:layout_marginBottom="10dp"
                 android:textSize="23sp"
                 android:textStyle="bold" />
+
+
 
             <LinearLayout
                 android:layout_width="match_parent"

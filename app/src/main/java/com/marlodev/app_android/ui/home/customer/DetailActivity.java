@@ -1,6 +1,9 @@
 package com.marlodev.app_android.ui.home.customer;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowInsetsController;
 import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
@@ -18,6 +21,7 @@ public class DetailActivity extends AppCompatActivity {
     private ProductViewModel productViewModel;
     private ActivityDetailBinding binding;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,22 +29,38 @@ public class DetailActivity extends AppCompatActivity {
         // UI Edge-to-Edge
         EdgeToEdge.enable(this);
 
-        // Inicializar ViewBinding
+        // ViewBinding
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Inicializar ViewModel
+        // ✅ Configurar la barra de estado (status bar) con íconos blancos
+        Window window = getWindow();
+        window.setStatusBarColor(Color.TRANSPARENT);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.getInsetsController().setSystemBarsAppearance(
+                    0,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            );
+        } else {
+            window.getDecorView().setSystemUiVisibility(
+                    window.getDecorView().getSystemUiVisibility()
+                            & ~android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            );
+        }
+
+        // ViewModel
         productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
 
-        // Configurar botón de volver atrás
+        // Botón atrás
         binding.btnArrowLeft.setOnClickListener(v -> finish());
 
-        // Obtener ID del producto enviado desde HomeActivity
+        // Cargar producto
         long productId = getIntent().getLongExtra("productId", -1);
         if (productId != -1) {
             loadProductDetail(productId);
         }
     }
+
 
     /**
      * Carga los detalles del producto usando ProductViewModel
