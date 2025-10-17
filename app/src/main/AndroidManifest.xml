@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.app_android">
         <activity
-            android:name=".activity.DetailActivity"
+            android:name=".ui.home.customer.DetailActivity"
             android:exported="false" />
         <!-- SplashActivity: launcher -->
         <activity

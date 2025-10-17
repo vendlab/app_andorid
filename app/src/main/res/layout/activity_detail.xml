@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.DetailActivity">
+    tools:context=".ui.home.customer.DetailActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -48,19 +48,6 @@
 
 
                 <ImageButton
-                    android:id="@+id/btn_add_favorite"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/bg_btn_white_50_opacity"
-                    android:padding="8dp"
-                    android:src="@drawable/favoriteactive"
-                    app:layout_constraintBottom_toBottomOf="@+id/btn_share"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_share"
-                    app:layout_constraintTop_toTopOf="@+id/btn_share"
-                    app:tint="@color/colorBlack" />
-
-                <ImageButton
                     android:id="@+id/btn_share"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
@@ -73,37 +60,113 @@
                     app:layout_constraintTop_toTopOf="@+id/btn_arrow_left"
                     app:tint="@color/colorBlack" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="40dp"
-                    android:background="@color/colorGrey100"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/txt_title_product"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="25dp"
+                android:text="title"
+                android:textColor="@color/colorBlack"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="25dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:textSize="23sp"
-                android:textStyle="bold"
-                android:textColor="@color/colorBlack"
-                android:text="title" />
+                android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/textView3"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="25dp"
-                android:textSize="14sp"
-                android:text="Siz y Variantes"
-                android:textStyle="bold"
-                android:textColor="@color/colorBlack"
-                />
+                android:orientation="horizontal"
+                android:layout_marginStart="25dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txt_store"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorGrey600"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="15dp"
+                        android:text="Store" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imageView2"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="5dp"
+                            app:srcCompat="@drawable/star" />
+
+                        <TextView
+                            android:id="@+id/txt_ranking"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="5dp"
+                            android:textSize="16sp"
+                            android:text="4.0" />
+
+                        <TextView
+                            android:id="@+id/txt_"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="10dp"
+                            android:textSize="12sp"
+                            android:textColor="@color/colorGrey600"
+                            android:text="(322)" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recy_thumbnails"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    tools:layout_weight="0.5" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="25dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:id="@+id/textView12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="3"
+                    android:text="Size"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="| Variantes"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -116,14 +179,14 @@
                     android:id="@+id/recyclerSize"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5" />
+                    android:layout_weight="3" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerVariante"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_weight="0.5" />
+                    android:layout_weight="5" />
 
             </LinearLayout>
 
@@ -132,14 +195,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:layout_margin="25dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="10dp"
                 android:textSize="14sp"
                 android:text="Detalles"
                 android:textStyle="bold"
                 android:textColor="@color/colorBlack"/>
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/txtDescripcion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="25dp"
@@ -199,7 +263,7 @@
                         android:textSize="18sp" />
 
                     <TextView
-                        android:id="@+id/tvQuantity"
+                        android:id="@+id/txtQuantity"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:gravity="center"
@@ -220,19 +284,20 @@
                 </LinearLayout>
 
                 <!-- Botón agregar al carrito -->
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnAddCart"
                     android:layout_width="wrap_content"
                     android:layout_height="60dp"
                     android:layout_marginTop="16dp"
-                    android:paddingStart="80dp"
-                    android:paddingEnd="80dp"
-                    android:textSize="16sp"
+                    android:background="@drawable/bg_btn_green_prmary_select"
                     android:backgroundTint="@color/colorPrimary"
                     android:drawableEnd="@drawable/icon_car"
-                    android:text="Agregar"
-                    android:textColor="@android:color/white"
                     android:drawableTint="@android:color/white"
+                    android:paddingStart="80dp"
+                    android:paddingEnd="80dp"
+                    android:text="Agregar  "
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/delante_fd" />
 
