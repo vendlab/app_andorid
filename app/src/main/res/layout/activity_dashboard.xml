@@ -553,9 +553,8 @@
                         <ImageView
                             android:layout_width="120dp"
                             android:layout_height="65dp"
-                            android:src=""
                             android:scaleType="fitCenter"
-                            android:contentDescription="Gráfico de ventas por hora" />
+                            android:contentDescription="Gráfico de ventas por hora"/>
                     </LinearLayout>
 
                     <!-- Tarjeta: Stock -->
@@ -685,7 +684,6 @@
                             android:layout_width="160dp"
                             android:layout_height="80dp"
                             android:layout_marginRight="60dp"
-                            android:src=""
                             android:layout_marginTop="-0dp"
                             android:scaleType="fitCenter"
                             android:contentDescription="Gráfico de ventas por categoría" />
