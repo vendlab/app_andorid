@@ -1,9 +1,10 @@
 package com.marlodev.app_android.network;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
+
+import com.marlodev.app_android.utils.SessionManager;
 
 import java.io.IOException;
 
@@ -13,24 +14,25 @@ import okhttp3.Response;
 
 public class AuthInterceptor implements Interceptor {
 
-    private final Context context;
+    private final SessionManager sessionManager;
 
     public AuthInterceptor(Context context) {
-        this.context = context.getApplicationContext(); // Evita fugas
+        this.sessionManager = SessionManager.getInstance(context);
     }
 
     @NonNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
-        SharedPreferences prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
-        String token = prefs.getString("token", null);
+        Request original = chain.request();
+        String token = sessionManager.getToken();
 
-        Request request = chain.request();
-        if(token != null){
-            request = request.newBuilder()
-                    .addHeader("Authorization", "Bearer " + token)
-                    .build();
+        if (token == null) {
+            return chain.proceed(original);
         }
+
+        Request request = original.newBuilder()
+                .addHeader("Authorization", "Bearer " + token)
+                .build();
         return chain.proceed(request);
     }
 }

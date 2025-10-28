@@ -1,119 +1,104 @@
 package com.marlodev.app_android;
 
+
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.CompositePageTransformer;
-import androidx.viewpager2.widget.MarginPageTransformer;
 
-import com.ismaeldivita.chipnavigation.ChipNavigationBar;
-import com.marlodev.app_android.adapter.PopularAdapter;
-import com.marlodev.app_android.adapter.SliderAdapter;
-import com.marlodev.app_android.adapter.TagAdapter;
-import com.marlodev.app_android.databinding.ActivityMainBinding;
-import com.marlodev.app_android.domain.BannerModel;
-import com.marlodev.app_android.ui.home.customer.DetailActivity;
-import com.marlodev.app_android.viewmodel.MainViewModel;
-import com.marlodev.app_android.viewmodel.ProductViewModel;
-
-import java.util.ArrayList;
+import com.ismaeldivita.chipnavigation.ChipNavigationBar; // ✅ Importa esta librería si usas ChipNavigationBar
+import com.marlodev.app_android.R;
+import com.marlodev.app_android.ui.admin.AdminDashboardActivity;
+import com.marlodev.app_android.ui.auth.LoginActivity;
+import com.marlodev.app_android.ui.client.ClientPerfilActivity;
+import com.marlodev.app_android.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
-    private PopularAdapter popularAdapter;
-    private MainViewModel mainViewModel;
-    private ProductViewModel productViewModel;
-    private String role;
+    private ChipNavigationBar bottomNavigation;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        EdgeToEdge.enable(this);
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        sessionManager = SessionManager.getInstance(this);
+        bottomNavigation = findViewById(R.id.bottomNavigation); // Asegúrate de usar el id correcto en tu layout XML
 
-        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
+        // 🔍 Revisa sesión y rol al abrir la app
+        checkSessionAndRedirect();
 
-        loadUserRole();
-
-        initBanner();
-        initTag();
-        initPopular();
+        // ⚙️ Configura la barra inferior
         setupBottomNavigation();
     }
 
-    private void loadUserRole() {
-        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        role = prefs.getString("role", "CLIENT");
-        Toast.makeText(this, "Bienvenido! Rol: " + role, Toast.LENGTH_SHORT).show();
-    }
+    /**
+     * Comprueba si hay sesión activa y redirige según el rol.
+     * Si no hay sesión, se queda en MainActivity (modo invitado).
+     */
+    private void checkSessionAndRedirect() {
+        if (sessionManager.isLoggedIn()) {
+            String role = sessionManager.getRole();
 
-    // --- Todo tu código existente se mantiene igual ---
-    private void setupBottomNavigation() {
-        binding.bottomNavigation.setItemSelected(R.id.menu_home, true);
-        binding.bottomNavigation.setOnItemSelectedListener(itemId -> {
-            // TODO: manejar navegación
-        });
-    }
-
-    private void initBanner() {
-        binding.progressBarSlider.setVisibility(View.VISIBLE);
-        mainViewModel.loadBanner().observe(this, banners -> {
-            if (banners != null && !banners.isEmpty()) {
-                setupBannerSlider(banners);
+            if ("ADMIN".equalsIgnoreCase(role)) {
+                // 🔐 Usuario administrador → redirigir al dashboard
+                Intent intent = new Intent(this, AdminDashboardActivity.class);
+                startActivity(intent);
+                finish();
+                return;
             }
-            binding.progressBarSlider.setVisibility(View.GONE);
+
+            if ("CLIENT".equalsIgnoreCase(role)) {
+                Toast.makeText(this, "Bienvenido cliente " + sessionManager.getEmail(), Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+            // 👤 Usuario invitado
+            Toast.makeText(this, "Bienvenido, estás navegando como invitado", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Configura los eventos de los ítems del menú inferior
+     */
+    private void setupBottomNavigation() {
+        bottomNavigation.setOnItemSelectedListener(id -> {
+            if (id == R.id.menu_home) {
+                Toast.makeText(this, "Inicio", Toast.LENGTH_SHORT).show();
+
+            } else if (id == R.id.menu_car) {
+                Toast.makeText(this, "Carrito", Toast.LENGTH_SHORT).show();
+
+            } else if (id == R.id.menu_search) {
+                Toast.makeText(this, "Buscar", Toast.LENGTH_SHORT).show();
+
+            } else if (id == R.id.menu_delivery) {
+                Toast.makeText(this, "Delivery", Toast.LENGTH_SHORT).show();
+
+            } else if (id == R.id.menu_perfil) {
+                openProfileOrGuest();
+            }
         });
     }
 
-    private void setupBannerSlider(ArrayList<BannerModel> banners) {
-        binding.viewPagerSlider.setAdapter(new SliderAdapter(banners, binding.viewPagerSlider));
-        binding.viewPagerSlider.setClipToPadding(false);
-        binding.viewPagerSlider.setClipChildren(false);
-        binding.viewPagerSlider.setOffscreenPageLimit(3);
-        binding.viewPagerSlider.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
-        CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
-        compositePageTransformer.addTransformer(new MarginPageTransformer(30));
-        binding.viewPagerSlider.setPageTransformer(compositePageTransformer);
-    }
+    /**
+     * Abre la pantalla según si hay sesión y rol
+     */
+    private void openProfileOrGuest() {
+        if (sessionManager.isLoggedIn()) {
+            String role = sessionManager.getRole();
 
-    private void initTag() {
-        binding.preogresBarTag.setVisibility(View.VISIBLE);
-        mainViewModel.loadCategory().observe(this, tags -> {
-            binding.tagsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            binding.tagsView.setAdapter(new TagAdapter(tags));
-            binding.tagsView.setNestedScrollingEnabled(true);
-            binding.preogresBarTag.setVisibility(View.GONE);
-        });
-    }
+            if ("ADMIN".equalsIgnoreCase(role)) {
+                startActivity(new Intent(this, AdminDashboardActivity.class));
+            } else {
+                startActivity(new Intent(this, ClientPerfilActivity.class));
+            }
 
-    private void initPopular() {
-        RecyclerView recyclerView = binding.popularView;
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        popularAdapter = new PopularAdapter();
-        recyclerView.setAdapter(popularAdapter);
-
-        popularAdapter.setOnProductClickListener(product -> {
-            Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-            intent.putExtra("productId", product.getId());
-            startActivity(intent);
-        });
-
-        binding.preogresBarPopular.setVisibility(View.VISIBLE);
-        productViewModel.getProducts().observe(this, products -> {
-            binding.preogresBarPopular.setVisibility(View.GONE);
-            popularAdapter.setProducts(products);
-        });
+        } else {
+            Toast.makeText(this, "Estás en modo invitado. Inicia sesión para acceder al perfil.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, LoginActivity.class));
+        }
     }
 }

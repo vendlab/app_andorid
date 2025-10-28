@@ -1,73 +1,53 @@
 package com.marlodev.app_android.repository;
 
-
+import android.content.Context;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 
 import com.marlodev.app_android.model.LoginRequest;
 import com.marlodev.app_android.model.LoginResponse;
+import com.marlodev.app_android.network.ApiClient;
+import com.marlodev.app_android.network.ApiService;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Body;
-import retrofit2.http.Headers;
-import retrofit2.http.POST;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
-/**
- * AuthRepository
- * -------------------------------------------------
- * Maneja login, logout y persistencia del token JWT
- */
 public class AuthRepository {
 
+    private final ApiService apiService;
 
-    private static final String BASE_URL = "https://tu-backend.com/api/auth/"; // 🔹 Cambia esto
-    private final AuthApi authApi;
-
-    public AuthRepository() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        authApi = retrofit.create(AuthApi.class);
+    public AuthRepository(Context context) {
+        Retrofit retrofit = ApiClient.getClient(context);
+        apiService = retrofit.create(ApiService.class);
     }
 
-    public LiveData<LoginResponse> login(String email, String password) {
-        MutableLiveData<LoginResponse> data = new MutableLiveData<>();
-        LoginRequest request = new LoginRequest(email, password);
-
-        authApi.login(request).enqueue(new Callback<LoginResponse>() {
+    /**
+     * Realiza login y devuelve MutableLiveData con LoginResponse (o null si error)
+     */
+    public MutableLiveData<LoginResponse> login(String username, String password) {
+        MutableLiveData<LoginResponse> liveData = new MutableLiveData<>();
+        LoginRequest req = new LoginRequest(username, password);
+        apiService.login(req).enqueue(new Callback<LoginResponse>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    data.setValue(response.body());
+                    liveData.postValue(response.body());
                 } else {
-                    data.setValue(null);
-                    Log.e("AuthRepository", "Login error: " + response.code());
+                    Log.e("AuthRepository", "Login failed: code=" + response.code());
+                    liveData.postValue(null);
                 }
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                data.setValue(null);
-                Log.e("AuthRepository", "Error en login: " + t.getMessage());
+            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+                Log.e("AuthRepository", "Login error: " + t.getMessage());
+                liveData.postValue(null);
             }
         });
-
-        return data;
+        return liveData;
     }
-
-    interface AuthApi {
-        @Headers("Content-Type: application/json")
-        @POST("login") // 🔹 Ajusta según tu endpoint
-        Call<LoginResponse> login(@Body LoginRequest request);
-    }
-
-
 }
-

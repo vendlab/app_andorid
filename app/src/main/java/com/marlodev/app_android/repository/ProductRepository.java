@@ -50,12 +50,12 @@ public class ProductRepository {
         this.apiService = ApiClient.getClient(context).create(ProductApiService.class);
 
         // Configuración de WebSocket solo si hay token válido
-        String token = sessionManager.getAuthToken();
-        if (token != null && !token.isEmpty()) {
-            webSocketManager = new ProductWebSocketManager(token);
-            webSocketManager.connect();
-            webSocketManager.getProductEventLiveData().observeForever(this::onWebSocketEvent);
-        }
+//        String token = sessionManager.getAuthToken();
+//        if (token != null && !token.isEmpty()) {
+//            webSocketManager = new ProductWebSocketManager(token);
+//            webSocketManager.connect();
+//            webSocketManager.getProductEventLiveData().observeForever(this::onWebSocketEvent);
+//        }
     }
 
     // LiveData públicos (inmutables)

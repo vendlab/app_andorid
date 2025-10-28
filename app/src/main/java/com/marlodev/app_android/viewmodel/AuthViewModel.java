@@ -8,58 +8,53 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.marlodev.app_android.model.LoginRequest;
 import com.marlodev.app_android.model.LoginResponse;
-import com.marlodev.app_android.network.ApiClient;
-import com.marlodev.app_android.network.ApiService;
+import com.marlodev.app_android.repository.AuthRepository;
+import com.marlodev.app_android.utils.JwtUtils;
+import com.marlodev.app_android.utils.SessionManager;
 
-import java.io.IOException;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import org.json.JSONObject;
 
 public class AuthViewModel extends AndroidViewModel {
 
-    private final ApiService apiService;
+    private final AuthRepository repository;
     private final MutableLiveData<String> loginToken = new MutableLiveData<>();
-    private final MutableLiveData<String> registerResult = new MutableLiveData<>();
+    private final SessionManager sessionManager;
 
     public AuthViewModel(@NonNull Application application) {
         super(application);
-        apiService = ApiClient.getClient(application).create(ApiService.class);
+        repository = new AuthRepository(application);
+        sessionManager = SessionManager.getInstance(application);
     }
 
     public LiveData<String> getLoginToken() { return loginToken; }
-    public LiveData<String> getRegisterResult() { return registerResult; }
 
     public void login(String username, String password) {
-        apiService.login(new LoginRequest(username, password))
-                .enqueue(new Callback<LoginResponse>() {
-                    @Override
-                    public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            String token = response.body().getAccessToken();
-                            Log.d("AuthViewModel", "✅ Login exitoso. Token recibido: " + token);
-                            loginToken.postValue(token);
-                        } else {
-                            try {
-                                String errorBody = response.errorBody() != null ? response.errorBody().string() : "sin cuerpo";
-                                Log.e("AuthViewModel", "❌ Error en login. Código: " + response.code() + ", cuerpo: " + errorBody);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            loginToken.postValue(null);
-                        }
-                    }
+        repository.login(username, password).observeForever(response -> {
+            if (response != null && response.getAccessToken() != null) {
+                String token = response.getAccessToken();
+                // Guardar token en SharedPreferences (SessionManager)
+                sessionManager.saveToken(token);
 
-                    @Override
-                    public void onFailure(Call<LoginResponse> call, Throwable t) {
-                        Log.e("AuthViewModel", "💥 Falla en conexión: " + t.getMessage());
-                        loginToken.postValue(null);
-                    }
-                });
+                // Extraer rol del token (si existe) y guardarlo
+                try {
+                    String role = JwtUtils.extractFirstRole(token);
+                    if (role != null) sessionManager.saveRole(role);
+                } catch (Exception e) {
+                    Log.w("AuthViewModel", "No se pudo extraer role del token: " + e.getMessage());
+                }
+
+                loginToken.postValue(token);
+                Log.d("AuthViewModel", "✅ Login exitoso. Token guardado.");
+            } else {
+                loginToken.postValue(null);
+                Log.e("AuthViewModel", "❌ Login fallido (response null).");
+            }
+        });
     }
 
-
+    public void logout() {
+        sessionManager.clear();
+        loginToken.postValue(null);
+    }
 }

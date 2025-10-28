@@ -1,10 +1,9 @@
-package com.marlodev.app_android.ui.admin;
+package com.marlodev.app_android.ui.client;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
-
-import com.google.android.material.button.MaterialButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,22 +11,23 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
+import com.marlodev.app_android.ui.auth.LoginActivity;
+import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.utils.SessionManager;
 
-public class AdminDashboardActivity extends AppCompatActivity {
+public class ClientPerfilActivity extends AppCompatActivity {
 
-    private TextView tvUserName, tvUserEmail, tvUserRole;
-    private MaterialButton btnLogout;
+    private TextView tvEmail, tvRole;
+    private Button btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_admin_dashboard);
+        setContentView(R.layout.activity_client_perfil);
 
-        // Ajuste visual EdgeToEdge
+        // Ajustar insets para diseño edge-to-edge
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -39,37 +39,37 @@ public class AdminDashboardActivity extends AppCompatActivity {
         setupLogoutButton();
     }
 
+    /**
+     * Inicializa las vistas de la interfaz.
+     */
     private void initViews() {
-        tvUserName = findViewById(R.id.tvUserName);
-        tvUserEmail = findViewById(R.id.tvUserEmail);
-        tvUserRole = findViewById(R.id.tvUserRole);
+        tvEmail = findViewById(R.id.tvEmail);
+        tvRole = findViewById(R.id.tvRole);
         btnLogout = findViewById(R.id.btnLogout);
     }
 
+    /**
+     * Carga los datos del usuario desde la sesión.
+     */
     private void loadUserData() {
-        SessionManager session = SessionManager.getInstance(this);
-        String email = session.getEmail();
-        String role = session.getRole();
+        SessionManager sessionManager = SessionManager.getInstance(this);
 
-        // Nombre simulado a partir del correo
-        String username = (email != null && email.contains("@"))
-                ? email.substring(0, email.indexOf("@"))
-                : "Administrador";
+        String email = sessionManager.getEmail();
+        String role = sessionManager.getRole();
 
-        tvUserName.setText(username);
-        tvUserEmail.setText(email != null ? email : "correo@ejemplo.com");
-        tvUserRole.setText("Rol: " + (role != null ? role : "Desconocido"));
+        tvEmail.setText(email != null ? email : "No disponible");
+        tvRole.setText("Rol: " + (role != null ? role : "Invitado"));
     }
 
     /**
-     * 🔹 Cierra sesión y redirige al MainActivity (no al login).
+     * Configura el botón de cierre de sesión.
+     * Al cerrar sesión redirige al MainActivity (no al Login).
      */
     private void setupLogoutButton() {
         btnLogout.setOnClickListener(v -> {
-            // Borrar toda la sesión
             SessionManager.getInstance(this).clear();
 
-            // Redirigir a MainActivity como invitado
+            // Redirigir a MainActivity (pantalla principal sin sesión)
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

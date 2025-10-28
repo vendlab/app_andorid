@@ -11,14 +11,14 @@
         android:src="@drawable/ic_launcher_foreground"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="32dp" />
 
     <EditText
         android:id="@+id/etEmail"
         android:hint="Correo"
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <EditText
         android:id="@+id/etPassword"
@@ -26,13 +26,23 @@
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="12dp" />
 
     <Button
         android:id="@+id/btnLogin"
         android:text="Iniciar Sesión"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp" />
+
+    <!-- ✅ ProgressBar agregado -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        android:indeterminate="true" />
 
 </LinearLayout>

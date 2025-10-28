@@ -1,12 +1,11 @@
 package com.marlodev.app_android.ui.auth;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,76 +14,115 @@ import androidx.lifecycle.ViewModelProvider;
 import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
 import com.marlodev.app_android.ui.admin.AdminDashboardActivity;
-import com.marlodev.app_android.ui.barista.BaristaHomeActivity;
-import com.marlodev.app_android.ui.delivery.DeliveryHomeActivity;
-import com.marlodev.app_android.utils.JwtUtils;
+import com.marlodev.app_android.utils.SessionManager;
 import com.marlodev.app_android.viewmodel.AuthViewModel;
 
-import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
+    private ProgressBar progressBar;
     private AuthViewModel authViewModel;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        initViews();
+        initViewModel();
+
+        // ✅ Si ya hay sesión activa, saltar el login
+        if (sessionManager.isLoggedIn()) {
+            navigateToRoleHome(sessionManager.getRole());
+            finish();
+            return;
+        }
+
+        btnLogin.setOnClickListener(v -> attemptLogin());
+    }
+
+    private void initViews() {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        progressBar = findViewById(R.id.progressBar);
+        sessionManager = SessionManager.getInstance(this);
+    }
 
+    private void initViewModel() {
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
-        btnLogin.setOnClickListener(v -> doLogin());
-
         authViewModel.getLoginToken().observe(this, token -> {
-            if(token != null && !token.isEmpty()) {
-                saveSession(token);
-                navigateAccordingToRole(token);
+            progressBar.setVisibility(View.GONE);
+            if (token != null) {
+                handleLoginSuccess(token);
             } else {
-                Toast.makeText(this, "Credenciales inválidas", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void doLogin() {
-        String username = etEmail.getText().toString().trim(); // ⚠️ Debe llamarse "username"
+    private void attemptLogin() {
+        String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
-        if(TextUtils.isEmpty(username) || TextUtils.isEmpty(password)){
-            Toast.makeText(this, "Ingrese email y contraseña", Toast.LENGTH_SHORT).show();
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Ingresa correo y contraseña", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        authViewModel.login(username, password);
+        progressBar.setVisibility(View.VISIBLE);
+        authViewModel.login(email, password);
     }
 
-    private void saveSession(String token){
-        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        prefs.edit()
-                .putBoolean("isLoggedIn", true)
-                .putString("token", token)
-                .apply();
+    private void handleLoginSuccess(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length < 2) throw new IllegalArgumentException("Token inválido");
+
+            byte[] decodedBytes = android.util.Base64.decode(parts[1],
+                    android.util.Base64.URL_SAFE | android.util.Base64.NO_PADDING | android.util.Base64.NO_WRAP);
+            String payload = new String(decodedBytes);
+            JSONObject json = new JSONObject(payload);
+
+            String email = json.optString("email", "");
+            JSONArray rolesArray = json.optJSONArray("roles");
+            String role = (rolesArray != null && rolesArray.length() > 0)
+                    ? rolesArray.getString(0)
+                    : "CLIENT";
+
+            sessionManager.saveToken(token);
+            sessionManager.saveEmail(email);
+            sessionManager.saveRole(role);
+
+            navigateToRoleHome(role);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error al procesar token", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void navigateAccordingToRole(String token){
-        List<String> roles = JwtUtils.getRolesFromToken(token);
-
+    private void navigateToRoleHome(String role) {
+        String redirect = getIntent().getStringExtra("redirect");
         Intent intent;
-        if(roles.contains("ADMIN")){
+
+        if ("ADMIN".equalsIgnoreCase(role) || "ROLE_ADMIN".equalsIgnoreCase(role)) {
             intent = new Intent(this, AdminDashboardActivity.class);
-        } else if(roles.contains("BARISTA")){
-            intent = new Intent(this, BaristaHomeActivity.class);
-        } else if(roles.contains("DELIVERY")){
-            intent = new Intent(this, DeliveryHomeActivity.class);
         } else {
-            intent = new Intent(this, MainActivity.class); // Cliente
+            intent = new Intent(this, MainActivity.class);
         }
 
+        if ("main".equals(redirect)) {
+            intent = new Intent(this, MainActivity.class);
+        }
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }

@@ -5,37 +5,52 @@ import android.util.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+public final class JwtUtils {
 
-public class JwtUtils {
+    private JwtUtils() {}
 
-    public static List<String> getRolesFromToken(String token) {
-        if (token == null || token.isEmpty()) return Collections.emptyList();
-
+    /**
+     * Decodifica el payload del JWT (sin validar firma).
+     * Retorna el payload como JSONObject o null si falla.
+     */
+    public static JSONObject decodePayload(String jwt) {
         try {
-            String[] parts = token.split("\\.");
-            if (parts.length != 3) return Collections.emptyList();
-
-            String payloadJson = new String(Base64.decode(parts[1], Base64.URL_SAFE), StandardCharsets.UTF_8);
-            JSONObject payload = new JSONObject(payloadJson);
-
-            List<String> roles = new ArrayList<>();
-            if (payload.has("roles")) {
-                JSONArray rolesArray = payload.getJSONArray("roles");
-                for (int i = 0; i < rolesArray.length(); i++) {
-                    roles.add(rolesArray.getString(i));
-                }
-            } else if (payload.has("role")) {
-                roles.add(payload.getString("role"));
-            }
-            return roles;
-
+            String[] parts = jwt.split("\\.");
+            if (parts.length < 2) return null;
+            byte[] decoded = Base64.decode(parts[1], Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP);
+            String json = new String(decoded);
+            return new JSONObject(json);
         } catch (Exception e) {
             e.printStackTrace();
-            return Collections.emptyList();
+            return null;
+        }
+    }
+
+    /**
+     * Extrae un role (primer role) si existe.
+     */
+    public static String extractFirstRole(String jwt) {
+        try {
+            JSONObject payload = decodePayload(jwt);
+            if (payload == null) return null;
+            if (payload.has("roles")) {
+                Object rolesObj = payload.get("roles");
+                if (rolesObj instanceof JSONArray) {
+                    JSONArray arr = payload.getJSONArray("roles");
+                    if (arr.length() > 0) return arr.getString(0);
+                } else if (rolesObj instanceof String) {
+                    return payload.getString("roles");
+                }
+            }
+            // alternativa común: "authorities" o "role"
+            if (payload.has("authorities")) {
+                JSONArray arr = payload.getJSONArray("authorities");
+                if (arr.length() > 0) return arr.getString(0);
+            }
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

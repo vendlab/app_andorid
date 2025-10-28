@@ -16,6 +16,9 @@
         android:theme="@style/Theme.app_android"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.client.ClientPerfilActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.delivery.DeliveryHomeActivity"
             android:exported="false" />
         <activity
