@@ -1,86 +1,105 @@
 package com.marlodev.app_android.network;
 
 import android.util.Log;
+
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
+import com.google.gson.Gson;
 import com.marlodev.app_android.model.ProductWebSocketEvent;
 
-import io.reactivex.disposables.CompositeDisposable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.disposables.Disposable;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
-import ua.naiksoftware.stomp.dto.LifecycleEvent;
-import ua.naiksoftware.stomp.dto.StompMessage;
+import ua.naiksoftware.stomp.dto.StompHeader;
 
-// Clase encargada de manejar la conexión WebSocket para productos
+/**
+ * ProductWebSocketManager (Enterprise)
+ * -------------------------------------------------
+ * 🔹 Conexión segura con STOMP + JWT.
+ * 🔹 Suscripción a /topic/products.
+ * 🔹 Reconexión automática con backoff.
+ * -------------------------------------------------
+ */
 public class ProductWebSocketManager {
 
-    // TAG para logs
     private static final String TAG = "ProductWebSocket";
-
-    // URL del WebSocket (localhost de emulador Android)
     private static final String WS_URL = "ws://10.0.2.2:5050/ws-products/websocket";
 
-    // Cliente STOMP
+    private final String jwtToken;
+    private final Gson gson = new Gson();
+    private final MutableLiveData<ProductWebSocketEvent> productEventLiveData = new MutableLiveData<>();
     private StompClient stompClient;
+    private Disposable lifecycleDisposable;
+    private Disposable topicDisposable;
 
-    // Manejo de múltiples disposables de RxJava para limpiar suscripciones
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-
-    // LiveData que expone eventos de productos recibidos vía WebSocket
-    public final MutableLiveData<ProductWebSocketEvent> productEventLiveData = new MutableLiveData<>();
-
-
-    // Conecta al WebSocket y configura listeners
-    public void connect() {
-        // Crear cliente STOMP usando OKHTTP
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_URL);
-
-        // Conectar al WebSocket
-        stompClient.connect();
-
-        // Suscribirse al ciclo de vida del WebSocket
-        Disposable lifecycleDisposable = stompClient.lifecycle().subscribe(event -> {
-            switch (event.getType()) {
-                case OPENED:
-                    // Conexión establecida
-                    Log.i(TAG, "✅ WebSocket conectado");
-                    break;
-                case ERROR:
-                    // Error de conexión
-                    Log.e(TAG, "❌ Error WebSocket", event.getException());
-                    break;
-                case CLOSED:
-                    // WebSocket cerrado
-                    Log.w(TAG, "⚠️ WebSocket cerrado");
-                    break;
-            }
-        });
-        // Agregar disposable para limpiarlo cuando se desconecte
-        compositeDisposable.add(lifecycleDisposable);
-
-        // Suscribirse a un tópico específico "/topic/products" para recibir mensajes
-        Disposable topicDisposable = stompClient.topic("/topic/products").subscribe(msg -> {
-            String payload = msg.getPayload(); // mensaje en formato JSON
-            try {
-                // Parsear JSON a objeto ProductWebSocketEvent
-                ProductWebSocketEvent event = ProductWebSocketEvent.fromJson(payload);
-
-                // Publicar evento en LiveData para que la UI pueda observarlo
-                productEventLiveData.postValue(event);
-            } catch (Exception e) {
-                // Error al parsear el mensaje
-                Log.e(TAG, "Error parseando mensaje: " + payload, e);
-            }
-        });
-        // Agregar disposable para limpiar la suscripción
-        compositeDisposable.add(topicDisposable);
+    public ProductWebSocketManager(String jwtToken) {
+        this.jwtToken = jwtToken;
     }
 
-    // Desconectar del WebSocket y limpiar disposables
-    public void disconnect() {
-        if (stompClient != null && stompClient.isConnected()) {
-            stompClient.disconnect();
+    public LiveData<ProductWebSocketEvent> getProductEventLiveData() {
+        return productEventLiveData;
+    }
+
+    public void connect() {
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_URL);
+
+        List<StompHeader> headers = new ArrayList<>();
+        if (jwtToken != null && !jwtToken.isEmpty()) {
+            headers.add(new StompHeader("Authorization", "Bearer " + jwtToken));
         }
-        compositeDisposable.clear(); // limpiar todas las suscripciones
+
+        stompClient.connect(headers);
+
+        lifecycleDisposable = stompClient.lifecycle().subscribe(lifecycleEvent -> {
+            switch (lifecycleEvent.getType()) {
+                case OPENED:
+                    Log.d(TAG, "✅ Conexión WebSocket abierta");
+                    subscribeToProductTopic();
+                    break;
+                case ERROR:
+                    Log.e(TAG, "⚠️ Error en WebSocket", lifecycleEvent.getException());
+                    reconnectWithDelay();
+                    break;
+                case CLOSED:
+                    Log.w(TAG, "🔌 Conexión cerrada. Reintentando...");
+                    reconnectWithDelay();
+                    break;
+            }
+        });
+    }
+
+    private void subscribeToProductTopic() {
+        if (topicDisposable != null && !topicDisposable.isDisposed()) topicDisposable.dispose();
+
+        topicDisposable = stompClient.topic("/topic/products").subscribe(stompMessage -> {
+            try {
+                ProductWebSocketEvent event = gson.fromJson(stompMessage.getPayload(), ProductWebSocketEvent.class);
+                productEventLiveData.postValue(event);
+            } catch (Exception e) {
+                Log.e(TAG, "Error parseando mensaje WebSocket", e);
+            }
+        });
+    }
+
+    private void reconnectWithDelay() {
+        new Thread(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+                connect();
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Error en reconexión WebSocket", e);
+            }
+        }).start();
+    }
+
+    public void disconnect() {
+        if (topicDisposable != null) topicDisposable.dispose();
+        if (lifecycleDisposable != null) lifecycleDisposable.dispose();
+        if (stompClient != null && stompClient.isConnected()) stompClient.disconnect();
     }
 }

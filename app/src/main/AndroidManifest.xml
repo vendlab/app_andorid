@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.marlodev.app_android">
-    <!-- Permiso para acceder a internet de manera local -->
+    <!-- Permiso para acceder a Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -13,11 +13,26 @@
         android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.app_android">
+        android:theme="@style/Theme.app_android"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.delivery.DeliveryHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.barista.BaristaHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".viewmodel.login"
+            android:exported="false" />
         <activity
             android:name=".ui.home.customer.DetailActivity"
-            android:exported="false" />
-        <!-- SplashActivity: launcher -->
+            android:exported="false" /> <!-- SplashActivity: launcher -->
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"

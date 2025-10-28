@@ -44,6 +44,9 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.recyclerview)
     implementation(libs.viewpager2)
+    implementation(libs.play.services.cast.framework)
+    implementation(libs.tracing.perfetto.handshake)
+    implementation(libs.volley)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -102,6 +105,16 @@ dependencies {
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+    // En tu build.gradle
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    // ViewModel y LiveData
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime:2.6.2")
+// KTX (opcional, más moderno)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+
 
 
 

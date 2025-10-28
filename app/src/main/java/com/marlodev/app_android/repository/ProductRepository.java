@@ -1,5 +1,9 @@
 package com.marlodev.app_android.repository;
 
+import android.content.Context;
+
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -8,6 +12,7 @@ import com.marlodev.app_android.model.ProductWebSocketEvent;
 import com.marlodev.app_android.network.ApiClient;
 import com.marlodev.app_android.network.ProductApiService;
 import com.marlodev.app_android.network.ProductWebSocketManager;
+import com.marlodev.app_android.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,127 +24,128 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Repositorio encargado de gestionar productos.
- * Combina datos iniciales desde REST con actualizaciones en tiempo real vía WebSocket.
+ * ProductRepository (Enterprise-Level)
+ * -------------------------------------------------
+ * 🔹 Patrón: Repository (MVVM)
+ * 🔹 Responsabilidad: Acceso a datos remotos (API + WebSocket)
+ * 🔹 Seguridad: JWT Token gestionado por AuthInterceptor + SessionManager
+ * 🔹 Comunicación: LiveData reactivos observados desde ViewModel
+ * 🔹 Resiliencia: Manejo de errores y autenticación
+ * -------------------------------------------------
  */
 public class ProductRepository {
 
-    // Servicio API REST
     private final ProductApiService apiService;
+    private ProductWebSocketManager webSocketManager;
 
-    // WebSocket para recibir actualizaciones en tiempo real
-    private final ProductWebSocketManager webSocketManager;
+    private final MutableLiveData<ArrayList<Product>> _products = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<Boolean> _authError = new MutableLiveData<>(false);
+    private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
 
-    // LiveData que mantiene la lista de productos para la UI
-    private final MutableLiveData<ArrayList<Product>> productsLiveData = new MutableLiveData<>(new ArrayList<>());
+    public ProductRepository(@NonNull Context context) {
+        // SessionManager Singleton
+        SessionManager sessionManager = SessionManager.getInstance(context);
 
-    /**
-     * Constructor del repositorio.
-     * Inicializa la API REST y la conexión WebSocket.
-     * Además, se suscribe a los eventos de WebSocket para actualizar LiveData.
-     */
-    public ProductRepository() {
-        apiService = ApiClient.getRetrofitInstance().create(ProductApiService.class);
-        webSocketManager = new ProductWebSocketManager();
-        webSocketManager.connect();
+        // Retrofit configurado con AuthInterceptor (añade el JWT automáticamente)
+        this.apiService = ApiClient.getClient(context).create(ProductApiService.class);
 
-        // Suscribirse a los eventos del WebSocket y manejarlos
-        webSocketManager.productEventLiveData.observeForever(this::handleWebSocketEvent);
+        // Configuración de WebSocket solo si hay token válido
+        String token = sessionManager.getAuthToken();
+        if (token != null && !token.isEmpty()) {
+            webSocketManager = new ProductWebSocketManager(token);
+            webSocketManager.connect();
+            webSocketManager.getProductEventLiveData().observeForever(this::onWebSocketEvent);
+        }
     }
 
-    // --------------------------
-    // 🔹 Manejo de eventos WebSocket
-    // --------------------------
-    private void handleWebSocketEvent(ProductWebSocketEvent event) {
-        ArrayList<Product> currentList = productsLiveData.getValue();
-        if (currentList == null) currentList = new ArrayList<>();
+    // LiveData públicos (inmutables)
+    public LiveData<ArrayList<Product>> getProducts() {
+        return _products;
+    }
 
-        switch (event.action) {
+    public LiveData<Boolean> getAuthError() {
+        return _authError;
+    }
 
+    public LiveData<String> getErrorMessage() {
+        return _errorMessage;
+    }
+
+    /**
+     * Carga inicial o manual de productos desde la API REST.
+     */
+    public void loadProducts() {
+        apiService.getProducts().enqueue(new Callback<List<Product>>() {
+            @Override
+            public void onResponse(@NonNull Call<List<Product>> call, @NonNull Response<List<Product>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    _products.postValue(new ArrayList<>(response.body()));
+                } else if (response.code() == 401 || response.code() == 403) {
+                    _authError.postValue(true);
+                } else {
+                    _errorMessage.postValue("Error al cargar productos (HTTP " + response.code() + ")");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<List<Product>> call, @NonNull Throwable t) {
+                _errorMessage.postValue("Error de red: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    /**
+     * Maneja eventos recibidos en tiempo real vía WebSocket.
+     */
+    @MainThread
+    private void onWebSocketEvent(ProductWebSocketEvent event) {
+        ArrayList<Product> current = _products.getValue();
+        if (current == null) current = new ArrayList<>();
+
+        switch (event.action != null ? event.action : "") {
             case "CREATE":
-                // Nuevo producto agregado, se inserta al inicio de la lista
-                Product created = Product.fromWebSocketEvent(event);
-                currentList.add(0, created);
+                current.add(0, Product.fromWebSocketEvent(event));
                 break;
 
             case "UPDATE":
-                // Actualización de un producto existente
-                for (int i = 0; i < currentList.size(); i++) {
-                    if (Objects.equals(currentList.get(i).getId(), event.id)) {
+                for (int i = 0; i < current.size(); i++) {
+                    if (Objects.equals(current.get(i).getId(), event.id)) {
                         Product updated = Product.fromWebSocketEvent(event);
-
-                        // Evitar que imageUrls sea null
                         if (updated.getImageUrls() == null) {
                             updated.setImageUrls(Collections.emptyList());
                         }
-
-                        currentList.set(i, updated);
+                        current.set(i, updated);
                         break;
                     }
                 }
                 break;
 
             case "DELETE":
-                // Eliminar producto de la lista si coincide el ID
-                currentList.removeIf(p -> p.getId() == event.id);
+                current.removeIf(p -> Objects.equals(p.getId(), event.id));
                 break;
 
             case "IMAGES_UPDATE":
-                // Actualizar solo las imágenes del producto
-                for (Product p : currentList) {
-                    if (p.getId() == event.id) {
-                        if (event.imageUrl != null && !event.imageUrl.trim().isEmpty()) {
-                            p.setImageUrls(List.of(event.imageUrl));
-                        } else {
-                            p.setImageUrls(Collections.emptyList()); // ← sin imágenes
+                if (event.imageUrl != null && !event.imageUrl.trim().isEmpty()) {
+                    for (Product p : current) {
+                        if (Objects.equals(p.getId(), event.id)) {
+                            p.setImageUrls(Collections.singletonList(event.imageUrl));
+                            break;
                         }
-                        break;
                     }
                 }
                 break;
         }
 
-        // Postear la lista actualizada a LiveData
-        productsLiveData.postValue(currentList);
-    }
-
-    // --------------------------
-    // 🔹 Carga inicial desde REST
-    // --------------------------
-    /**
-     * Devuelve LiveData observable con los productos.
-     * También dispara la carga inicial desde la API REST.
-     */
-    public LiveData<ArrayList<Product>> getProducts() {
-        loadProducts(); // Carga inicial desde REST
-        return productsLiveData;
+        _products.postValue(current);
     }
 
     /**
-     * Llama al endpoint REST para obtener los productos.
+     * Cierra conexiones y observadores para evitar fugas de memoria.
      */
-    private void loadProducts() {
-        apiService.getProducts().enqueue(new Callback<List<Product>>() {
-            @Override
-            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    // Actualiza LiveData con los productos obtenidos
-                    productsLiveData.postValue(new ArrayList<>(response.body()));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Product>> call, Throwable t) {
-                // Manejo de errores de red
-                t.printStackTrace();
-            }
-        });
-    }
-
-    /**
-     * Desconecta el WebSocket para liberar recursos.
-     */
-    public void disconnect() {
-        webSocketManager.disconnect();
+    public void clear() {
+        if (webSocketManager != null) {
+            webSocketManager.disconnect();
+            webSocketManager.getProductEventLiveData().removeObserver(this::onWebSocketEvent);
+        }
     }
 }

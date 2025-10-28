@@ -2,9 +2,14 @@ package com.marlodev.app_android.network;
 
 // Importaciones necesarias
 import com.marlodev.app_android.domain.Product; // Modelo de datos Product
+import com.marlodev.app_android.model.LoginRequest;
+import com.marlodev.app_android.model.LoginResponse;
+
 import java.util.List; // Para manejar listas de productos
 import retrofit2.Call; // Retrofit usa Call para manejar peticiones HTTP
+import retrofit2.http.Body;
 import retrofit2.http.GET; // Anotación para indicar que este método hace una petición GET
+import retrofit2.http.POST;
 
 // Interfaz que define los endpoints de la API relacionados con productos
 public interface ProductApiService {
@@ -13,4 +18,9 @@ public interface ProductApiService {
     // Retrofit lo convierte en una llamada HTTP que retorna una lista de productos
     @GET("admin/products")
     Call<List<Product>> getProducts(); // Devuelve un Call de Retrofit con una lista de objetos Product
+
+    @POST("auth/login")
+    Call<LoginResponse> login(@Body LoginRequest loginRequest);
+
+
 }
