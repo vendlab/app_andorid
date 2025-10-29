@@ -1,330 +1,343 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#F0F0F0"
-    android:id="@+id/main"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="false"
+    android:background="@color/colorGrey100"
     tools:context=".ui.client.ClientPerfilActivity">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <!-- ScrollView para todo el contenido -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Fondo superior con superposición de elementos -->
-        <FrameLayout
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="250dp">
+            android:layout_height="wrap_content">
 
-            <!-- Imagen de fondo -->
-            <ImageView
+            <!-- Banner superior con imagen y degradado -->
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/banner_user" />
+                android:layout_height="350dp"
+                android:clipToPadding="false">
 
-            <!-- Contenedor vertical centrado -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <!-- Foto de perfil circular -->
+                <!-- Imagen de fondo -->
                 <ImageView
-                    android:id="@+id/imgProfile"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/avatar_user_perfil"
-                    android:contentDescription="Foto de perfil"
-                    android:layout_marginBottom="8dp"
-                    android:background="@drawable/circle_background"
-                    android:padding="2dp"
-                    android:clipToOutline="true" />
+                    android:src="@drawable/banner_user" />
 
-                <!-- Nombre y correo -->
-                <TextView
-                    android:id="@+id/tvUserName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="User"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                <!-- Degradado superior -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:background="@drawable/bg_status_bar_gradient" />
 
-                <TextView
-                    android:id="@+id/tvEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="user@gmail.com"
-                    android:textColor="@color/colorGrey100"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
+                <!-- Contenedor centrado -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                <TextView
-                    android:id="@+id/tvRole"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Rol"
-                    android:textColor="@color/colorWhite"
-                    android:textSize="14sp"
-                    android:layout_marginTop="4dp" />
+                    <!-- Foto de perfil circular -->
+                    <ImageView
+                        android:id="@+id/imgProfile"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/avatar_user_perfil"
+                        android:contentDescription="Foto de perfil"
+                        android:layout_marginBottom="8dp"
+                        android:background="@drawable/circle_background"
+                        android:padding="2dp"
+                        android:clipToOutline="true" />
+
+                    <!-- Nombre y correo -->
+                    <TextView
+                        android:id="@+id/tvUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="User"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="user@gmail.com"
+                        android:textColor="#DDDDDD"
+                        android:textSize="14sp"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvRole"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rol"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:layout_marginTop="4dp" />
+
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Tarjeta de Mi Dirección y Cuenta -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="12dp"
+                android:padding="16dp"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:elevation="4dp"
+                android:background="@drawable/bg_white"
+                android:clipToOutline="true" >
+
+                <!-- Mi Dirección -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_gps"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Icono dirección" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Mi Dirección"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_right_arrow"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Flecha" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EEEEEE"
+                    android:layout_marginVertical="8dp" />
+
+                <!-- Cuenta -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_user_config"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Icono cuenta" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Cuenta"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_right_arrow"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Flecha" />
+                </LinearLayout>
 
             </LinearLayout>
 
-        </FrameLayout>
-
-        <!-- Primera tarjeta -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:padding="12dp"
-            android:clipToPadding="false"
-            android:clipChildren="false"
-            android:elevation="4dp"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#FFFFFF"
-            android:clipToOutline="true"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:background="@drawable/bg_white">
-
-            <!-- Mi Dirección -->
+            <!-- Tarjeta de Notificaciones, Dispositivo, Contraseña y Logout -->
             <LinearLayout
-                android:orientation="horizontal"
+
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:padding="16dp"
+                android:clipToPadding="false"
+                android:clipChildren="false"
+                android:elevation="4dp"
+                android:background="@drawable/bg_white"
+                android:clipToOutline="true">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_gps"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Icono dirección" />
+                <!-- Notificaciones -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Mi Dirección"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp" />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_notify"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Icono notificaciones" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_right_arrow"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Flecha" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Notificaciones"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:layout_marginStart="12dp" />
 
-            </LinearLayout>
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_right_arrow"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Flecha" />
+                </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"
-                android:layout_marginVertical="8dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EEEEEE"
+                    android:layout_marginVertical="8dp" />
 
-            <!-- Cuenta -->
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical">
+                <!-- Dispositivo -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_user_config"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Icono cuenta" />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_device"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Icono dispositivo" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Cuenta"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Dispositivo"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:layout_marginStart="12dp" />
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_right_arrow"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Flecha" />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_right_arrow"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Flecha" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EEEEEE"
+                    android:layout_marginVertical="8dp" />
+
+                <!-- Contraseña -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_secure"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Icono contraseña" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Contraseña"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:layout_marginStart="12dp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_right_arrow"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Flecha" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EEEEEE"
+                    android:layout_marginVertical="8dp" />
+
+                <!-- Botón Cerrar Sesión -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/icon_logout"
+                        android:tint="#AAAAAA"
+                        android:contentDescription="Icono logout" />
+
+                    <Button
+                        android:id="@+id/btnLogout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cerrar Sesión"
+                        android:padding="0dp"
+                        android:textSize="16sp"
+                        android:paddingStart="13dp"
+                        android:backgroundTint="@android:color/transparent"
+                        android:textColor="#000000" />
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
-
-        <!-- Segunda tarjeta -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:padding="12dp"
-            android:elevation="4dp"
-            android:layout_marginTop="8dp"
-            android:clipToOutline="true"
-            android:background="@drawable/bg_white">
-
-            <!-- Notificaciones -->
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_notify"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Icono notificaciones" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Notificaciones"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_right_arrow"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Flecha" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"
-                android:layout_marginVertical="8dp" />
-
-            <!-- Dispositivo -->
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_device"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Icono dispositivo" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Dispositivo"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_right_arrow"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Flecha" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"
-                android:layout_marginVertical="8dp" />
-
-            <!-- Contraseña -->
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_secure"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Icono contraseña" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Contraseña"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_right_arrow"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Flecha" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE"
-                android:layout_marginVertical="8dp" />
-
-            <!-- Lenguaje -->
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/icon_logout"
-                    android:tint="#AAAAAA"
-                    android:contentDescription="Icono lenguaje" />
-
-                <Button
-
-                    android:id="@+id/btnLogout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Cerrar Sesión"
-                    android:padding="0dp"
-                    android:textSize="16sp"
-                    android:paddingStart="13dp"
-                    android:backgroundTint="@color/colorTransparent"
-                    android:textColor="#000000"
-                    />
-
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-</ScrollView>
-
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

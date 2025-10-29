@@ -26,10 +26,12 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         viewBinding = true
     }
@@ -37,95 +39,54 @@ android {
 
 dependencies {
 
+    // AndroidX y Material
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation(libs.firebase.database)
     implementation(libs.recyclerview)
     implementation(libs.viewpager2)
+    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // Firebase
+    implementation(libs.firebase.database)
     implementation(libs.play.services.cast.framework)
-    implementation(libs.tracing.perfetto.handshake)
-    implementation(libs.volley)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
 
-
-
-    //Nuevas dependencias (1)
-    //Principales
-    implementation ("com.github.bumptech.glide:glide:4.12.0")
-    implementation ("com.google.code.gson:gson:2.9.1")
-    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
-    //Para el Splash
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.5")
-
-
-    //    Para vincular y utilizar mi backend en springBoo
-
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    // Networking: Retrofit + OkHttp + Gson
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
+    // Glide
+    implementation("com.github.bumptech.glide:glide:4.12.0")
 
+    // JSON
+    implementation("com.google.code.gson:gson:2.9.1")
 
-    // STOMP y WebSocket
+    // STOMP/WebSocket
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
-
-
-
-    //Nuevas dependencias (1)
-    //Principales
-    implementation ("com.github.bumptech.glide:glide:4.12.0")
-    implementation ("com.google.code.gson:gson:2.9.1")
-    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
-    //Para el Splash
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.5")
-
-
-    //    Para vincular y utilizar mi backend en springBoo
-
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-
-
-    // STOMP y WebSocket
-
-
-
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
-    implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
-    // En tu build.gradle
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-    // ViewModel y LiveData
+
+    // Chip Navigation Bar
+    implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
+
+    // Lifecycle: ViewModel + LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
     implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
     implementation("androidx.lifecycle:lifecycle-runtime:2.6.2")
-// KTX (opcional, más moderno)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
 
-
-
-//    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-//    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-//    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-//    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
-//    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-//    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
-//    implementation("org.json:json:20230227")
-// si necesitas JSON simple (opcional)
-
-
-
+//    // Testing
+//    testImplementation(libs.junit)
+//    androidTestImplementation(libs.ext.junit)
+//    androidTestImplementation(libs.espresso.core)
+//
+//    // Misc
+//    implementation(libs.tracing.perfetto.handshake)
+//    implementation(libs.volley)
 }
