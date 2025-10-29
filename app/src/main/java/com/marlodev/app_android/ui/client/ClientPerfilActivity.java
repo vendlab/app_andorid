@@ -18,7 +18,7 @@ import com.marlodev.app_android.utils.SessionManager;
 
 public class ClientPerfilActivity extends AppCompatActivity {
 
-    private TextView tvEmail, tvRole;
+    private TextView tvEmail, tvRole, tvUserName;
     private Button btnLogout;
 
     @Override
@@ -43,6 +43,7 @@ public class ClientPerfilActivity extends AppCompatActivity {
      * Inicializa las vistas de la interfaz.
      */
     private void initViews() {
+        tvUserName = findViewById(R.id.tvUserName);
         tvEmail = findViewById(R.id.tvEmail);
         tvRole = findViewById(R.id.tvRole);
         btnLogout = findViewById(R.id.btnLogout);
@@ -53,10 +54,13 @@ public class ClientPerfilActivity extends AppCompatActivity {
      */
     private void loadUserData() {
         SessionManager sessionManager = SessionManager.getInstance(this);
-
         String email = sessionManager.getEmail();
         String role = sessionManager.getRole();
-
+        // Nombre simulado a partir del correo
+        String username = (email != null && email.contains("@"))
+                ? email.substring(0, email.indexOf("@"))
+                : "Administrador";
+        tvUserName.setText(username);
         tvEmail.setText(email != null ? email : "No disponible");
         tvRole.setText("Rol: " + (role != null ? role : "Invitado"));
     }
