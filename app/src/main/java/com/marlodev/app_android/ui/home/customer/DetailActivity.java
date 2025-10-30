@@ -2,6 +2,7 @@ package com.marlodev.app_android.ui.home.customer;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowInsetsController;
 import android.widget.ImageButton;
@@ -66,9 +67,17 @@ public class DetailActivity extends AppCompatActivity {
      * Carga los detalles del producto usando ProductViewModel
      */
     private void loadProductDetail(long productId) {
+        // 1. Log para verificar que la búsqueda se inicia
+        Log.d("DEBUG_BUSQUEDA", "Buscando producto por ID: " + productId);
+
         productViewModel.getProductById(productId).observe(this, product -> {
             if (product != null) {
+                // 2. ÉXITO: Los datos llegaron.
+                Log.d("DEBUG_BUSQUEDA", "✅ Producto ENCONTRADO. Nombre: " + product.getName());
                 displayProduct(product);
+            } else {
+                // 3. FALLO: ViewModel no encontró el producto.
+                Log.e("DEBUG_BUSQUEDA", "❌ ERROR: Producto NO encontrado en el ViewModel para ID: " + productId);
             }
         });
     }

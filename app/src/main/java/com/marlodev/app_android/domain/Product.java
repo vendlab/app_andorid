@@ -126,9 +126,10 @@ public class Product {
     public List<String> getImagePublicIds() { return imagePublicIds; }
     public void setImagePublicIds(List<String> imagePublicIds) { this.imagePublicIds = imagePublicIds; }
 
+
     // --------------------------
-    // 🔹 Conversión desde evento WebSocket
-    // --------------------------
+// 🔹 Conversión desde evento WebSocket
+// --------------------------
     /**
      * Convierte un evento recibido desde WebSocket en un objeto Product.
      * Esto permite que la app actualice la UI en tiempo real.
@@ -137,11 +138,35 @@ public class Product {
      * @return Producto actualizado
      */
     public static Product fromWebSocketEvent(ProductWebSocketEvent event) {
+
+        // **Añadir comprobación de nulidad del evento (aunque no crashea aquí, es buena práctica)**
+        if (event == null) {
+            return null;
+        }
+
         Product product = new Product();
+
+        // 1. Asignaciones seguras (String, Long, boolean primitiva no causan NPE al asignar null)
+        // Nota: Si 'event.id' es null y 'product.id' es Long (objeto), no hay problema.
         product.id = event.id;
         product.name = event.name;
-        product.price = event.price;
+        // Si event.isNew es un objeto Boolean y product.isNew es un primitivo boolean,
+        // también puede causar NPE. Asumo que event.isNew es un primitivo o manejas la nulidad.
         product.isNew = event.isNew;
+
+        // 2. CORRECCIÓN PRINCIPAL (Línea 143): Evita Unboxing de NULL
+
+        // Si event.price (que es un Double) es null, asigna 0.0 al campo primitivo price.
+        // Esto previene la java.lang.NullPointerException.
+        product.price = (event.price != null) ? event.price.doubleValue() : 0.0; // ¡Línea 143 corregida!
+
+        // 3. Asignaciones de otros campos numéricos (Deben ser revisadas también)
+        // Es posible que event.oldPrice, event.rating, etc., también sean nulos.
+        // Aunque el crash ocurrió en 'price', por seguridad, corrige todos los demás:
+
+        // Nota: Si tu ProductWebSocketEvent tiene más campos Double/Integer/Long, corrígelos así:
+        // product.oldPrice = (event.oldPrice != null) ? event.oldPrice.doubleValue() : 0.0;
+        // product.rating = (event.rating != null) ? event.rating.doubleValue() : 0.0;
 
         // Evita que imageUrls sea null
         if (event.imageUrl != null && !event.imageUrl.trim().isEmpty()) {
@@ -152,4 +177,5 @@ public class Product {
 
         return product;
     }
+
 }

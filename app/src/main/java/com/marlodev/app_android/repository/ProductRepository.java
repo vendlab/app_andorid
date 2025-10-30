@@ -1,151 +1,124 @@
 package com.marlodev.app_android.repository;
 
-import android.content.Context;
-
-import androidx.annotation.MainThread;
-import androidx.annotation.NonNull;
+import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
 import com.marlodev.app_android.domain.Product;
 import com.marlodev.app_android.model.ProductWebSocketEvent;
-import com.marlodev.app_android.network.ApiClient;
 import com.marlodev.app_android.network.ProductApiService;
 import com.marlodev.app_android.network.ProductWebSocketManager;
-import com.marlodev.app_android.utils.SessionManager;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * ProductRepository (Enterprise-Level)
- * -------------------------------------------------
- * 🔹 Patrón: Repository (MVVM)
- * 🔹 Responsabilidad: Acceso a datos remotos (API + WebSocket)
- * 🔹 Seguridad: JWT Token gestionado por AuthInterceptor + SessionManager
- * 🔹 Comunicación: LiveData reactivos observados desde ViewModel
- * 🔹 Resiliencia: Manejo de errores y autenticación
- * -------------------------------------------------
+ * Repositorio para gestionar los datos de los productos.
+ *
+ * Esta clase es la única fuente de verdad para los datos de los productos. Se encarga de obtener los datos
+ * de la API REST y de mantenerlos actualizados en tiempo real a través de un WebSocket.
  */
 public class ProductRepository {
 
-    private final ProductApiService apiService;
-    private ProductWebSocketManager webSocketManager;
+    private static final String TAG = "ProductRepository";
 
-    private final MutableLiveData<ArrayList<Product>> _products = new MutableLiveData<>(new ArrayList<>());
-    private final MutableLiveData<Boolean> _authError = new MutableLiveData<>(false);
-    private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
+    private final ProductApiService productApiService;
+    private final ProductWebSocketManager webSocketManager;
 
-    public ProductRepository(@NonNull Context context) {
-        // SessionManager Singleton
-        SessionManager sessionManager = SessionManager.getInstance(context);
+    private final MutableLiveData<List<Product>> _products = new MutableLiveData<>();
+    public final LiveData<List<Product>> products = _products;
 
-        // Retrofit configurado con AuthInterceptor (añade el JWT automáticamente)
-        this.apiService = ApiClient.getClient(context).create(ProductApiService.class);
+    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
+    public final LiveData<Boolean> isLoading = _isLoading;
 
-        // Configuración de WebSocket solo si hay token válido
-//        String token = sessionManager.getAuthToken();
-//        if (token != null && !token.isEmpty()) {
-//            webSocketManager = new ProductWebSocketManager(token);
-//            webSocketManager.connect();
-//            webSocketManager.getProductEventLiveData().observeForever(this::onWebSocketEvent);
-//        }
-    }
-
-    // LiveData públicos (inmutables)
-    public LiveData<ArrayList<Product>> getProducts() {
-        return _products;
-    }
-
-    public LiveData<Boolean> getAuthError() {
-        return _authError;
-    }
-
-    public LiveData<String> getErrorMessage() {
-        return _errorMessage;
+    /**
+     * Constructor.
+     *
+     * @param productApiService El servicio para obtener datos de la API REST.
+     * @param webSocketManager  El gestor para la comunicación por WebSocket.
+     */
+    public ProductRepository(ProductApiService productApiService, ProductWebSocketManager webSocketManager) {
+        this.productApiService = productApiService;
+        this.webSocketManager = webSocketManager;
+        _products.setValue(new ArrayList<>());
+        observeWebSocketEvents();
     }
 
     /**
-     * Carga inicial o manual de productos desde la API REST.
+     * Carga la lista inicial de productos desde la API.
      */
     public void loadProducts() {
-        apiService.getProducts().enqueue(new Callback<List<Product>>() {
+        _isLoading.setValue(true);
+        productApiService.getProducts().enqueue(new Callback<List<Product>>() {
             @Override
-            public void onResponse(@NonNull Call<List<Product>> call, @NonNull Response<List<Product>> response) {
+            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    _products.postValue(new ArrayList<>(response.body()));
-                } else if (response.code() == 401 || response.code() == 403) {
-                    _authError.postValue(true);
-                } else {
-                    _errorMessage.postValue("Error al cargar productos (HTTP " + response.code() + ")");
+                    _products.setValue(response.body());
                 }
+                _isLoading.setValue(false);
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Product>> call, @NonNull Throwable t) {
-                _errorMessage.postValue("Error de red: " + t.getLocalizedMessage());
+            public void onFailure(Call<List<Product>> call, Throwable t) {
+                Log.e(TAG, "Error al cargar los productos", t);
+                _isLoading.setValue(false);
             }
         });
     }
 
     /**
-     * Maneja eventos recibidos en tiempo real vía WebSocket.
+     * Comienza a observar los eventos del WebSocket para actualizar la lista de productos.
      */
-    @MainThread
-    private void onWebSocketEvent(ProductWebSocketEvent event) {
-        ArrayList<Product> current = _products.getValue();
-        if (current == null) current = new ArrayList<>();
-
-        switch (event.action != null ? event.action : "") {
-            case "CREATE":
-                current.add(0, Product.fromWebSocketEvent(event));
-                break;
-
-            case "UPDATE":
-                for (int i = 0; i < current.size(); i++) {
-                    if (Objects.equals(current.get(i).getId(), event.id)) {
-                        Product updated = Product.fromWebSocketEvent(event);
-                        if (updated.getImageUrls() == null) {
-                            updated.setImageUrls(Collections.emptyList());
-                        }
-                        current.set(i, updated);
-                        break;
-                    }
-                }
-                break;
-
-            case "DELETE":
-                current.removeIf(p -> Objects.equals(p.getId(), event.id));
-                break;
-
-            case "IMAGES_UPDATE":
-                if (event.imageUrl != null && !event.imageUrl.trim().isEmpty()) {
-                    for (Product p : current) {
-                        if (Objects.equals(p.getId(), event.id)) {
-                            p.setImageUrls(Collections.singletonList(event.imageUrl));
-                            break;
-                        }
-                    }
-                }
-                break;
-        }
-
-        _products.postValue(current);
+    private void observeWebSocketEvents() {
+        webSocketManager.getProductEventLiveData().observeForever(this::handleWebSocketEvent);
     }
 
     /**
-     * Cierra conexiones y observadores para evitar fugas de memoria.
+     * Procesa un evento WebSocket y actualiza la lista de productos local.
+     *
+     * @param event El evento recibido.
      */
-    public void clear() {
-        if (webSocketManager != null) {
-            webSocketManager.disconnect();
-            webSocketManager.getProductEventLiveData().removeObserver(this::onWebSocketEvent);
+    private void handleWebSocketEvent(ProductWebSocketEvent event) {
+        if (event == null || event.getAction() == null) return;
+
+        List<Product> currentList = new ArrayList<>(Objects.requireNonNull(_products.getValue()));
+
+        switch (event.getAction()) {
+            case "CREATE":
+                Product newProduct = Product.fromWebSocketEvent(event);
+                currentList.add(newProduct);
+                Log.d(TAG, "Producto CREADO: " + newProduct.getName());
+                break;
+
+            case "UPDATE":
+                Product updatedProduct = Product.fromWebSocketEvent(event);
+                currentList.removeIf(p -> p.getId().equals(updatedProduct.getId()));
+                currentList.add(updatedProduct);
+                Log.d(TAG, "Producto ACTUALIZADO: " + updatedProduct.getName());
+                break;
+
+            case "DELETE":
+                currentList.removeIf(p -> p.getId().equals(event.getId()));
+                Log.d(TAG, "Producto ELIMINADO: " + event.getId());
+                break;
         }
+
+        _products.postValue(currentList);
+    }
+
+    /**
+     * Inicia la conexión del WebSocket.
+     */
+    public void connectWebSocket() {
+        webSocketManager.connect();
+    }
+
+    /**
+     * Cierra la conexión del WebSocket y libera los recursos.
+     */
+    public void disconnectWebSocket() {
+        webSocketManager.disconnect();
     }
 }

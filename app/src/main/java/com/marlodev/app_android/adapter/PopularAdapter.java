@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -24,87 +25,56 @@ import java.util.List;
  */
 public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHolder> {
 
-    private final List<Product> products = new ArrayList<>(); // Lista de productos
-    private Context context;                                   // Contexto para Glide
-
-
-    //#####
+    private final List<Product> products = new ArrayList<>();
     private OnProductClickListener listener;
 
-    // Interfaz para manejar click
     public interface OnProductClickListener {
         void onProductClick(Product product);
     }
 
-    // Setter del listener
     public void setOnProductClickListener(OnProductClickListener listener) {
         this.listener = listener;
     }
-    // #######
-
 
     public PopularAdapter() {}
 
-    // --------------------------
-    // 🔹 Inflado de item
-    // --------------------------
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        // Inflamos el layout item_product_popular.xml
         ItemProductPopularBinding binding = ItemProductPopularBinding.inflate(
-                LayoutInflater.from(context), parent, false
+                LayoutInflater.from(parent.getContext()), parent, false
         );
         return new ViewHolder(binding);
     }
 
-    // --------------------------
-    // 🔹 Bind de datos al item
-    // --------------------------
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Product product = products.get(position);
+        ItemProductPopularBinding b = holder.binding;
 
-        // ────────── Título del producto ──────────
-        holder.binding.txtTitle.setText(
-                product.getName() != null ? product.getName() : "Sin nombre"
-        );
+        b.txtTitle.setText(product.getName() != null ? product.getName() : "Sin nombre");
 
-        // ────────── Imagen del producto ──────────
         List<String> images = product.getImageUrls();
         if (images != null && !images.isEmpty()) {
-            Glide.with(context)
-                    .load(images.get(0))                       // Carga la primera imagen
-                    .placeholder(R.drawable.ic_image_placeholder) // Imagen mientras carga
-                    .error(R.drawable.ic_image_placeholder)      // Imagen si falla
+            Glide.with(holder.itemView.getContext())
+                    .load(images.get(0))
+                    .placeholder(R.drawable.ic_image_placeholder)
+                    .error(R.drawable.ic_image_placeholder)
                     .centerCrop()
-                    .into(holder.binding.pic);
+                    .into(b.pic);
         } else {
-            holder.binding.pic.setImageResource(R.drawable.ic_image_placeholder);
+            b.pic.setImageResource(R.drawable.ic_image_placeholder);
         }
 
-        // ────────── Indicador "Nuevo" ──────────
-        holder.binding.txtNuevo.setVisibility(product.isNew() ? View.VISIBLE : View.GONE);
+        b.txtNuevo.setVisibility(product.isNew() ? View.VISIBLE : View.GONE);
+        b.txtPrece.setText("S/." + product.getPrice());
+        b.txtOldPrece.setText("S/." + product.getOldPrice());
+        b.txtRanking.setText(String.valueOf(product.getRating()));
+        b.txtReviews.setText("(" + product.getReviewsCount() + ")");
 
-        // ────────── Precio ──────────
-        holder.binding.txtPrece.setText("S/." + product.getPrice());
-        holder.binding.txtOldPrece.setText("S/." + product.getOldPrice());
-
-        // ────────── Rating y cantidad de reviews ──────────
-        holder.binding.txtRanking.setText(String.valueOf(product.getRating()));
-        holder.binding.txtReviews.setText("(" + product.getReviewsCount() + ")");
-
-        //#########
-        // En onBindViewHolder:
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onProductClick(products.get(position));
-            }
+            if (listener != null) listener.onProductClick(product);
         });
-
-
-        //#######
     }
 
     @Override
@@ -112,48 +82,35 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
         return products.size();
     }
 
-    // --------------------------
-    // 🔹 Actualizar lista completa de productos
-    // --------------------------
+    // -----------------------------
+    // 🔹 Actualización con DiffUtil
+    // -----------------------------
     public void setProducts(List<Product> newProducts) {
-        products.clear();
-        if (newProducts != null) products.addAll(newProducts);
-        notifyDataSetChanged();
+        if (newProducts == null) newProducts = new ArrayList<>();
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffCallback(this.products, newProducts));
+        this.products.clear();
+        this.products.addAll(newProducts);
+        diffResult.dispatchUpdatesTo(this);
     }
 
-    // --------------------------
-    // 🔹 Métodos para manejar actualizaciones vía WebSocket
-    // --------------------------
-
-    // Agrega un nuevo producto al inicio de la lista
-    public void addProduct(ProductWebSocketEvent event) {
-        Product product = Product.fromWebSocketEvent(event);
-        if (product.getImageUrls() == null) {
-            product.setImageUrls(Collections.emptyList()); // Evita null
-        }
+    public void addProduct(Product product) {
         products.add(0, product);
         notifyItemInserted(0);
     }
 
-    // Actualiza un producto existente según el evento WebSocket
-    public void updateProduct(ProductWebSocketEvent event) {
+    public void updateProduct(Product product) {
         for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getId() == event.id) {
-                Product updated = Product.fromWebSocketEvent(event);
-                if (updated.getImageUrls() == null) {
-                    updated.setImageUrls(Collections.emptyList());
-                }
-                products.set(i, updated);
+            if (product.getId() != null && product.getId().equals(products.get(i).getId())) {
+                products.set(i, product);
                 notifyItemChanged(i);
                 return;
             }
         }
     }
 
-    // Elimina un producto por ID
     public void removeProduct(long id) {
         for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getId() == id) {
+            if (products.get(i).getId() != null && products.get(i).getId() == id) {
                 products.remove(i);
                 notifyItemRemoved(i);
                 return;
@@ -161,30 +118,63 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
         }
     }
 
-    // Actualiza solo las imágenes de un producto
     public void updateProductImages(long id, String imageUrl) {
         for (int i = 0; i < products.size(); i++) {
-            if (products.get(i).getId() == id) {
-                if (imageUrl != null && !imageUrl.isEmpty()) {
-                    products.get(i).setImageUrls(List.of(imageUrl));
-                } else {
-                    products.get(i).setImageUrls(Collections.emptyList());
-                }
+            Product p = products.get(i);
+            if (p.getId() != null && p.getId() == id) {
+                p.setImageUrls(imageUrl != null ? List.of(imageUrl) : new ArrayList<>());
                 notifyItemChanged(i);
                 return;
             }
         }
     }
 
-    // --------------------------
+    // -----------------------------
     // 🔹 ViewHolder
-    // --------------------------
+    // -----------------------------
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final ItemProductPopularBinding binding;
 
         public ViewHolder(@NonNull ItemProductPopularBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+        }
+    }
+
+    // -----------------------------
+    // 🔹 DiffUtil.Callback
+    // -----------------------------
+    private static class DiffCallback extends DiffUtil.Callback {
+        private final List<Product> oldList;
+        private final List<Product> newList;
+
+        public DiffCallback(List<Product> oldList, List<Product> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() { return oldList.size(); }
+
+        @Override
+        public int getNewListSize() { return newList.size(); }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            Long oldId = oldList.get(oldItemPosition).getId();
+            Long newId = newList.get(newItemPosition).getId();
+            return oldId != null && oldId.equals(newId);
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            Product oldP = oldList.get(oldItemPosition);
+            Product newP = newList.get(newItemPosition);
+            return oldP.getName().equals(newP.getName()) &&
+                    oldP.getPrice() == newP.getPrice() &&
+                    oldP.getOldPrice() == newP.getOldPrice() &&
+                    oldP.getImageUrls().equals(newP.getImageUrls()) &&
+                    oldP.isNew() == newP.isNew();
         }
     }
 }

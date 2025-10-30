@@ -58,12 +58,10 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.google.code.gson:gson:2.11.0")
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.12.0")
-
-    // JSON
-    implementation("com.google.code.gson:gson:2.9.1")
 
     // STOMP/WebSocket
     implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
@@ -74,19 +72,16 @@ dependencies {
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
 
     // Lifecycle: ViewModel + LiveData
-    implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-livedata:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-runtime:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
-//    // Testing
-//    testImplementation(libs.junit)
-//    androidTestImplementation(libs.ext.junit)
-//    androidTestImplementation(libs.espresso.core)
-//
-//    // Misc
-//    implementation(libs.tracing.perfetto.handshake)
-//    implementation(libs.volley)
+    // Testing (opcional, comentar si no se usa)
+    // testImplementation(libs.junit)
+    // androidTestImplementation(libs.ext.junit)
+    // androidTestImplementation(libs.espresso.core)
+
+    // Misc
+    // implementation(libs.tracing.perfetto.handshake)
+    // implementation(libs.volley)
 }
