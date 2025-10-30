@@ -9,6 +9,10 @@ import androidx.core.os.HandlerCompat;
 
 import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
+import com.marlodev.app_android.ui.admin.AdminMainActivity;
+import com.marlodev.app_android.ui.barista.BaristaMainActivity;
+import com.marlodev.app_android.ui.delivery.DeliveryMainActivity;
+import com.marlodev.app_android.utils.SessionManager;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -30,17 +34,40 @@ public class SplashActivity extends AppCompatActivity {
      * Si no hay sesión → también MainActivity (modo invitado)
      */
     private void navigateNext() {
-        SharedPreferences prefs = getSharedPreferences("app_prefs", MODE_PRIVATE);
-        boolean isLoggedIn = prefs.getBoolean("isLoggedIn", false);
+        SessionManager session = SessionManager.getInstance(this);
 
-        // 👉 Siempre redirige a MainActivity
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent;
 
-        // Si en algún momento quieres personalizar el flujo:
-        // if (isLoggedIn) intent = new Intent(this, MainActivity.class);
-        // else intent = new Intent(this, GuestActivity.class); // opcional
+        if (session.isLoggedIn()) {
+            // Obtiene rol del usuario
+            String role = session.getRole();
 
+            switch (role.toUpperCase()) {
+                case "ADMIN":
+                case "ROLE_ADMIN":
+                    intent = new Intent(this, AdminMainActivity.class);
+                    break;
+                case "BARISTA":
+                case "ROLE_BARISTA":
+                    intent = new Intent(this, BaristaMainActivity.class);
+                    break;
+                case "DELIVERY":
+                case "ROLE_DELIVERY":
+                    intent = new Intent(this, DeliveryMainActivity.class);
+                    break;
+                default: // CLIENTE
+                    intent = new Intent(this, MainActivity.class);
+                    break;
+            }
+        } else {
+            // Invitado
+            intent = new Intent(this, MainActivity.class);
+        }
+
+        // Limpia la pila de actividades para que no quede atrás
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
+
 }

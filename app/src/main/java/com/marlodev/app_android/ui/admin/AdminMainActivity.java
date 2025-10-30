@@ -16,7 +16,7 @@ import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
 import com.marlodev.app_android.utils.SessionManager;
 
-public class AdminDashboardActivity extends AppCompatActivity {
+public class AdminMainActivity extends AppCompatActivity {
 
     private TextView tvUserName, tvUserEmail, tvUserRole;
     private MaterialButton btnLogout;
@@ -25,7 +25,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_admin_dashboard);
+        setContentView(R.layout.activity_admin_main);
 
         // Ajuste visual EdgeToEdge
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

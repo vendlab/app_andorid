@@ -1,22 +1,19 @@
 package com.marlodev.app_android;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Window;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.marlodev.app_android.databinding.ActivityMainBinding;
-import com.marlodev.app_android.ui.admin.AdminDashboardActivity;
+import com.marlodev.app_android.ui.admin.AdminMainActivity;
 import com.marlodev.app_android.ui.auth.LoginActivity;
-import com.marlodev.app_android.ui.client.CleintOrderFragment;
+import com.marlodev.app_android.ui.client.ClientOrderFragment;
 import com.marlodev.app_android.ui.client.ClientCarFragment;
 import com.marlodev.app_android.ui.client.ClientHomeFragment;
 import com.marlodev.app_android.ui.client.ClientPerfilFragment;
@@ -41,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Cambiar el color de la barra de estado aquí
-        Window window = getWindow();
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorGreen1));
+//        Window window = getWindow();
+//        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorGreen1));
 
 
         // Resto de tu inicialización
@@ -73,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
         String role = sessionManager.getRole();
         if ("ADMIN".equalsIgnoreCase(role)) {
-            startActivity(new Intent(this, AdminDashboardActivity.class));
+            startActivity(new Intent(this, AdminMainActivity.class));
             finish();
         }
     }
@@ -96,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == R.id.menu_home) fragment = new ClientHomeFragment();
             else if (id == R.id.menu_car) fragment = new ClientCarFragment();
-            else if (id == R.id.menu_delivery) fragment = new CleintOrderFragment();
+            else if (id == R.id.menu_delivery) fragment = new ClientOrderFragment();
             else if (id == R.id.menu_perfil) {
                 openProfileOrGuest();
                 return;
@@ -120,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
             if ("ADMIN".equalsIgnoreCase(sessionManager.getRole())) {
                 // Para Admin seguimos abriendo Activity
-                startActivity(new Intent(this, AdminDashboardActivity.class));
+                startActivity(new Intent(this, AdminMainActivity.class));
                 return;
             } else {
                 // Para cliente, cargamos el Fragment de perfil

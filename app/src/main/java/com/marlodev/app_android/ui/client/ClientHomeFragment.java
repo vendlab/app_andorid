@@ -1,16 +1,20 @@
 package com.marlodev.app_android.ui.client;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.marlodev.app_android.R;
 import com.marlodev.app_android.adapter.PopularAdapter;
 import com.marlodev.app_android.databinding.FragmentClientHomeBinding;
 import com.marlodev.app_android.ui.home.customer.DetailActivity;
@@ -67,4 +71,6 @@ public class ClientHomeFragment extends Fragment {
             productViewModel.loadProducts();
         }
     }
+
+
 }

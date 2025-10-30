@@ -1,25 +1,26 @@
 package com.marlodev.app_android.ui.client;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.NonNull; // Importación necesaria para el override
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import com.marlodev.app_android.R;
 import com.marlodev.app_android.utils.StatusBarUtil;
+public class ClientOrderFragment extends Fragment {
 
-public class ClientCarFragment extends Fragment {
-
-    public ClientCarFragment() { }
-
-    public static ClientCarFragment newInstance() {
-        return new ClientCarFragment();
+    public ClientOrderFragment() {
+        // Required empty public constructor
+    }
+    public static ClientOrderFragment newInstance() {
+        return new ClientOrderFragment();
     }
 
     @Nullable
@@ -29,7 +30,7 @@ public class ClientCarFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         // Inflar el layout
-        View view = inflater.inflate(R.layout.fragment_cliente_carrito, container, false);
+        View view = inflater.inflate(R.layout.fragment_client_order, container, false);
 
         // Ajustar padding según barras del sistema (status bar, navigation bar)
         ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
@@ -42,5 +43,17 @@ public class ClientCarFragment extends Fragment {
         return view;
     }
 
+//        @Override
+//    public void onResume() {
+//        super.onResume();
+//        StatusBarUtil.setStatusBarColor(requireActivity(), R.color.colorBlack, false);
+//    }
 //
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        StatusBarUtil.setStatusBarColor(requireActivity(), R.color.colorGreen1, true);
+//    }
 }
+
+

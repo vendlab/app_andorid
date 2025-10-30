@@ -16,28 +16,16 @@
         android:theme="@style/Theme.app_android"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.client.clientFavoriteActivity"
+            android:name=".ui.delivery.DeliveryMainActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.client.ClientNotifyActivity"
+            android:name=".ui.barista.BaristaMainActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.client.ClientPerfilActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.delivery.DeliveryHomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.barista.BaristaHomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.admin.AdminDashboardActivity"
+            android:name=".ui.admin.AdminMainActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name=".viewmodel.login"
             android:exported="false" />
         <activity
             android:name=".ui.home.customer.DetailActivity"

@@ -13,7 +13,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
-import com.marlodev.app_android.ui.admin.AdminDashboardActivity;
+import com.marlodev.app_android.ui.admin.AdminMainActivity;
+import com.marlodev.app_android.ui.barista.BaristaMainActivity;
+import com.marlodev.app_android.ui.delivery.DeliveryMainActivity;
 import com.marlodev.app_android.utils.SessionManager;
 import com.marlodev.app_android.viewmodel.AuthViewModel;
 
@@ -113,11 +115,16 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent;
 
         if ("ADMIN".equalsIgnoreCase(role) || "ROLE_ADMIN".equalsIgnoreCase(role)) {
-            intent = new Intent(this, AdminDashboardActivity.class);
-        } else {
+            intent = new Intent(this, AdminMainActivity.class);
+        }
+        else if ("BARISTA".equalsIgnoreCase(role) || "ROLE_BARISTA".equalsIgnoreCase(role)) {
+            intent = new Intent(this, BaristaMainActivity.class);
+        }
+        else if ("DELIVERY".equalsIgnoreCase(role) || "ROLE_DELIVERY".equalsIgnoreCase(role)) {
+            intent = new Intent(this, DeliveryMainActivity.class);
+        }else {
             intent = new Intent(this, MainActivity.class);
         }
-
         if ("main".equals(redirect)) {
             intent = new Intent(this, MainActivity.class);
         }
