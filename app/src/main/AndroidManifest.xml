@@ -16,6 +16,12 @@
         android:theme="@style/Theme.app_android"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.client.clientFavoriteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.client.ClientNotifyActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.client.ClientPerfilActivity"
             android:exported="false" />
         <activity

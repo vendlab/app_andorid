@@ -70,6 +70,7 @@ dependencies {
 
     // Chip Navigation Bar
     implementation("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 
     // Lifecycle: ViewModel + LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
