@@ -1,112 +1,144 @@
 package com.marlodev.app_android;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.CompositePageTransformer;
-import androidx.viewpager2.widget.MarginPageTransformer;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
-import com.marlodev.app_android.adapter.PopularAdapter;
-import com.marlodev.app_android.adapter.SliderAdapter;
-import com.marlodev.app_android.adapter.TagAdapter;
 import com.marlodev.app_android.databinding.ActivityMainBinding;
-import com.marlodev.app_android.domain.BannerModel;
-import com.marlodev.app_android.domain.Product;
-import com.marlodev.app_android.viewmodel.MainViewModel;
-
-import java.util.ArrayList;
+import com.marlodev.app_android.ui.admin.AdminMainActivity;
+import com.marlodev.app_android.ui.auth.LoginActivity;
+import com.marlodev.app_android.ui.client.ClientOrderFragment;
+import com.marlodev.app_android.ui.client.ClientCarFragment;
+import com.marlodev.app_android.ui.client.ClientHomeFragment;
+import com.marlodev.app_android.ui.client.ClientPerfilFragment;
+import com.marlodev.app_android.utils.SessionManager;
+import com.marlodev.app_android.viewmodel.ProductViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    private MainViewModel viewModel;
+    private SessionManager sessionManager;
+    private ProductViewModel productViewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        viewModel = new MainViewModel();
-        initTag();
-        initBanner();
-        initPopular();
-        bottomNavigation();
+
+        sessionManager = SessionManager.getInstance(this);
+        productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
+
+
+        // Cambiar el color de la barra de estado aquí
+//        Window window = getWindow();
+//        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorGreen1));
+
+
+        // Resto de tu inicialización
+        setupWebSocket();
+        checkSessionAndRedirect();
+        setupBottomNavigation();
     }
 
-    private void bottomNavigation() {
-        binding.bottomNavigation.setItemSelected(R.id.menu_home, true);
-        binding.bottomNavigation.setOnItemSelectedListener(new ChipNavigationBar.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(int i) {
+    private void setupWebSocket() {
+        Log.i("MainActivity", "🔌 Iniciando conexión WebSocket...");
+        String wsUrl = "ws://10.0.2.2:5050/ws-products/websocket";
+        String token = sessionManager.getToken();
+        productViewModel.initWebSocket(wsUrl, token);
+
+        productViewModel.getProductEventLiveData().observe(this, event -> {
+            if (event != null) {
+                productViewModel.handleWebSocketEvent(event);
+                Log.d("MainActivity", "📨 Evento recibido: " + event.getAction());
             }
         });
     }
 
+    private void checkSessionAndRedirect() {
+        if (!sessionManager.isLoggedIn()) {
+            Toast.makeText(this, "Bienvenido, estás navegando como invitado", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-    private void initPopular() {
-        binding.preogresBarPopular.setVisibility(View.VISIBLE);
-        viewModel.loadPopular().observeForever(Product ->{
-            if(!Product.isEmpty()){
-                binding.popularView.setLayoutManager(
-                        new LinearLayoutManager (MainActivity.this, LinearLayoutManager.HORIZONTAL, false));
-                binding.popularView.setAdapter(new PopularAdapter(Product));
-                binding.popularView.setNestedScrollingEnabled(true);
+        String role = sessionManager.getRole();
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            startActivity(new Intent(this, AdminMainActivity.class));
+            finish();
+        }
+    }
+
+
+    private void setupBottomNavigation() {
+        ChipNavigationBar chipNavigationBar = binding.bottomNavigation;
+        chipNavigationBar.setBackgroundColor(getResources().getColor(R.color.colorGrey100));
+
+        if (getSupportFragmentManager().findFragmentById(R.id.fragment_container) == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, new ClientHomeFragment())
+                    .commit();
+            chipNavigationBar.setItemSelected(R.id.menu_home, true);
+        }
+
+        chipNavigationBar.setOnItemSelectedListener(id -> {
+            Fragment fragment = null;
+
+            if (id == R.id.menu_home) fragment = new ClientHomeFragment();
+            else if (id == R.id.menu_car) fragment = new ClientCarFragment();
+            else if (id == R.id.menu_delivery) fragment = new ClientOrderFragment();
+            else if (id == R.id.menu_perfil) {
+                openProfileOrGuest();
+                return;
             }
-            binding.preogresBarPopular.setVisibility(View.GONE);
-        });
-        viewModel.loadPopular();
-    }
 
-    private void initBanner() {
-        binding.progressBarSlider.setVisibility(View.VISIBLE);
-        viewModel.loadBanner().observeForever(bannerModel -> {
-            if (bannerModel!=null && !bannerModel.isEmpty()){
-                banners(bannerModel);
-                binding.progressBarSlider.setVisibility(View.GONE);
+            if (fragment != null) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragment_container, fragment)
+                        .commit();
             }
         });
-
-        viewModel.loadBanner();
     }
 
-    private void banners(ArrayList<BannerModel> bannerModel) {
-        binding.viewPagerSlider.setAdapter(new SliderAdapter(bannerModel,binding.viewPagerSlider));
-        binding.viewPagerSlider.setClipToPadding(false);
-        binding.viewPagerSlider.setClipChildren(false);
-        binding.viewPagerSlider.setOffscreenPageLimit(3);
-        binding.viewPagerSlider.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
+    /**
+     * Abre el perfil del usuario como fragment o el login si no está logueado
+     */
+    private void openProfileOrGuest() {
+        if (sessionManager.isLoggedIn()) {
+            Fragment fragment;
 
-        CompositePageTransformer compositePageTransformer = new CompositePageTransformer();
-        compositePageTransformer.addTransformer(new MarginPageTransformer(40));
-        binding.viewPagerSlider.setPageTransformer(compositePageTransformer);
+            if ("ADMIN".equalsIgnoreCase(sessionManager.getRole())) {
+                // Para Admin seguimos abriendo Activity
+                startActivity(new Intent(this, AdminMainActivity.class));
+                return;
+            } else {
+                // Para cliente, cargamos el Fragment de perfil
+                fragment = new ClientPerfilFragment();
+            }
 
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit();
 
+        } else {
+            Toast.makeText(this, "Estás en modo invitado. Inicia sesión para acceder al perfil.", Toast.LENGTH_LONG).show();
+            startActivity(new Intent(this, LoginActivity.class));
+        }
     }
 
-    private  void initTag(){
-        binding.preogresBarTag.setVisibility(View.VISIBLE);
-        viewModel.loadCategory().observeForever(tagModel -> {
-            binding.tagsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            binding.tagsView.setAdapter(new TagAdapter(tagModel));
-            binding.tagsView.setNestedScrollingEnabled(true);
-            binding.preogresBarTag.setVisibility(View.GONE);
-        });
-     }
-
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        productViewModel.disconnectWebSocket();
+    }
 }
-
-
-
 

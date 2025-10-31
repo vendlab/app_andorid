@@ -3,7 +3,7 @@
 
     <!-- Tema base -->
     <style name="Base.Theme.app_android" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorSecondary</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorGreen2</item>
         <item name="colorOnPrimary">@color/colorGrey400</item>
         <item name="android:statusBarColor">@color/colorGreen2</item>
