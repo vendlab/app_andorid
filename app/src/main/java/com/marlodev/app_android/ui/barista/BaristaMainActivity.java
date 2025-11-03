@@ -2,77 +2,109 @@ package com.marlodev.app_android.ui.barista;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
+import com.marlodev.app_android.ui.auth.LoginActivity;
+import com.marlodev.app_android.ui.delivery.DeliveryGananciasFragment;
+import com.marlodev.app_android.ui.delivery.DeliveryHistorialFragment;
+import com.marlodev.app_android.ui.delivery.DeliveryHomeFragment;
+import com.marlodev.app_android.ui.delivery.DeliveryMensajeriaFragment;
+import com.marlodev.app_android.ui.delivery.DeliveryPerfilFragment;
 import com.marlodev.app_android.utils.SessionManager;
 
 public class BaristaMainActivity extends AppCompatActivity {
 
-    private TextView tvUserName, tvUserEmail, tvUserRole;
-    private MaterialButton btnLogout;
+    private SessionManager sessionManager;
+    private ChipNavigationBar bottomNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_admin_main);
+        setContentView(R.layout.activity_barista_main);
 
-        // Ajuste visual EdgeToEdge
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        sessionManager = SessionManager.getInstance(this);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+
+        // 🔷 Ajuste de padding para dispositivos con notch o barras de sistema
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.fragment_container), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        initViews();
-        loadUserData();
-        setupLogoutButton();
-    }
-
-    private void initViews() {
-        tvUserName = findViewById(R.id.tvUserName);
-        tvUserEmail = findViewById(R.id.tvUserEmail);
-        tvUserRole = findViewById(R.id.tvUserRole);
-        btnLogout = findViewById(R.id.btnLogout);
-    }
-
-    private void loadUserData() {
-        SessionManager session = SessionManager.getInstance(this);
-        String email = session.getEmail();
-        String role = session.getRole();
-
-        // Nombre simulado a partir del correo
-        String username = (email != null && email.contains("@"))
-                ? email.substring(0, email.indexOf("@"))
-                : "Administrador";
-
-        tvUserName.setText(username);
-        tvUserEmail.setText(email != null ? email : "correo@ejemplo.com");
-        tvUserRole.setText("Rol: " + (role != null ? role : "Desconocido"));
+        checkSessionAndRedirect();
+        setupBottomNavigation();
     }
 
     /**
-     * 🔹 Cierra sesión y redirige al MainActivity (no al login).
+     * Configura la barra de navegación inferior.
+     * Define el fragmento inicial y los listeners de los menús.
      */
-    private void setupLogoutButton() {
-        btnLogout.setOnClickListener(v -> {
-            // Borrar toda la sesión
-            SessionManager.getInstance(this).clear();
 
-            // Redirigir a MainActivity como invitado
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+    private void setupBottomNavigation() {
+        bottomNavigation.setBackgroundColor(getResources().getColor(R.color.colorGrey100));
+
+        // Fragmento por defecto al iniciar
+        if (getSupportFragmentManager().findFragmentById(R.id.fragment_container) == null) {
+            loadFragment(new BaristaHomeFragment());
+            bottomNavigation.setItemSelected(R.id.menu_home_barista, true);
+        }
+
+        // Escucha de selección de ítems en el menú
+        bottomNavigation.setOnItemSelectedListener(id -> {
+            Fragment fragment = null;
+
+            if (id == R.id.menu_home_barista) {
+                fragment = new BaristaHomeFragment();
+            } else if (id == R.id.menu_detalle_barista) {
+                fragment = new BaristaDetalleFragment();
+            } else if (id == R.id.menu_historial_barista) {
+                fragment = new BaristaHistorialFragment();
+            } else if (id == R.id.menu_notificaciones_barista) {
+                fragment = new BaristaNotificacionesFragment();
+            } else if (id == R.id.menu_perfil_barista) {
+                openProfileOrGuest();
+                return;
+            }
+            if (fragment != null) loadFragment(fragment);
         });
+    }
+
+    // Muestra mensaje de bienvenida si el usuario no está logueado.
+    private void checkSessionAndRedirect() {
+        if (!sessionManager.isLoggedIn()) {
+            Toast.makeText(this, "Bienvenido, estás navegando como invitado", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Abre el perfil si hay sesión, o redirige al login si es invitado.
+    private void openProfileOrGuest() {
+        if (sessionManager.isLoggedIn()) {
+            loadFragment(new BaristaHistorialFragment());
+        } else {
+            Toast.makeText(this, "Inicia sesión para acceder al perfil", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+        }
+    }
+
+    // Metodo auxiliar para cargar fragmentos.
+    private void loadFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
     }
 }
