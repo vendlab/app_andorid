@@ -58,7 +58,7 @@ public class AdminMainActivity extends AppCompatActivity {
 
         // Fragmento por defecto al iniciar
         if (getSupportFragmentManager().findFragmentById(R.id.fragment_container) == null) {
-            loadFragment(new BaristaHomeFragment());
+            loadFragment(new AdminHomeFragment());
             bottomNavigation.setItemSelected(R.id.menu_home_admin, true);
         }
 
@@ -73,7 +73,7 @@ public class AdminMainActivity extends AppCompatActivity {
             } else if (id == R.id.menu_usuarios_admin) {
                 fragment = new AdminUsersFragment();
             } else if (id == R.id.menu_tags_admin) {
-                fragment = new AdminInventarioFragment();
+                fragment = new AdminTagsFragment();
             } else if (id == R.id.menu_inventario_admin) {
                 openProfileOrGuest();
                 return;
@@ -92,7 +92,7 @@ public class AdminMainActivity extends AppCompatActivity {
     // Abre el perfil si hay sesión, o redirige al login si es invitado.
     private void openProfileOrGuest() {
         if (sessionManager.isLoggedIn()) {
-            loadFragment(new BaristaHistorialFragment());
+            loadFragment(new AdminInventarioFragment());
         } else {
             Toast.makeText(this, "Inicia sesión para acceder al perfil", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, LoginActivity.class));

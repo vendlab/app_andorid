@@ -43,17 +43,6 @@ public class ClientOrderFragment extends Fragment {
         return view;
     }
 
-//        @Override
-//    public void onResume() {
-//        super.onResume();
-//        StatusBarUtil.setStatusBarColor(requireActivity(), R.color.colorBlack, false);
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        StatusBarUtil.setStatusBarColor(requireActivity(), R.color.colorGreen1, true);
-//    }
 }
 
 
