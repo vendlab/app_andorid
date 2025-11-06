@@ -42,5 +42,4 @@ public class ClientCarFragment extends Fragment {
         return view;
     }
 
-//
 }

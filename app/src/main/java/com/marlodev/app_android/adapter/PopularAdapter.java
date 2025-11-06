@@ -13,10 +13,8 @@ import com.bumptech.glide.Glide;
 import com.marlodev.app_android.R;
 import com.marlodev.app_android.databinding.ItemProductPopularBinding;
 import com.marlodev.app_android.domain.Product;
-import com.marlodev.app_android.model.ProductWebSocketEvent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -66,7 +64,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
             b.pic.setImageResource(R.drawable.ic_image_placeholder);
         }
 
-        b.txtNuevo.setVisibility(product.isNew() ? View.VISIBLE : View.GONE);
+        b.txtNuevo.setVisibility(product.isNewProduct() ? View.VISIBLE : View.GONE);
         b.txtPrece.setText("S/." + product.getPrice());
         b.txtOldPrece.setText("S/." + product.getOldPrice());
         b.txtRanking.setText(String.valueOf(product.getRating()));
@@ -174,7 +172,8 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
                     oldP.getPrice() == newP.getPrice() &&
                     oldP.getOldPrice() == newP.getOldPrice() &&
                     oldP.getImageUrls().equals(newP.getImageUrls()) &&
-                    oldP.isNew() == newP.isNew();
+                    oldP.isNewProduct() == newP.isNewProduct();
         }
+
     }
 }

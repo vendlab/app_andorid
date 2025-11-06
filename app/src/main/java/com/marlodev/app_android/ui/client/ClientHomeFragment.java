@@ -1,76 +1,89 @@
 package com.marlodev.app_android.ui.client;
 
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.marlodev.app_android.R;
 import com.marlodev.app_android.adapter.PopularAdapter;
+import com.marlodev.app_android.adapter.SliderAdapter;
 import com.marlodev.app_android.databinding.FragmentClientHomeBinding;
+import com.marlodev.app_android.domain.Product;
 import com.marlodev.app_android.ui.home.customer.DetailActivity;
 import com.marlodev.app_android.viewmodel.ProductViewModel;
+
+import java.util.List;
 
 public class ClientHomeFragment extends Fragment {
 
     private FragmentClientHomeBinding binding;
     private ProductViewModel productViewModel;
     private PopularAdapter popularAdapter;
+    private SliderAdapter sliderAdapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentClientHomeBinding.inflate(inflater, container, false);
 
         productViewModel = new ViewModelProvider(requireActivity()).get(ProductViewModel.class);
 
-        initPopular();
+        setupAdapters();
+        observeViewModel();
 
         return binding.getRoot();
     }
 
-    private void initPopular() {
+    private void setupAdapters() {
+        // RecyclerView de productos populares
         popularAdapter = new PopularAdapter();
-        binding.popularView.setLayoutManager(
-                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)
-        );
+        binding.popularView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.popularView.setAdapter(popularAdapter);
+        popularAdapter.setOnProductClickListener(this::openProductDetail);
 
-        popularAdapter.setOnProductClickListener(product -> {
-            Intent intent = new Intent(getContext(), DetailActivity.class);
-            intent.putExtra("productId", product.getId());
-            startActivity(intent);
-        });
+        // Slider de banners (si aplica)
+        binding.viewPagerSlider.setAdapter(sliderAdapter);
+    }
 
+     private void observeViewModel() {
+        // Observamos los productos
         productViewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
-            if (products != null && !products.isEmpty()) {
-                popularAdapter.setProducts(products);
-            }
+            popularAdapter.setProducts(products != null ? products : List.of());
+            binding.popularView.setVisibility(products != null && !products.isEmpty() ? View.VISIBLE : View.GONE);
         });
 
-        productViewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            binding.progressBarPopular.setVisibility(Boolean.TRUE.equals(isLoading) ? View.VISIBLE : View.GONE);
-            // **IMPORTANTE**: También oculta el RecyclerView mientras carga para evitar mostrar datos antiguos.
-            // Aunque esto no es estrictamente necesario, es una buena práctica.
-            binding.popularView.setVisibility(Boolean.TRUE.equals(isLoading) ? View.GONE : View.VISIBLE);
-        });
+        // Observamos el estado de carga
+        productViewModel.getIsLoading().observe(getViewLifecycleOwner(), this::showPopularLoading);
+    }
 
-        // 🎯 Llama a loadProducts() solo si los productos no se han cargado.
-        // Esto asume que productViewModel.getProducts() devuelve un LiveData
-        // que mantiene el estado de los datos ya cargados.
-        if (productViewModel.getProducts().getValue() == null || productViewModel.getProducts().getValue().isEmpty()) {
-            productViewModel.loadProducts();
+    private void updatePopularProducts(List<Product> products) {
+        popularAdapter.setProducts(products != null ? products : List.of());
+        binding.popularView.setVisibility(products != null && !products.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private void showPopularLoading(Boolean isLoading) {
+        boolean loading = Boolean.TRUE.equals(isLoading);
+        binding.progressBarPopular.setVisibility(loading ? View.VISIBLE : View.GONE);
+
+        // Si no hay productos aún, ocultamos RecyclerView solo cuando esté vacío
+        if (!loading && popularAdapter.getItemCount() > 0) {
+            binding.popularView.setVisibility(View.VISIBLE);
         }
     }
 
+    private void openProductDetail(Product product) {
+        Intent intent = new Intent(getContext(), DetailActivity.class);
+        intent.putExtra("productId", product.getId());
+        startActivity(intent);
+    }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // evita memory leaks
+    }
 }

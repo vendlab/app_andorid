@@ -1,66 +1,88 @@
 package com.marlodev.app_android.ui.barista;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
+import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
+import com.marlodev.app_android.utils.SessionManager;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link BaristaHomeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class BaristaHomeFragment extends Fragment {
+    private TextView tvUserName, tvUserEmail, tvUserRole;
+    private MaterialButton btnLogout;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public BaristaHomeFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BaristaHomeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static BaristaHomeFragment newInstance(String param1, String param2) {
-        BaristaHomeFragment fragment = new BaristaHomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        // Inflamos el layout del fragment
+        View root = inflater.inflate(R.layout.fragment_barista_home, container, false);
+
+        // Inicializamos views
+        initViews(root);
+
+        // Edge-to-edge (opcional, igual que en la Activity)
+        ViewCompat.setOnApplyWindowInsetsListener(root.findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
+        // Cargamos datos del usuario
+        loadUserData();
+
+        // Configuramos el botón de logout
+        setupLogoutButton();
+
+        return root;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_barista_home, container, false);
+    private void initViews(View root) {
+        tvUserName = root.findViewById(R.id.tvUserName);
+        tvUserEmail = root.findViewById(R.id.tvUserEmail);
+        tvUserRole = root.findViewById(R.id.tvUserRole);
+        btnLogout = root.findViewById(R.id.btnLogout);
+    }
+
+    private void loadUserData() {
+        SessionManager session = SessionManager.getInstance(requireContext());
+        String email = session.getEmail();
+        String role = session.getRole();
+
+        // Nombre simulado a partir del correo
+        String username = (email != null && email.contains("@"))
+                ? email.substring(0, email.indexOf("@"))
+                : "Delivery";
+
+        tvUserName.setText(username);
+        tvUserEmail.setText(email != null ? email : "correo@ejemplo.com");
+        tvUserRole.setText("Rol: " + (role != null ? role : "Desconocido"));
+    }
+
+    private void setupLogoutButton() {
+        btnLogout.setOnClickListener(v -> {
+            // Borrar sesión
+            SessionManager.getInstance(requireContext()).clear();
+
+            // Redirigir a MainActivity
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
     }
 }

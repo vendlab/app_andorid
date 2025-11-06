@@ -12,6 +12,7 @@
         android:id="@+id/scroll_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/colorWhite"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottom_fixed_container">
 
@@ -230,7 +231,7 @@
         android:id="@+id/bottom_fixed_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/colorWhite"
         android:elevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -267,15 +268,15 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_rectanguloo_border"
             android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="@id/tvCurrentPrice"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvCurrentPrice"
-            app:layout_constraintBottom_toBottomOf="@id/tvCurrentPrice">
+            app:layout_constraintTop_toTopOf="@+id/tvOldPrice">
 
             <Button
                 android:id="@+id/btnMinus"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="@android:color/transparent"
+                android:background="@color/colorTransparent"
                 android:padding="0dp"
                 android:text="-"
                 android:textColor="@color/colorBlack"
@@ -285,9 +286,9 @@
                 android:id="@+id/txtQuantity"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:gravity="center"
                 android:layout_marginStart="15dp"
                 android:layout_marginEnd="15dp"
+                android:gravity="center"
                 android:text="2"
                 android:textSize="18sp" />
 
@@ -295,8 +296,8 @@
                 android:id="@+id/btnPlus"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:background="@color/colorTransparent"
                 android:padding="0dp"
-                android:background="@android:color/transparent"
                 android:text="+"
                 android:textColor="@color/colorBlack"
                 android:textSize="18sp" />
