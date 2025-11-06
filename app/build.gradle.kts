@@ -38,6 +38,10 @@ android {
 }
 
 dependencies {
+    // Testing (opcional, para crear un apk de prueba)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.ext.junit)
+    androidTestImplementation(libs.espresso.core)
 
     // AndroidX y Material
     implementation(libs.appcompat)
@@ -77,12 +81,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
-    // Testing (opcional, comentar si no se usa)
-    // testImplementation(libs.junit)
-    // androidTestImplementation(libs.ext.junit)
-    // androidTestImplementation(libs.espresso.core)
 
-    // Misc
-    // implementation(libs.tracing.perfetto.handshake)
-    // implementation(libs.volley)
+    // Lombok para Java
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
+
 }
