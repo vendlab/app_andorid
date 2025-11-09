@@ -11,8 +11,8 @@ public final class ApiClient {
 
     private static volatile Retrofit retrofit;
     private static final Object LOCK = new Object();
-//    private static String BASE_URL = "https://ecommerce-backend-o9y5.onrender.com/api/";
-    private static String BASE_URL = "http://10.0.2.2:8080/api/";
+    private static String BASE_URL = "https://ecommerce-backend-o9y5.onrender.com/api/";
+    //private static String BASE_URL = "http://10.0.2.2:8080/api/";
 
     private ApiClient() {}
 

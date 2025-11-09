@@ -1,60 +1,25 @@
 package com.marlodev.app_android.ui.admin;
 
+import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView; // <-- Importante
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+// Importaciones para los componentes de Material Design
+import com.google.android.material.textfield.TextInputLayout; // <-- Importante
 
 import com.marlodev.app_android.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AdminUsersFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AdminUsersFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public AdminUsersFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AdminUsersFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AdminUsersFragment newInstance(String param1, String param2) {
-        AdminUsersFragment fragment = new AdminUsersFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -62,5 +27,37 @@ public class AdminUsersFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_admin_users, container, false);
+    }
+
+    // --- ESTE MÉTODO ES EL QUE HACE EL TRABAJO ---
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // --- ENCONTRAR LOS DOS COMPONENTES POR SUS IDs ---
+
+        // 1. El layout de texto para "Buscar usuarios"
+        TextInputLayout searchLayout = view.findViewById(R.id.search_text_input_layout);
+
+        // 2. El recuadro de texto para "Todos los roles"
+        TextView rolesFilter = view.findViewById(R.id.roles_filter_text);
+
+        // --- CAMBIAR EL COLOR DE AMBOS A GRIS CLARO ---
+
+        // Definimos el color gris una sola vez
+        int lightGreyColor = Color.parseColor("#F5F5F5");
+
+        // Aplicamos el color al fondo del campo de búsqueda
+        if (searchLayout != null) {
+            // Esta es la línea clave: cambiamos el color de la "caja" del TextInputLayout
+            searchLayout.setBoxBackgroundColor(lightGreyColor);
+        }
+
+        // Aplicamos el color al fondo del filtro de roles
+        if (rolesFilter != null) {
+            // Para cambiar el fondo de un TextView que usa un drawable, le cambiamos el tinte.
+            // Esto conserva la forma (bordes redondeados) pero cambia el color.
+            rolesFilter.getBackground().setTint(lightGreyColor);
+        }
     }
 }

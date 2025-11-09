@@ -35,8 +35,8 @@ public class ProductViewModel extends AndroidViewModel {
         SessionManager session = SessionManager.getInstance(application);
         String token = session.getToken();
 
-//        String wsUrl = "wss://ecommerce-backend-o9y5.onrender.com/ws-products";
-        String wsUrl = "ws://10.0.2.2:8080/ws-products";
+        String wsUrl = "wss://ecommerce-backend-o9y5.onrender.com/ws-products";
+        //String wsUrl = "ws://10.0.2.2:8080/ws-products";
 
 
         GenericWebSocketManager<ProductWebSocketEvent> wsManager =
