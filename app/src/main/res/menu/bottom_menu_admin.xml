@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<item
+    android:id="@+id/menu_home_admin"
+    android:icon="@drawable/icon_dash_admin"
+    android:title="Resumen"
+    app:cnb_backgroundColor="@color/colorPrimary"
+    app:cnb_iconColor="@color/colorWhite"/>
+<item
+    android:id="@+id/menu_productos_admin"
+    android:icon="@drawable/icon_products_admin"
+    android:title="Productos"
+    app:cnb_backgroundColor="@color/colorPrimary"
+    app:cnb_iconColor="@color/colorWhite"/>
+<item
+    android:id="@+id/menu_usuarios_admin"
+    android:icon="@drawable/icon_users_admin"
+    android:title="Usuarios"
+    app:cnb_iconColor="@color/colorWhite"
+    app:cnb_backgroundColor="@color/colorPrimary"/>
+<item
+    android:id="@+id/menu_tags_admin"
+    android:icon="@drawable/icon_tag_admin"
+    android:title="Categorias"
+    app:cnb_iconColor="@color/colorWhite"
+    app:cnb_backgroundColor="@color/colorPrimary"/>
+<item
+    android:id="@+id/menu_inventario_admin"
+    android:icon="@drawable/icon_inventario_admin"
+    android:title="Inventario"
+    app:cnb_iconColor="@color/colorWhite"
+    app:cnb_backgroundColor="@color/colorPrimary" />
+</menu>

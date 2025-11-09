@@ -12,7 +12,6 @@ public class BannerModel {
     public BannerModel() {
 
     }
-
     public String getUrl() {
         return url;
     }

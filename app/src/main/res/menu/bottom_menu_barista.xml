@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<item
+    android:id="@+id/menu_home_barista"
+    android:icon="@drawable/icon_home"
+    android:title="Inicio"
+    app:cnb_backgroundColor="@color/colorPrimary"
+    app:cnb_iconColor="@color/colorWhite"/>
+<item
+    android:id="@+id/menu_detalle_barista"
+    android:icon="@drawable/icon_detalle_barista"
+    android:title="Detalle"
+    app:cnb_backgroundColor="@color/colorPrimary"
+    app:cnb_iconColor="@color/colorWhite"/>
+<item
+    android:id="@+id/menu_historial_barista"
+    android:icon="@drawable/icon_historial"
+    android:title="Historial"
+    app:cnb_iconColor="@color/colorWhite"
+    app:cnb_backgroundColor="@color/colorPrimary"/>
+<item
+    android:id="@+id/menu_notificaciones_barista"
+    android:icon="@drawable/icon_notificaciones_barista"
+    android:title="Notificaciones"
+    app:cnb_iconColor="@color/colorWhite"
+    app:cnb_backgroundColor="@color/colorPrimary"/>
+<item
+    android:id="@+id/menu_perfil_barista"
+    android:icon="@drawable/icon_perfil"
+    android:title="Perfil"
+    app:cnb_iconColor="@color/colorWhite"
+    app:cnb_backgroundColor="@color/colorPrimary" />
+</menu>

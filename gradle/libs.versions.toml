@@ -11,6 +11,9 @@ googleGmsGoogleServices = "4.4.3"
 firebaseDatabase = "22.0.1"
 recyclerview = "1.4.0"
 viewpager2 = "1.1.0"
+playServicesCastFramework = "22.2.0"
+tracingPerfettoHandshake = "1.0.0"
+volley = "1.2.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -23,6 +26,9 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 viewpager2 = { group = "androidx.viewpager2", name = "viewpager2", version.ref = "viewpager2" }
+play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
+tracing-perfetto-handshake = { group = "androidx.tracing", name = "tracing-perfetto-handshake", version.ref = "tracingPerfettoHandshake" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
