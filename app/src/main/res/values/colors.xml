@@ -11,6 +11,7 @@
 
     <!--    Neutral    -->
     <color name="colorBlack">#000000</color>
+    <color name="colorGrey300">#E0E0E0</color>
     <color name="colorGrey800">#585858</color>
     <color name="colorGrey600">#B0B4B4</color>
     <color name="colorGrey400">#DBDFDF</color>
@@ -39,6 +40,11 @@
     <color name="colorOnBlue">#35629A</color>
     <color name="colorPurple">#D4C5E7</color>
     <color name="colorOnPurple">#493E95</color>
+    <color name="colorVerdeOscuro">#4CAF50</color>
+    <color name="colorRojo">#D71454</color>
+    <color name="colorBrown">#5A3F0C</color>
+    <color name="colorGreenLight">#E6F4D9</color>
+    <color name="colorGrey">#D9D9D9</color>
 
 
 </resources>
