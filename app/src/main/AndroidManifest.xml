@@ -16,6 +16,18 @@
         android:theme="@style/Theme.app_android"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.barista.BaristaHistorialFrag"
+            android:exported="false" />
+        <activity
+            android:name=".ui.barista.BaristaInventarioFragment"
+            android:exported="false" />
+        <activity
+            android:name=".ui.barista.BaristaInicioFragment"
+            android:exported="false" />
+        <activity
+            android:name=".ui.barista.GestionPedidosFragment"
+            android:exported="false" />
+        <activity
             android:name=".ui.delivery.DeliveryMainActivity"
             android:exported="false" />
         <activity
