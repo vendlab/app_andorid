@@ -22,7 +22,6 @@
             android:layout_height="wrap_content">
 
 
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 android:layout_width="wrap_content"
@@ -95,13 +94,10 @@
 
             <!-- LISTA DE PEDIDOS -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerPedidos"
+                android:id="@+id/recyclerViewPedidos"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingBottom="16dp"
-                tools:listitem="@layout/item_pedido_home"
-                tools:itemCount="4"/>
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
