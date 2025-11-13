@@ -26,10 +26,10 @@
     <!--    Accent -->
     <color name="colorRed">#FFC1CE</color>
     <color name="colorOnRed">#93344B</color>
-    <color name="colorOrange">#F9C7A4</color>
+    <color name="colorOnYellow">#F9C7A4</color>
     <color name="colorOnOrange">#A1673E</color>
     <color name="colorYellow">#F9E7A4</color>
-    <color name="colorOnYellow">#DEAB29</color>
+    <color name="colorOrange">#FF9800</color>
     <color name="colorGreen">#D5EBDD</color>
     <color name="colorOnGreen">#54AC78</color>
     <color name="colorTurquoise">#C5E7E7</color>
@@ -38,6 +38,12 @@
     <color name="colorOnBlue">#35629A</color>
     <color name="colorPurple">#D4C5E7</color>
     <color name="colorOnPurple">#493E95</color>
+    <color name="colorVerdeOscuro">#4CAF50</color>
+    <color name="colorRojo">#D71454</color>
+    <color name="colorBrown">#5A3F0C</color>
+    <color name="colorGreenLight">#E6F4D9</color>
+
+
 
 
 </resources>
