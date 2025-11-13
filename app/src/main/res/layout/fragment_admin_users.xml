@@ -1,14 +1,378 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.admin.AdminUsersFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!--Apartado para la cabecera-->
+    <RelativeLayout
+        android:id="@+id/header_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gb_gradient_green_transparent"
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="8dp">
+
+        <TextView
+            android:id="@+id/greeting_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="Buenas tardes, carla"
+            android:textColor="#212121"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/greeting_text"
+            android:layout_alignStart="@id/greeting_text"
+            android:text="Administradora kaphly Perú"
+            android:textColor="#212121"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/ic_person"
+            tools:ignore="ContentDescription" />
+
+        <ImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/imageView"
+            android:src="@drawable/ic_notifications"
+            tools:ignore="ContentDescription" />
+    </RelativeLayout>
+
+    <!-- Contenido principal -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Admin Usuarios" />
+        android:layout_below="@id/header_container"
+        android:fillViewport="true">
 
-</FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <!-- Título y Botón -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:text="Gestión de Usuarios"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:backgroundTint="@color/colorBlack"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="+ Nuevo Usuario"
+                    android:textColor="@color/colorWhite" />
+            </RelativeLayout>
+
+            <!-- Búsqueda y Filtro -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/search_text_input_layout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:hintEnabled="false"
+                    app:boxStrokeWidth="1dp"
+                    app:boxStrokeColor="#E0E0E0"
+                    app:boxBackgroundColor="#F5F5F5"
+                    app:boxCornerRadiusTopStart="8dp"
+                    app:boxCornerRadiusTopEnd="8dp"
+                    app:boxCornerRadiusBottomStart="8dp"
+                    app:boxCornerRadiusBottomEnd="8dp">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:drawableStart="@drawable/ic_search"
+                        android:drawablePadding="8dp"
+                        android:drawableTint="#616161"
+                        android:hint="Buscar usuarios"
+                        android:paddingStart="12dp"
+                        android:textColor="#212121"
+                        android:textColorHint="#212121" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/roles_filter_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:drawableEnd="@drawable/ic_arrow_down"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical|start"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="Todos los roles"
+                    android:textColor="#212121"
+                    app:drawableTint="#616161" />
+            </LinearLayout>
+
+            <!-- 4. CABECERAS DE LA TABLA -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.8"
+                    android:text="Usuario"
+                    android:textColor="@color/colorBlack"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.0"
+                    android:text="Rol"
+                    android:textColor="@color/colorBlack"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.8"
+                    android:text="Estado"
+                    android:textColor="@color/colorBlack"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.4"
+                    android:text="Acciones"
+                    android:gravity="center"
+                    android:textColor="@color/colorBlack"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#E0E0E0" />
+
+            <!--  María Gonzales -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.8"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="María Gonzales"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="maria@cafeteria.com"
+                        android:textColor="#616161"
+                        android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2.0" android:layout_marginEnd="4dp" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Administrador" android:textColor="#8A2BE2" android:textSize="10sp" android:maxLines="1" android:textStyle="bold" android:ellipsize="end" tools:ignore="SmallSp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1.8" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Activo" android:textColor="#1E8E3E" android:textSize="11sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end"/>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.4"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+                    <ImageView
+                        android:id="@+id/edit_icon_1"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:padding="6dp"
+                        android:contentDescription="Editar Usuario"
+                        tools:src="@drawable/ic_edit" />
+                    <ImageView
+                        android:id="@+id/delete_icon_1"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="4dp"
+                        android:padding="6dp"
+                        android:contentDescription="Eliminar Usuario"
+                        tools:src="@drawable/ic_delete" />
+                </LinearLayout>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="2dp" android:background="#E0E0E0"/>
+
+            <!-- Carlos Ruiz -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.8"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Carlos Ruiz" android:textColor="@color/colorBlack" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="carlos@cafeteria.com" android:textColor="#616161" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2.0" android:layout_marginEnd="4dp" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Barista" android:textColor="#1E90FF" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold" tools:ignore="SmallSp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1.8" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Activo" android:textColor="#1E8E3E" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.4" android:gravity="end" android:orientation="horizontal">
+                    <ImageView android:id="@+id/edit_icon_2" android:layout_width="32dp" android:layout_height="32dp" android:padding="6dp" tools:src="@drawable/ic_edit"/>
+                    <ImageView android:id="@+id/delete_icon_2" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginStart="4dp" android:padding="6dp" tools:src="@drawable/ic_delete"/>
+                </LinearLayout>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="2dp" android:background="#E0E0E0"/>
+
+            <!-- Ana López -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.8"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ana López" android:textColor="@color/colorBlack" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ana@cafeteria.com" android:textColor="#616161" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2.0" android:layout_marginEnd="4dp" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Cajero" android:textColor="#32CD32" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold" tools:ignore="SmallSp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1.8" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Inactivo" android:textColor="#FF4500" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.4" android:gravity="end" android:orientation="horizontal">
+                    <ImageView android:id="@+id/edit_icon_3" android:layout_width="32dp" android:layout_height="32dp" android:padding="6dp" tools:src="@drawable/ic_edit"/>
+                    <ImageView android:id="@+id/delete_icon_3" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginStart="4dp" android:padding="6dp" tools:src="@drawable/ic_delete"/>
+                </LinearLayout>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="2dp" android:background="#E0E0E0"/>
+
+            <!--  Luis Torres -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.8"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Luis Torres" android:textColor="@color/colorBlack" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="luis@cafeteria.com" android:textColor="#616161" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2.0" android:layout_marginEnd="4dp" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Barista" android:textColor="#1E90FF" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold" tools:ignore="SmallSp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1.8" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Activo" android:textColor="#1E8E3E" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.4" android:gravity="end" android:orientation="horizontal">
+                    <ImageView android:id="@+id/edit_icon_4" android:layout_width="32dp" android:layout_height="32dp" android:padding="6dp" tools:src="@drawable/ic_edit"/>
+                    <ImageView android:id="@+id/delete_icon_4" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginStart="4dp" android:padding="6dp" tools:src="@drawable/ic_delete"/>
+                </LinearLayout>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="2dp" android:background="#E0E0E0"/>
+
+            <!-- Jimena Cerquín -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.8"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Jimena Cerquín" android:textColor="@color/colorBlack" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="jimena@cafeteria.com" android:textColor="#616161" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2.0" android:layout_marginEnd="4dp" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Cajero" android:textColor="#32CD32" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold" tools:ignore="SmallSp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1.8" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Inactivo" android:textColor="#FF4500" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.4" android:gravity="end" android:orientation="horizontal">
+                    <ImageView android:id="@+id/edit_icon_5" android:layout_width="32dp" android:layout_height="32dp" android:padding="6dp" tools:src="@drawable/ic_edit"/>
+                    <ImageView android:id="@+id/delete_icon_5" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginStart="4dp" android:padding="6dp" tools:src="@drawable/ic_delete"/>
+                </LinearLayout>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="2dp" android:background="#E0E0E0"/>
+
+            <!-- Juan Pérez -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingVertical="16dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2.8"
+                    android:orientation="vertical">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Juan Pérez" android:textColor="@color/colorBlack" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="juan@cafeteria.com" android:textColor="#616161" android:textSize="12sp" />
+                </LinearLayout>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2.0" android:layout_marginEnd="4dp" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Barista" android:textColor="#1E90FF" android:textSize="10sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold" tools:ignore="SmallSp"/>
+                <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_weight="1.8" android:gravity="center" android:paddingHorizontal="6dp" android:paddingVertical="4dp" android:text="Activo" android:textColor="#1E8E3E" android:textSize="11sp" android:maxLines="1" android:ellipsize="end" android:textStyle="bold"/>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.4" android:gravity="end" android:orientation="horizontal">
+                    <ImageView android:id="@+id/edit_icon_6" android:layout_width="32dp" android:layout_height="32dp" android:padding="6dp" tools:src="@drawable/ic_edit"/>
+                    <ImageView android:id="@+id/delete_icon_6" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginStart="4dp" android:padding="6dp" tools:src="@drawable/ic_delete"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</RelativeLayout>
