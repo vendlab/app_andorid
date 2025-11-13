@@ -137,7 +137,6 @@
                     android:clipToPadding="false"
                     android:orientation="vertical"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_ingrediente_inventario"
                     tools:itemCount="3"/>
 
 
@@ -158,7 +157,7 @@
                     android:paddingBottom="16dp"
                     app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                     app:spanCount="2"
-                    tools:listitem="@layout/item_inventario_producto"
+                    tools:listitem="@layout/item_product_popular"
                     tools:itemCount="4"/>
 
             </LinearLayout>
