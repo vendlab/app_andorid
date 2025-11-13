@@ -39,6 +39,7 @@ public class ProductViewModel extends AndroidViewModel {
 //        String wsUrl = "ws://10.0.2.2:8080/ws-products";
 
 
+
         GenericWebSocketManager<ProductWebSocketEvent> wsManager =
                 new GenericWebSocketManager<>(wsUrl, token, "/topic/products", ProductWebSocketEvent.class);
 
