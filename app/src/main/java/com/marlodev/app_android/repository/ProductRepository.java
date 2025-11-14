@@ -32,8 +32,6 @@ public class ProductRepository {
     private final MutableLiveData<List<Product>> _products = new MutableLiveData<>(new ArrayList<>());
     public LiveData<List<Product>> products = _products;
 
-    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(true);
-    public LiveData<Boolean> isLoading = _isLoading;
 
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     public LiveData<String> errorMessage = _errorMessage;
@@ -96,7 +94,6 @@ public class ProductRepository {
         }
 
         _products.postValue(currentList);
-        _isLoading.postValue(false);
     }
 
     /** Conexión WS con token */
@@ -120,17 +117,14 @@ public class ProductRepository {
     }
 
     public void loadProducts() {
-        _isLoading.postValue(true);
         apiService.getProducts().enqueue(new Callback<List<Product>>() {
             @Override
             public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     _products.postValue(response.body());
-                    _isLoading.postValue(false);
                     Log.d(TAG, "✅ Productos cargados: " + response.body().size());
                 } else {
                     _errorMessage.postValue("Error al cargar los productos (" + response.code() + ")");
-                    _isLoading.postValue(false);
                     Log.e(TAG, "⚠️ Error al cargar productos: " + response.code());
                 }
             }
@@ -144,28 +138,67 @@ public class ProductRepository {
 
         });
     }
+    public void loadProductsWithCallback(Runnable onComplete) {
+        apiService.getProducts().enqueue(new Callback<List<Product>>() {
+            @Override
+            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    _products.postValue(response.body());
+                } else {
+                    _errorMessage.postValue("Error al cargar los productos (" + response.code() + ")");
+                }
+                onComplete.run();
+            }
+
+            @Override
+            public void onFailure(Call<List<Product>> call, Throwable t) {
+                _errorMessage.postValue("Error de red");
+                retryLoadProductsWithDelay(1);
+                onComplete.run();
+            }
+        });
+    }
 
     /** Obtener producto por ID */
+
     public LiveData<Product> getProductById(long id) {
-        MutableLiveData<Product> productLiveData = new MutableLiveData<>();
+        MutableLiveData<Product> liveData = new MutableLiveData<>();
+
+        // 1️⃣ Buscar localmente
+        List<Product> list = _products.getValue();
+        Product local = null;
+
+        if (list != null) {
+            local = list.stream()
+                    .filter(p -> p.getId() == id)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (local != null) {
+            liveData.postValue(local);
+            return liveData; // ⬅ No hace falta llamar a la API
+        }
+
+        // 2️⃣ Solo si NO hay producto local, ir a la API
         apiService.getProductById(id).enqueue(new Callback<Product>() {
             @Override
             public void onResponse(Call<Product> call, Response<Product> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    productLiveData.postValue(response.body());
+                    liveData.postValue(response.body());
                 } else {
-                    productLiveData.postValue(null);
-                    Log.w(TAG, "⚠️ Producto no encontrado ID: " + id);
+                    liveData.postValue(null);
                 }
             }
 
             @Override
             public void onFailure(Call<Product> call, Throwable t) {
-                productLiveData.postValue(null);
-                Log.e(TAG, "❌ Falló la conexión para producto ID: " + id, t);
+                liveData.postValue(null);
             }
         });
-        return productLiveData;
+
+        return liveData;
     }
+
 }
 

@@ -156,13 +156,15 @@
                         android:text="Items"
                         android:textSize="16sp"
                         android:textColor="#555555" />
+
                     <TextView
+                        android:id="@+id/txtTotalItems"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
                         android:text="S/. 23.57"
-                        android:textSize="16sp"
                         android:textColor="#555555"
-                        android:layout_alignParentEnd="true" />
+                        android:textSize="16sp" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -176,6 +178,7 @@
                         android:textSize="16sp"
                         android:textColor="#555555" />
                     <TextView
+                        android:id="@+id/txt_descuento_car"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="S/. 3.57"
@@ -201,6 +204,7 @@
                         android:textStyle="bold"
                         android:textColor="#333333" />
                     <TextView
+                        android:id="@+id/txtTotalPriceCar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="S/. 26.57"
@@ -223,7 +227,7 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:id="@+id/place_order_button"
+            android:id="@+id/btnRealizarOrder"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="Realizar orden"
