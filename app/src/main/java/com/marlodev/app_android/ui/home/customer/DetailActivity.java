@@ -27,7 +27,6 @@ public class DetailActivity extends AppCompatActivity {
     private ActivityDetailBinding binding;
     private ClientProductDetailVM vm;
     private SessionManager sessionManager;
-
     private long productId;
 
     private final ActivityResultLauncher<Intent> loginLauncher =
@@ -49,18 +48,15 @@ public class DetailActivity extends AppCompatActivity {
 
         binding.txtQuantity.setText("1");
         binding.btnPlus.setOnClickListener(v -> {
-            int quantity = getQuantity();
-            quantity++;  // incrementa
+            int quantity = getQuantity() + 1;
             binding.txtQuantity.setText(String.valueOf(quantity));
         });
 
         binding.btnMinus.setOnClickListener(v -> {
             int quantity = getQuantity();
-            if (quantity > 1) {  // nunca menos de 1
-                quantity--;
-                binding.txtQuantity.setText(String.valueOf(quantity));
-            }
+            if (quantity > 1) binding.txtQuantity.setText(String.valueOf(quantity - 1));
         });
+
         Window window = getWindow();
         window.setStatusBarColor(Color.TRANSPARENT);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
@@ -72,7 +68,6 @@ public class DetailActivity extends AppCompatActivity {
 
         vm = new ViewModelProvider(this).get(ClientProductDetailVM.class);
         sessionManager = SessionManager.getInstance(this);
-
 
         binding.btnArrowLeft.setOnClickListener(v -> finish());
 
@@ -86,6 +81,7 @@ public class DetailActivity extends AppCompatActivity {
                 loginLauncher.launch(new Intent(this, LoginActivity.class));
             }
         });
+
         observeViewModel();
     }
 

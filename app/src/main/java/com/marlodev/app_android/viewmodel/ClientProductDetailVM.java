@@ -17,6 +17,7 @@ import com.marlodev.app_android.network.order.CartApi;
 import com.marlodev.app_android.model.ProductWebSocketEvent;
 import com.marlodev.app_android.repository.CartRepository;
 import com.marlodev.app_android.repository.ProductRepository;
+import com.marlodev.app_android.utils.CartNotifier;
 import com.marlodev.app_android.utils.SessionManager;
 
 import java.math.BigDecimal;
@@ -80,26 +81,25 @@ public class ClientProductDetailVM extends AndroidViewModel {
             return;
         }
 
-        // 🔹 Obtener el producto actual cargado
         Product current = product.getValue();
         if (current == null) {
             errorMessage.postValue("El producto aún no se ha cargado");
             return;
         }
 
-        // 🔹 Construir request usando los campos obligatorios
         CartItemRequest request = new CartItemRequest(
                 productId,
-                null,                   // Sin variantes
-                null,                   // Sin extras
-                (int) quantity,         // Quantity como Integer
-                BigDecimal.valueOf(current.getPrice())   // Convertir double → BigDecimal
+                null,
+                null,
+                (int) quantity,
+                BigDecimal.valueOf(current.getPrice())
         );
 
         cartRepo.addItem(request, new CartRepository.SimpleCallback<OrderResponse>() {
             @Override
             public void onSuccess(OrderResponse result) {
                 navigationEvent.postValue("ADDED_TO_CART");
+                CartNotifier.notifyCartUpdated(); // 🔹 notificar cambio global
             }
 
             @Override
@@ -109,12 +109,11 @@ public class ClientProductDetailVM extends AndroidViewModel {
         });
     }
 
-    /** Conectar WS para actualizaciones en tiempo real */
+    /** WS */
     public void connectWebSocket() {
         productRepo.connectWebSocket();
     }
 
-    /** Desconectar WS al destruir ViewModel */
     @Override
     protected void onCleared() {
         super.onCleared();

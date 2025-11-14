@@ -1,15 +1,21 @@
 package com.marlodev.app_android.model.order;
 
 public class CartItem {
-    private ProductResponse product; // la info del producto
-    private int quantity;            // cantidad en el carrito
 
-    public CartItem(ProductResponse product, int quantity) {
+    private Long id; // ← id del item en el carrito
+    private ProductResponse product;
+    private int quantity;
+
+    public CartItem(Long id, ProductResponse product, int quantity) {
+        this.id = id;
         this.product = product;
         this.quantity = quantity;
     }
 
     // getters y setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
     public ProductResponse getProduct() { return product; }
     public void setProduct(ProductResponse product) { this.product = product; }
 

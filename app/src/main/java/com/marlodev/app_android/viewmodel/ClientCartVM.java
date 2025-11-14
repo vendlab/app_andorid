@@ -14,6 +14,7 @@ import com.marlodev.app_android.model.order.ProductResponse;
 import com.marlodev.app_android.repository.CartRepository;
 import com.marlodev.app_android.network.ApiClient;
 import com.marlodev.app_android.network.order.CartApi;
+import com.marlodev.app_android.utils.CartNotifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,6 @@ public class ClientCartVM extends AndroidViewModel {
     private final MutableLiveData<List<CartItem>> cartItems = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>(null);
-
     private final MutableLiveData<Integer> totalItems = new MutableLiveData<>(0);
     private final MutableLiveData<Double> totalPrice = new MutableLiveData<>(0.0);
 
@@ -42,6 +42,7 @@ public class ClientCartVM extends AndroidViewModel {
     public LiveData<Integer> getTotalItems() { return totalItems; }
     public LiveData<Double> getTotalPrice() { return totalPrice; }
 
+    /** Carga el carrito desde el backend */
     public void loadCart() {
         isLoading.setValue(true);
         repository.getCart(new CartRepository.SimpleCallback<OrderResponse>() {
@@ -49,10 +50,12 @@ public class ClientCartVM extends AndroidViewModel {
             public void onSuccess(OrderResponse result) {
                 List<CartItem> list = new ArrayList<>();
                 if (result != null && result.getItems() != null) {
+
                     for (CartItemResponse item : result.getItems()) {
                         ProductResponse product = item.getProduct();
                         int qty = item.getQuantity() != null ? item.getQuantity() : 1;
-                        list.add(new CartItem(product, qty));
+                        Long cartItemId = item.getId(); // ← ID del item en el carrito
+                        list.add(new CartItem(cartItemId, product, qty)); // ahora son 3 argumentos
                     }
                 }
                 cartItems.postValue(list);
@@ -68,21 +71,38 @@ public class ClientCartVM extends AndroidViewModel {
         });
     }
 
+    /** Actualiza cantidad de un item */
     public void updateQuantity(CartItem item, int newQty) {
         item.setQuantity(newQty);
         cartItems.setValue(cartItems.getValue()); // refresca LiveData
         recalcTotals(cartItems.getValue());
-        // Aquí también puedes llamar al backend: repository.updateItem(...)
+        CartNotifier.notifyCartUpdated(); // 🔹 notificar cambio
     }
 
+    /** Elimina un item del carrito */
+
+
+
+
     public void deleteItem(CartItem item) {
-        repository.deleteItem(item.getProduct().getId(), new CartRepository.SimpleCallback<OrderResponse>() {
+        repository.deleteItem(item.getId(), new CartRepository.SimpleCallback<OrderResponse>() {
             @Override
             public void onSuccess(OrderResponse result) {
-                List<CartItem> current = new ArrayList<>(cartItems.getValue());
-                current.remove(item);
-                cartItems.postValue(current);
-                recalcTotals(current);
+
+                List<CartItem> updatedList = new ArrayList<>();
+
+                if (result != null && result.getItems() != null) {
+                    for (CartItemResponse resp : result.getItems()) {
+                        ProductResponse product = resp.getProduct();
+                        int qty = resp.getQuantity() != null ? resp.getQuantity() : 1;
+                        updatedList.add(new CartItem(resp.getId(), product, qty)); // ✔️ 3 argumentos
+                    }
+                }
+
+                cartItems.postValue(updatedList);
+                recalcTotals(updatedList);
+
+                CartNotifier.notifyCartUpdated();
             }
 
             @Override
@@ -92,6 +112,8 @@ public class ClientCartVM extends AndroidViewModel {
         });
     }
 
+
+    /** Calcula totales */
     private void recalcTotals(List<CartItem> items) {
         if (items == null) return;
         int count = 0;
@@ -103,5 +125,31 @@ public class ClientCartVM extends AndroidViewModel {
         }
         totalItems.postValue(count);
         totalPrice.postValue(total);
+    }
+
+    /** Checkout */
+    public void checkout() {
+        isLoading.setValue(true);
+        repository.checkout(new CartRepository.SimpleCallback<OrderResponse>() {
+            @Override
+            public void onSuccess(OrderResponse result) {
+                cartItems.postValue(new ArrayList<>());
+                recalcTotals(new ArrayList<>());
+                isLoading.postValue(false);
+                errorMessage.postValue("Compra realizada exitosamente");
+                CartNotifier.notifyCartUpdated(); // 🔹 notificar cambio
+            }
+
+            @Override
+            public void onError(String message) {
+                errorMessage.postValue(message);
+                isLoading.postValue(false);
+            }
+        });
+    }
+
+    /** Recargar carrito desde cualquier lugar */
+    public void refreshCart() {
+        loadCart();
     }
 }
