@@ -20,7 +20,7 @@ public interface OrderApi {
     @GET("orders/{orderId}/tracking")
     Call<OrderTrackingResponse> getOrderTracking(@Path("orderId") Long orderId);
 
-    @GET("orders/assets")
+    @GET("orders/active")
     Call<List<OrderResponse>> getActiveOrders();
 
 

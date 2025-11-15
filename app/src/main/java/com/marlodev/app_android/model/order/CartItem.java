@@ -2,11 +2,10 @@ package com.marlodev.app_android.model.order;
 
 public class CartItem {
 
-    private Long id; // ← id del item en el carrito
+    private Long id;
     private ProductResponse product;
     private int quantity;
 
-//    private String message;
 
    public CartItem(Long id, ProductResponse product, int quantity) {
         this.id = id;
@@ -24,11 +23,5 @@ public class CartItem {
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
 
-//    public String getMessage() {
-//        return message;
-//    }
-//
-//    public void setMessage(String message) {
-//        this.message = message;
-//    }
+
 }

@@ -54,14 +54,14 @@
             tools:textColor="#2E8B57"/>
 
         <TextView
-            android:id="@+id/text_status_detail"
+            android:id="@+id/tv_order_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="#777777"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/item_image"
-            tools:layout_editor_absoluteY="13dp"
+            app:layout_constraintStart_toStartOf="@+id/tv_order_status"
+            app:layout_constraintTop_toBottomOf="@+id/tv_order_status"
             tools:text="Estamos preparando su pedido con cuidado para garantizar que llegue en perfectas condiciones." />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
