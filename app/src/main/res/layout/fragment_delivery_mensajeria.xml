@@ -1,14 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.delivery.DeliveryMensajeriaFragment">
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    android:padding="12dp">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- Header del chat -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Delivery mensajeria" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp">
 
-</FrameLayout>
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_circle_lightgray"
+            android:src="@drawable/icon_left_arrow"
+            android:contentDescription="Volver" />
+
+        <ImageView
+            android:id="@+id/imgPerfil"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/icon_perfil"
+            android:background="@drawable/bg_circle_lightgray"
+            android:scaleType="centerCrop" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp">
+
+            <TextView
+                android:id="@+id/txtNombre"
+                android:text="Hugo Silva"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_height="0dp"
+                android:layout_width="0dp" />
+
+            <TextView
+                android:id="@+id/txtEstado"
+                android:text="Online"
+                android:textColor="#00A859"
+                android:textSize="12sp"
+                android:layout_height="0dp"
+                android:layout_width="0dp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnLlamar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_circle_lightgray"
+            android:src="@drawable/ic_call"
+            android:contentDescription="Llamar" />
+    </LinearLayout>
+
+    <!-- Lista de mensajes -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerChat"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        android:paddingVertical="8dp" />
+
+    <!-- Campo de texto y botón enviar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/edtMensaje"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:hint="Message..."
+            android:background="@drawable/bg_input_chat"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#999999"
+            android:textSize="14sp" />
+
+        <ImageButton
+            android:id="@+id/btnEnviar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_send_button"
+            android:src="@drawable/icon_email"
+            android:contentDescription="Enviar mensaje"
+            app:tint="#FFFFFF" />
+    </LinearLayout>
+</LinearLayout>

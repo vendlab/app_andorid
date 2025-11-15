@@ -1,87 +1,78 @@
 package com.marlodev.app_android.ui.delivery;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
-import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
-import com.marlodev.app_android.utils.SessionManager;
+import com.marlodev.app_android.adapter.PedidoAdapter;
+import com.marlodev.app_android.domain.Pedido;
 
-public class DeliveryHomeFragment extends Fragment {
+import java.util.ArrayList;
+import java.util.List;
 
-    private TextView tvUserName, tvUserEmail, tvUserRole;
-    private MaterialButton btnLogout;
+public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPedidoClickListener {
+
+    private RecyclerView recyclerPedidos;
+    private PedidoAdapter pedidoAdapter;
+    private List<Pedido> listaPedidos;
+    private OnPedidoSelectedListener listener;
+
+    // Interfaz para comunicar con la Activity
+    public interface OnPedidoSelectedListener {
+        void onPedidoSelected(Pedido pedido);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnPedidoSelectedListener) {
+            listener = (OnPedidoSelectedListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " debe implementar OnPedidoSelectedListener");
+        }
+    }
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Inflamos el layout del fragment
-        View root = inflater.inflate(R.layout.fragment_delivery_home, container, false);
 
-        // Inicializamos views
-        initViews(root);
+        View view = inflater.inflate(R.layout.fragment_delivery_home, container, false);
+        recyclerPedidos = view.findViewById(R.id.recyclerViewPedidos);
+        recyclerPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Edge-to-edge (opcional, igual que en la Activity)
-        ViewCompat.setOnApplyWindowInsetsListener(root.findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        // Datos simulados
+        listaPedidos = new ArrayList<>();
+        listaPedidos.add(new Pedido(1, "Benjamin Rumay", "Jirón Del Comercio 456, Cajamarca, Perú", "1.2 km"));
+        listaPedidos.add(new Pedido(2, "Fany Palomino", "Avenida Los Héroes 1020, Cajamarca, Perú", "3.5 km"));
+        listaPedidos.add(new Pedido(3, "Hugo Silva", "Jirón Dos de Mayo 315, Cajamarca, Perú", "2.1 km"));
 
-        // Cargamos datos del usuario
-        loadUserData();
+        pedidoAdapter = new PedidoAdapter(listaPedidos, this);
+        recyclerPedidos.setAdapter(pedidoAdapter);
 
-        // Configuramos el botón de logout
-        setupLogoutButton();
-
-        return root;
+        return view;
     }
 
-    private void initViews(View root) {
-        tvUserName = root.findViewById(R.id.tvUserName);
-        tvUserEmail = root.findViewById(R.id.tvUserEmail);
-        tvUserRole = root.findViewById(R.id.tvUserRole);
-        btnLogout = root.findViewById(R.id.btnLogout);
+    @Override
+    public void onAceptarClick(Pedido pedido) {
+        Toast.makeText(getContext(), "Pedido de " + pedido.getCliente() + " aceptado", Toast.LENGTH_SHORT).show();
     }
 
-    private void loadUserData() {
-        SessionManager session = SessionManager.getInstance(requireContext());
-        String email = session.getEmail();
-        String role = session.getRole();
-
-        // Nombre simulado a partir del correo
-        String username = (email != null && email.contains("@"))
-                ? email.substring(0, email.indexOf("@"))
-                : "Delivery";
-
-        tvUserName.setText(username);
-        tvUserEmail.setText(email != null ? email : "correo@ejemplo.com");
-        tvUserRole.setText("Rol: " + (role != null ? role : "Desconocido"));
-    }
-
-    private void setupLogoutButton() {
-        btnLogout.setOnClickListener(v -> {
-            // Borrar sesión
-            SessionManager.getInstance(requireContext()).clear();
-
-            // Redirigir a MainActivity
-            Intent intent = new Intent(requireContext(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        });
+    @Override
+    public void onDetalleClick(Pedido pedido) {
+        if (listener != null) {
+            listener.onPedidoSelected(pedido);
+        }
     }
 }
