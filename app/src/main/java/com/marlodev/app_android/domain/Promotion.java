@@ -3,8 +3,6 @@ package com.marlodev.app_android.domain;
 import java.util.List;
 
 public class Promotion {
-
-
     private int id;
     private String description;
     private String type;
@@ -90,3 +88,7 @@ public class Promotion {
         this.productIds = productIds;
     }
 }
+
+
+
+

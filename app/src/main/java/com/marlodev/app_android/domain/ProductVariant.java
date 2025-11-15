@@ -7,6 +7,7 @@ public class ProductVariant {
     private List<String> temperature;
 
     public ProductVariant() {
+
     }
 
     public List<ProductVariantSize> getSizes() {
@@ -24,4 +25,5 @@ public class ProductVariant {
     public void setTemperature(List<String> temperature) {
         this.temperature = temperature;
     }
+
 }

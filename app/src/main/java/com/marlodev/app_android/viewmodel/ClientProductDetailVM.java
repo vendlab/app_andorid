@@ -120,3 +120,7 @@ public class ClientProductDetailVM extends AndroidViewModel {
         productRepo.disconnectWebSocket();
     }
 }
+
+
+
+
