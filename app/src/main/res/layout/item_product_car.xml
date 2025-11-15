@@ -100,7 +100,7 @@
                 android:id="@+id/minus_button"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                tools:src="@drawable/icon_right_arrow"
+                tools:src="@drawable/menos"
                 android:background="@android:color/transparent"
                 android:contentDescription="Diminuir quantidade"
                 android:padding="4dp" />
@@ -119,16 +119,18 @@
                 android:id="@+id/plus_button"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                tools:src="@drawable/icon_right_arrow"
+                tools:src="@drawable/plus"
                 android:background="@android:color/transparent"
+                android:contentDescription="Diminuir quantidade"
                 android:padding="4dp" />
+            plus_button
         </LinearLayout>
 
         <ImageView
             android:id="@+id/delete_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            tools:src="@drawable/favorite"
+            tools:src="@drawable/delete"
             android:tint="#888888" />
     </LinearLayout>
 

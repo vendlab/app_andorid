@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -18,10 +20,7 @@ import ua.naiksoftware.stomp.StompClient;
 import ua.naiksoftware.stomp.dto.StompHeader;
 
 /**
- * Generic WebSocket Manager
- *
- * Permite suscribirse a cualquier topic de STOMP de manera genérica y obtener
- * los eventos parseados en objetos tipo T.
+ * Generic WebSocket Manager profesional.
  *
  * @param <T> Tipo de evento (ProductWebSocketEvent, UserWebSocketEvent, etc.)
  */
@@ -30,7 +29,6 @@ public class GenericWebSocketManager<T> {
     private static final String TAG = "GenericWebSocket";
 
     private final StompClient stompClient;
-    private final MutableLiveData<T> eventLiveData = new MutableLiveData<>();
     private final Gson gson = new Gson();
     private final Class<T> eventClass;
     private final String wsUrl;
@@ -38,6 +36,20 @@ public class GenericWebSocketManager<T> {
     private final String topic;
 
     private Disposable subscription;
+    private final MutableLiveData<T> eventLiveData = new MutableLiveData<>();
+    private final MutableLiveData<ConnectionState> connectionState = new MutableLiveData<>(ConnectionState.DISCONNECTED);
+
+    // Scheduler seguro para reconexiones controladas
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private int retryDelay = 3; // segundos
+    private boolean reconnecting = false;
+
+    public enum ConnectionState {
+        CONNECTING,
+        CONNECTED,
+        DISCONNECTED,
+        ERROR
+    }
 
     public GenericWebSocketManager(String wsUrl, String token, String topic, Class<T> eventClass) {
         this.wsUrl = wsUrl;
@@ -48,80 +60,107 @@ public class GenericWebSocketManager<T> {
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
         stompClient.withClientHeartbeat(10000).withServerHeartbeat(10000);
 
-        // Monitoreo del lifecycle del WebSocket
         stompClient.lifecycle().subscribe(lifecycleEvent -> {
             Log.d(TAG, "📡 Estado WS: " + lifecycleEvent.getType());
             switch (lifecycleEvent.getType()) {
                 case OPENED:
-                    Log.i(TAG, "✅ WebSocket conectado correctamente");
+                    Log.i(TAG, "✅ WebSocket conectado");
+                    retryDelay = 3;
+                    reconnecting = false;
+                    connectionState.postValue(ConnectionState.CONNECTED);
                     subscribeToTopic();
                     break;
+
                 case ERROR:
-                    Log.e(TAG, "❌ Error en WebSocket", lifecycleEvent.getException());
+                    Log.e(TAG, "❌ Error WS", lifecycleEvent.getException());
+                    connectionState.postValue(ConnectionState.ERROR);
+                    scheduleReconnect();
                     break;
+
                 case CLOSED:
-                    Log.w(TAG, "⚠️ WebSocket cerrado, reintentando en 5s...");
-                    reconnect();
+                    Log.w(TAG, "⚠️ WebSocket cerrado");
+                    connectionState.postValue(ConnectionState.DISCONNECTED);
+                    scheduleReconnect();
                     break;
+
+                default:
+                    connectionState.postValue(ConnectionState.CONNECTING);
             }
         });
     }
 
-    /** Suscripción al topic */
+    /** Suscripción segura al topic */
     private void subscribeToTopic() {
         if (subscription != null && !subscription.isDisposed()) subscription.dispose();
 
-        Log.i(TAG, "📡 Subscribiéndose a " + topic);
         subscription = stompClient.topic(topic)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(message -> {
                     try {
                         T event = gson.fromJson(message.getPayload(), eventClass);
                         eventLiveData.postValue(event);
-                        Log.d(TAG, "🔔 Evento recibido en " + topic + ": " + event);
+                        Log.d(TAG, "🔔 Evento recibido: " + message.getPayload());
                     } catch (Exception e) {
                         Log.e(TAG, "❌ Error parseando evento WS", e);
                     }
-                }, throwable -> Log.e(TAG, "❌ Error al recibir evento WS", throwable));
+                }, throwable -> Log.e(TAG, "❌ Error recibiendo evento WS", throwable));
     }
 
-    /** Reconexión automática tras cierre */
-    private void reconnect() {
-        new Thread(() -> {
-            try {
-                TimeUnit.SECONDS.sleep(5);
-                connect();
-            } catch (InterruptedException e) {
-                Log.e(TAG, "❌ Error en reconexión WS", e);
-            }
-        }).start();
+    /** Reconexión controlada con backoff exponencial */
+    private void scheduleReconnect() {
+        if (reconnecting) return; // evita múltiples hilos
+        reconnecting = true;
+
+        scheduler.schedule(() -> {
+            Log.i(TAG, "🔁 Intentando reconectar al WS...");
+            connect();
+            retryDelay = Math.min(retryDelay * 2, 30); // aumenta hasta 30s
+            reconnecting = false; // permite siguiente reconexión si falla
+        }, retryDelay, TimeUnit.SECONDS);
     }
 
-
+    /** Conecta al WebSocket con headers */
     public void connect() {
-        List<StompHeader> headers = new ArrayList<>();
+        try {
+            List<StompHeader> headers = new ArrayList<>();
+            if (token != null && !token.isEmpty()) {
+                headers.add(new StompHeader("Authorization", "Bearer " + token));
+            }
 
-        if (token != null && !token.isEmpty()) {
-            headers.add(new StompHeader("Authorization", "Bearer " + token));
-            Log.i(TAG, "📌 Headers enviados: Authorization: Bearer " + token);
-        } else {
-            Log.w(TAG, "⚠️ Token nulo o vacío, conectando al WS de forma anónima");
+            connectionState.postValue(ConnectionState.CONNECTING);
+            stompClient.connect(headers);
+            Log.i(TAG, "🚀 Conectando a WS: " + wsUrl);
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Exception en connect()", e);
+            scheduleReconnect();
         }
-
-        Log.i(TAG, "🚀 Conectando al WebSocket: " + wsUrl);
-        stompClient.connect(headers);
     }
 
-
-    /** Desconecta y libera recursos */
+    /** Desconecta y libera recursos de manera segura */
     public void disconnect() {
-        if (subscription != null && !subscription.isDisposed()) subscription.dispose();
-        if (stompClient != null) stompClient.disconnect();
-        Log.i(TAG, "❎ Desconectado del WebSocket");
+        try {
+            if (subscription != null && !subscription.isDisposed()) subscription.dispose();
+            stompClient.disconnect();
+            connectionState.postValue(ConnectionState.DISCONNECTED);
+            reconnecting = false;
+            Log.i(TAG, "❎ WebSocket desconectado");
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Exception en disconnect()", e);
+        }
     }
 
-    /** Devuelve un LiveData para observar eventos */
+    /** Reconexión manual con delay seguro */
+    public void reconnectWithDelay(long delayMillis) {
+        scheduler.schedule(this::connect, delayMillis, TimeUnit.MILLISECONDS);
+    }
+
+    /** Eventos emitidos por el servidor */
     public LiveData<T> getEventLiveData() {
         return eventLiveData;
+    }
+
+    /** Estado actual del WebSocket */
+    public LiveData<ConnectionState> getConnectionState() {
+        return connectionState;
     }
 }

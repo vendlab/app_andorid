@@ -1,13 +1,16 @@
 package com.marlodev.app_android.ui.home.customer;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowInsetsController;
-import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -15,26 +18,45 @@ import com.bumptech.glide.Glide;
 import com.marlodev.app_android.R;
 import com.marlodev.app_android.databinding.ActivityDetailBinding;
 import com.marlodev.app_android.domain.Product;
-import com.marlodev.app_android.viewmodel.ProductViewModel;
+import com.marlodev.app_android.ui.auth.LoginActivity;
+import com.marlodev.app_android.utils.SessionManager;
+import com.marlodev.app_android.viewmodel.ClientProductDetailVM;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private ProductViewModel productViewModel;
     private ActivityDetailBinding binding;
+    private ClientProductDetailVM vm;
+    private SessionManager sessionManager;
+    private long productId;
 
+    private final ActivityResultLauncher<Intent> loginLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (sessionManager.isLoggedIn()) {
+                    vm.addToCart(productId, getQuantity());
+                } else {
+                    Toast.makeText(this, "Debes iniciar sesión", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // UI Edge-to-Edge
         EdgeToEdge.enable(this);
-
-        // ViewBinding
         binding = ActivityDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // ✅ Configurar la barra de estado (status bar) con íconos blancos
+        binding.txtQuantity.setText("1");
+        binding.btnPlus.setOnClickListener(v -> {
+            int quantity = getQuantity() + 1;
+            binding.txtQuantity.setText(String.valueOf(quantity));
+        });
+
+        binding.btnMinus.setOnClickListener(v -> {
+            int quantity = getQuantity();
+            if (quantity > 1) binding.txtQuantity.setText(String.valueOf(quantity - 1));
+        });
+
         Window window = getWindow();
         window.setStatusBarColor(Color.TRANSPARENT);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
@@ -42,65 +64,75 @@ public class DetailActivity extends AppCompatActivity {
                     0,
                     WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
             );
-        } else {
-            window.getDecorView().setSystemUiVisibility(
-                    window.getDecorView().getSystemUiVisibility()
-                            & ~android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            );
         }
 
-        // ViewModel
-        productViewModel = new ViewModelProvider(this).get(ProductViewModel.class);
+        vm = new ViewModelProvider(this).get(ClientProductDetailVM.class);
+        sessionManager = SessionManager.getInstance(this);
 
-        // Botón atrás
         binding.btnArrowLeft.setOnClickListener(v -> finish());
 
-        // Cargar producto
-        long productId = getIntent().getLongExtra("productId", -1);
-        if (productId != -1) {
-            loadProductDetail(productId);
-        }
+        productId = getIntent().getLongExtra("productId", -1);
+        if (productId != -1) vm.loadProduct(productId);
+
+        binding.btnAddCart.setOnClickListener(v -> {
+            if (sessionManager.isLoggedIn()) {
+                vm.addToCart(productId, getQuantity());
+            } else {
+                loginLauncher.launch(new Intent(this, LoginActivity.class));
+            }
+        });
+
+        observeViewModel();
     }
 
+    private void observeViewModel() {
 
-    /**
-     * Carga los detalles del producto usando ProductViewModel
-     */
-    private void loadProductDetail(long productId) {
-        // 1. Log para verificar que la búsqueda se inicia
-        Log.d("DEBUG_BUSQUEDA", "Buscando producto por ID: " + productId);
+        vm.getProduct().observe(this, this::displayProduct);
 
-        productViewModel.getProductById(productId).observe(this, product -> {
-            if (product != null) {
-                // 2. ÉXITO: Los datos llegaron.
-                Log.d("DEBUG_BUSQUEDA", "✅ Producto ENCONTRADO. Nombre: " + product.getName());
-                displayProduct(product);
-            } else {
-                // 3. FALLO: ViewModel no encontró el producto.
-                Log.e("DEBUG_BUSQUEDA", "❌ ERROR: Producto NO encontrado en el ViewModel para ID: " + productId);
+        vm.getIsLoading().observe(this, loading ->
+                binding.progressBarDetail.setVisibility(loading ? android.view.View.VISIBLE : android.view.View.GONE)
+        );
+
+        vm.getErrorMessage().observe(this, msg -> {
+            if (msg != null) {
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                Log.e("DETAIL", msg);
+            }
+        });
+
+        vm.getNavigationEvent().observe(this, event -> {
+            if (event == null) return;
+
+            if (event.startsWith("GO_LOGIN_FIRST")) {
+                loginLauncher.launch(new Intent(this, LoginActivity.class));
+            }
+
+            if (event.equals("ADDED_TO_CART")) {
+                Toast.makeText(this, "Producto agregado al carrito", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    /**
-     * Muestra los datos del producto en la UI
-     */
     private void displayProduct(Product product) {
+        if (product == null) return;
+
         binding.txtTitleProduct.setText(product.getName());
         binding.tvCurrentPrice.setText("S/." + product.getPrice());
         binding.tvOldPrice.setText("S/." + product.getOldPrice());
         binding.txtDescripcion.setText(product.getDescription());
 
-        // Cargar imagen principal con Glide
         if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
             Glide.with(this)
                     .load(product.getImageUrls().get(0))
                     .placeholder(R.drawable.ic_image_placeholder)
                     .error(R.drawable.ic_image_placeholder)
-                    .centerCrop()
                     .into(binding.imageView);
         } else {
             binding.imageView.setImageResource(R.drawable.ic_image_placeholder);
         }
+    }
+
+    private int getQuantity() {
+        return Integer.parseInt(binding.txtQuantity.getText().toString());
     }
 }

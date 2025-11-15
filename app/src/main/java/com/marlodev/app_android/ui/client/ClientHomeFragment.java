@@ -5,73 +5,70 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.marlodev.app_android.adapter.PopularAdapter;
-import com.marlodev.app_android.adapter.SliderAdapter;
 import com.marlodev.app_android.databinding.FragmentClientHomeBinding;
 import com.marlodev.app_android.domain.Product;
 import com.marlodev.app_android.ui.home.customer.DetailActivity;
-import com.marlodev.app_android.viewmodel.ProductViewModel;
+import com.marlodev.app_android.viewmodel.ClientHomeVM;
 
 import java.util.List;
 
 public class ClientHomeFragment extends Fragment {
 
     private FragmentClientHomeBinding binding;
-    private ProductViewModel productViewModel;
+    private ClientHomeVM clientHomeVM;
     private PopularAdapter popularAdapter;
-    private SliderAdapter sliderAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentClientHomeBinding.inflate(inflater, container, false);
 
-        productViewModel = new ViewModelProvider(requireActivity()).get(ProductViewModel.class);
+        clientHomeVM = new ViewModelProvider(requireActivity()).get(ClientHomeVM.class);
 
-        setupAdapters();
+        setupPopularAdapter();
         observeViewModel();
 
         return binding.getRoot();
     }
 
-    private void setupAdapters() {
-        // RecyclerView de productos populares
+    private void setupPopularAdapter() {
         popularAdapter = new PopularAdapter();
-        binding.popularView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        binding.popularView.setLayoutManager(
+                new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)
+        );
         binding.popularView.setAdapter(popularAdapter);
-        popularAdapter.setOnProductClickListener(this::openProductDetail);
 
-        // Slider de banners (si aplica)
-        binding.viewPagerSlider.setAdapter(sliderAdapter);
+        popularAdapter.setOnProductClickListener(this::openProductDetail);
     }
 
-     private void observeViewModel() {
-        // Observamos los productos
-        productViewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
-            popularAdapter.setProducts(products != null ? products : List.of());
-            binding.popularView.setVisibility(products != null && !products.isEmpty() ? View.VISIBLE : View.GONE);
-        });
-
-        // Observamos el estado de carga
-        productViewModel.getIsLoading().observe(getViewLifecycleOwner(), this::showPopularLoading);
+    private void observeViewModel() {
+        clientHomeVM.getProducts().observe(getViewLifecycleOwner(), this::updatePopularProducts);
+        clientHomeVM.getIsLoading().observe(getViewLifecycleOwner(), this::showLoading);
+        clientHomeVM.getErrorMessage().observe(getViewLifecycleOwner(), this::showError);
     }
 
     private void updatePopularProducts(List<Product> products) {
-        popularAdapter.setProducts(products != null ? products : List.of());
-        binding.popularView.setVisibility(products != null && !products.isEmpty() ? View.VISIBLE : View.GONE);
+        boolean hasData = products != null && !products.isEmpty();
+        popularAdapter.setProducts(hasData ? products : List.of());
+        binding.popularView.setVisibility(hasData ? View.VISIBLE : View.GONE);
     }
 
-    private void showPopularLoading(Boolean isLoading) {
-        boolean loading = Boolean.TRUE.equals(isLoading);
-        binding.progressBarPopular.setVisibility(loading ? View.VISIBLE : View.GONE);
+    private void showLoading(Boolean loading) {
+        boolean isLoading = Boolean.TRUE.equals(loading);
 
-        // Si no hay productos aún, ocultamos RecyclerView solo cuando esté vacío
-        if (!loading && popularAdapter.getItemCount() > 0) {
-            binding.popularView.setVisibility(View.VISIBLE);
+        binding.progressBarPopular.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        binding.popularView.setVisibility(!isLoading && popularAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private void showError(String error) {
+        if (error != null && !error.isBlank()) {
+            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -84,6 +81,6 @@ public class ClientHomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // evita memory leaks
+        binding = null;
     }
 }

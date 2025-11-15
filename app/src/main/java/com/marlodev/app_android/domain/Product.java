@@ -47,9 +47,11 @@ public class Product {
     // --------------------------
     // 🔹 Información adicional
     // --------------------------
-    private List<String> tags;
-    private List<ProductExtra> extras;
-    private ProductVariants variants;
+
+    // 🔹 Relaciones
+    private List<String> tags = new ArrayList<>();
+    private List<ProductExtra> extras = new ArrayList<>();
+    private List<ProductVariant> variants = new ArrayList<>(); // ✅ cambiado
 
     // --------------------------
     // 🔹 Conversión desde evento WebSocket
