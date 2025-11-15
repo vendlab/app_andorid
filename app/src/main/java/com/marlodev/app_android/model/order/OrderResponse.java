@@ -9,6 +9,8 @@ public class OrderResponse {
     private Integer userId;
     private String username;
     private String status;          // Enum como string
+
+    private String message;
     private BigDecimal totalAmount;     // BigDecimal → double
     private String createdAt;       // ZonedDateTime → String
     private String updatedAt;
@@ -63,6 +65,14 @@ public class OrderResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public void setTotalAmount(BigDecimal totalAmount) {

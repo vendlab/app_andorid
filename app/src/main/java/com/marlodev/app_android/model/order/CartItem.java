@@ -6,7 +6,9 @@ public class CartItem {
     private ProductResponse product;
     private int quantity;
 
-    public CartItem(Long id, ProductResponse product, int quantity) {
+//    private String message;
+
+   public CartItem(Long id, ProductResponse product, int quantity) {
         this.id = id;
         this.product = product;
         this.quantity = quantity;
@@ -21,4 +23,12 @@ public class CartItem {
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+
+//    public String getMessage() {
+//        return message;
+//    }
+//
+//    public void setMessage(String message) {
+//        this.message = message;
+//    }
 }
