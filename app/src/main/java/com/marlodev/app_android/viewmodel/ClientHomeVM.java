@@ -56,8 +56,8 @@ public class ClientHomeVM extends AndroidViewModel {
         // -----------------------------
         // Configurar WebSocket
         // -----------------------------
-        String wsUrl = "ws://10.0.2.2:8080/ws-products";
-//        String wsUrl = "wss://ecommerce-backend-o9y5.onrender.com/ws-products";
+        //String wsUrl = "ws://10.0.2.2:8080/ws-products";
+        String wsUrl = "wss://ecommerce-backend-o9y5.onrender.com/ws-products";
 
         // 🔹 Crear WebSocket manager
         webSocketManager = new GenericWebSocketManager<>(

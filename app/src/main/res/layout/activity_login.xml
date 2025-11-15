@@ -156,14 +156,16 @@
                 android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/txtRegistrarse"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=" Registrarse"
                 android:textColor="#A5C35D"
                 android:textStyle="bold"
-                android:textSize="14sp" />
-        </LinearLayout>
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true" />
     </LinearLayout>
-
+    </LinearLayout>
 </LinearLayout>
 

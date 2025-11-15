@@ -2,6 +2,8 @@ package com.marlodev.app_android.network;
 
 import com.marlodev.app_android.model.LoginRequest;
 import com.marlodev.app_android.model.LoginResponse;
+import com.marlodev.app_android.model.RegisterRequest;
+import com.marlodev.app_android.model.RegisterResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,4 +18,7 @@ public interface ApiService {
     Call<LoginResponse> login(@Body LoginRequest request);
 
     // Otros endpoints generales pueden ir aquí
+    @POST("auth/register")
+    Call<RegisterResponse> register(@Body RegisterRequest request);
+
 }

@@ -53,7 +53,6 @@
     </string>
 
 
-
     <string name="text_semanal">
         <font color="#35629A"><b>S/.Esta Semana</b></font>
     </string>
@@ -70,7 +69,6 @@
     </string>
 
 
-
     <string name="text_mes">
         <font color="#493E95"><b>S/.Este Mes</b></font>
     </string>
@@ -84,8 +82,6 @@
     <string name="mes_porcentajes">
         <font color="#4CAF50"><b>+15.3%</b></font>
     </string>
-
-
 
 
     <string name="ventas_hora">
@@ -111,7 +107,6 @@
     </string>
 
     <string name="user_icon_description">Icono de usuario</string>
-
 
 
 </resources>

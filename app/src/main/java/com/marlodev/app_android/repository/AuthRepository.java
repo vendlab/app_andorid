@@ -8,6 +8,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.marlodev.app_android.model.LoginRequest;
 import com.marlodev.app_android.model.LoginResponse;
+import com.marlodev.app_android.model.RegisterRequest;
+import com.marlodev.app_android.model.RegisterResponse;
 import com.marlodev.app_android.network.ApiClient;
 import com.marlodev.app_android.network.ApiService;
 
@@ -50,4 +52,32 @@ public class AuthRepository {
         });
         return liveData;
     }
+    public MutableLiveData<RegisterResponse> register(String name, String email, String password) {
+        MutableLiveData<RegisterResponse> liveData = new MutableLiveData<>();
+
+        RegisterRequest req = new RegisterRequest(name, email, password);
+
+        apiService.register(req).enqueue(new Callback<RegisterResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<RegisterResponse> call, @NonNull Response<RegisterResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    liveData.postValue(response.body());
+                } else {
+                    RegisterResponse error = new RegisterResponse();
+                    liveData.postValue(error);
+                    Log.e("AuthRepository", "Register failed: code=" + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<RegisterResponse> call, @NonNull Throwable t) {
+                RegisterResponse error = new RegisterResponse();
+                liveData.postValue(error);
+                Log.e("AuthRepository", "Register error: " + t.getMessage());
+            }
+        });
+
+        return liveData;
+    }
+
 }

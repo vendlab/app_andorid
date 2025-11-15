@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.marlodev.app_android.model.LoginResponse;
+import com.marlodev.app_android.model.RegisterResponse;
 import com.marlodev.app_android.repository.AuthRepository;
 import com.marlodev.app_android.utils.JwtUtils;
 import com.marlodev.app_android.utils.SessionManager;
@@ -45,11 +46,20 @@ public class AuthViewModel extends AndroidViewModel {
                 }
 
                 loginToken.postValue(token);
-                Log.d("AuthViewModel", "✅ Login exitoso. Token guardado.");
+                Log.d("AuthViewModel", "Login exitoso. Token guardado.");
             } else {
                 loginToken.postValue(null);
-                Log.e("AuthViewModel", "❌ Login fallido (response null).");
+                Log.e("AuthViewModel", "Login fallido (response null).");
             }
+        });
+    }
+
+    private final MutableLiveData<RegisterResponse> registerStatus = new MutableLiveData<>();
+    public LiveData<RegisterResponse> getRegisterStatus() { return registerStatus; }
+
+    public void register(String nombre, String email, String password) {
+        repository.register(nombre, email, password).observeForever(response -> {
+            registerStatus.postValue(response);
         });
     }
 

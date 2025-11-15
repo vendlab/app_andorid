@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/colorGrey100">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="0dp">
+
+        <!-- 💚 Encabezado -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:background="@drawable/ic_launcher_background_lr">
+
+            <ImageView
+                android:id="@+id/imgLogoRight"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:contentDescription="Logo Derecha"
+                android:scaleType="fitCenter"
+                android:src="@drawable/logo_kaphiy_light"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgLogoLeft"
+                android:layout_width="143dp"
+                android:layout_height="188dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:contentDescription="Logo Izquierda"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ilustra_login"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 🧾 Formulario -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-20dp"
+            android:background="@drawable/bg_rounded_top"
+            android:orientation="vertical"
+            android:padding="35dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Registrarse"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Nombre -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre completo"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/etNombre"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:hint="Ingresa tu nombre"
+                android:drawableStart="@drawable/icon_user"
+                android:drawablePadding="10dp"
+                android:paddingStart="16dp"
+                android:background="@drawable/bg_input_rounded"
+                android:inputType="textPersonName"
+                android:textColor="#000000"
+                android:textColorHint="@color/colorGrey800"
+                android:textSize="16sp" />
+
+            <!-- Email -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:hint="Ingresa tu correo"
+                android:drawableStart="@drawable/icon_email"
+                android:drawablePadding="10dp"
+                android:paddingStart="16dp"
+                android:background="@drawable/bg_input_rounded"
+                android:inputType="textEmailAddress"
+                android:textColor="#000000"
+                android:textColorHint="@color/colorGrey800"
+                android:textSize="16sp" />
+
+            <!-- Contraseña -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Contraseña"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:hint="Ingresa tu contraseña"
+                android:drawableStart="@drawable/icon_password"
+                android:drawablePadding="10dp"
+                android:paddingStart="16dp"
+                android:background="@drawable/bg_input_rounded"
+                android:inputType="textPassword"
+                android:textColor="#000000"
+                android:textColorHint="@color/colorGrey800"
+                android:textSize="16sp" />
+
+            <!-- Confirmar -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirmar contraseña"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginTop="10dp" />
+
+            <EditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="16dp"
+                android:hint="Repite tu contraseña"
+                android:drawableStart="@drawable/icon_password"
+                android:drawablePadding="10dp"
+                android:paddingStart="16dp"
+                android:background="@drawable/bg_input_rounded"
+                android:inputType="textPassword"
+                android:textColor="#000000"
+                android:textColorHint="@color/colorGrey800"
+                android:textSize="16sp" />
+
+            <!-- Botón -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="28dp"
+                android:backgroundTint="#C5D87B"
+                android:text="Registrarse"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                app:cornerRadius="28dp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                android:indeterminateTint="#A5C35D" />
+
+            <!-- Link login -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ya tengo cuenta."
+                    android:textColor="#000000"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" Iniciar Sesión"
+                    android:textColor="#A5C35D"
+                    android:textStyle="bold"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

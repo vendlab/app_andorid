@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private AuthViewModel authViewModel;
     private SessionManager sessionManager;
+    private TextView txtRegistrarse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         initViews();
         initViewModel();
 
-        // ✅ Si ya hay sesión activa, saltar el login
+        // Si ya hay sesión activa, saltar el login
         if (sessionManager.isLoggedIn()) {
             navigateToRoleHome(sessionManager.getRole());
             finish();
@@ -46,6 +48,12 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         btnLogin.setOnClickListener(v -> attemptLogin());
+
+        // Acción de ir a pantalla de registro
+        txtRegistrarse.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void initViews() {
@@ -53,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         progressBar = findViewById(R.id.progressBar);
+        txtRegistrarse = findViewById(R.id.txtRegistrarse);
         sessionManager = SessionManager.getInstance(this);
     }
 
@@ -87,8 +96,11 @@ public class LoginActivity extends AppCompatActivity {
             String[] parts = token.split("\\.");
             if (parts.length < 2) throw new IllegalArgumentException("Token inválido");
 
-            byte[] decodedBytes = android.util.Base64.decode(parts[1],
-                    android.util.Base64.URL_SAFE | android.util.Base64.NO_PADDING | android.util.Base64.NO_WRAP);
+            byte[] decodedBytes = android.util.Base64.decode(
+                    parts[1],
+                    android.util.Base64.URL_SAFE | android.util.Base64.NO_PADDING | android.util.Base64.NO_WRAP
+            );
+
             String payload = new String(decodedBytes);
             JSONObject json = new JSONObject(payload);
 
@@ -111,20 +123,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void navigateToRoleHome(String role) {
+
         String redirect = getIntent().getStringExtra("redirect");
         Intent intent;
 
         if ("ADMIN".equalsIgnoreCase(role) || "ROLE_ADMIN".equalsIgnoreCase(role)) {
             intent = new Intent(this, AdminMainActivity.class);
-        }
-        else if ("BARISTA".equalsIgnoreCase(role) || "ROLE_BARISTA".equalsIgnoreCase(role)) {
+        } else if ("BARISTA".equalsIgnoreCase(role) || "ROLE_BARISTA".equalsIgnoreCase(role)) {
             intent = new Intent(this, BaristaMainActivity.class);
-        }
-        else if ("DELIVERY".equalsIgnoreCase(role) || "ROLE_DELIVERY".equalsIgnoreCase(role)) {
+        } else if ("DELIVERY".equalsIgnoreCase(role) || "ROLE_DELIVERY".equalsIgnoreCase(role)) {
             intent = new Intent(this, DeliveryMainActivity.class);
-        }else {
+        } else {
             intent = new Intent(this, MainActivity.class);
         }
+
         if ("main".equals(redirect)) {
             intent = new Intent(this, MainActivity.class);
         }
