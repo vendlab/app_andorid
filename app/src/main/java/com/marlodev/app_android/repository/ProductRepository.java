@@ -28,6 +28,8 @@ public class ProductRepository {
 
     private final ProductApiService apiService;
     private final GenericWebSocketManager<ProductWebSocketEvent> wsManager;
+    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);
+    public LiveData<Boolean> isLoading = _isLoading;
 
     private final MutableLiveData<List<Product>> _products = new MutableLiveData<>(new ArrayList<>());
     public LiveData<List<Product>> products = _products;
