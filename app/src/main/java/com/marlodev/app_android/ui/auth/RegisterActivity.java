@@ -37,7 +37,6 @@ public class RegisterActivity extends AppCompatActivity {
             finish(); // Cierra RegisterActivity y vuelve al Login
         });
     }
-
     private void initViews() {
         etNombre = findViewById(R.id.etNombre);
         etEmail = findViewById(R.id.etEmail);
@@ -46,7 +45,6 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         progressBar = findViewById(R.id.progressBar);
     }
-
     private void initViewModel() {
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
@@ -61,7 +59,6 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-
     private void attemptRegister() {
         String nombre = etNombre.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
@@ -84,7 +81,6 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             return;
         }
-
         progressBar.setVisibility(View.VISIBLE);
         authViewModel.register(nombre, email, password);
     }
