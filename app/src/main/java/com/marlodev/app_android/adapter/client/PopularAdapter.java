@@ -63,7 +63,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
             b.pic.setImageResource(R.drawable.ic_image_placeholder);
         }
 
-        b.txtNuevo.setVisibility(product.isNewProduct() ? View.VISIBLE : View.GONE);
+        b.txtNuevo.setVisibility(product.getIsNew() ? View.VISIBLE : View.GONE);
         b.txtPrece.setText("S/." + product.getPrice());
         b.txtOldPrece.setText("S/." + product.getOldPrice());
         b.txtRanking.setText(String.valueOf(product.getRating()));
@@ -171,7 +171,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
                     oldP.getPrice() == newP.getPrice() &&
                     oldP.getOldPrice() == newP.getOldPrice() &&
                     oldP.getImageUrls().equals(newP.getImageUrls()) &&
-                    oldP.isNewProduct() == newP.isNewProduct();
+                    oldP.getIsNew()  == newP.getIsNew();
         }
 
     }

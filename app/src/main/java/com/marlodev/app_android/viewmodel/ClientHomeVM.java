@@ -18,135 +18,78 @@ import com.marlodev.app_android.repository.ProductRepository;
 import com.marlodev.app_android.utils.SessionManager;
 import com.marlodev.app_android.BuildConfig;
 
-
-
 import java.util.List;
 
 /**
- * ViewModel profesional para manejar productos.
- *
- * Funcionalidades:
- * 1️⃣ Carga inicial de productos vía REST.
- * 2️⃣ Escucha de actualizaciones en tiempo real vía WebSocket.
- * 3️⃣ Manejo de errores y estados de carga.
- * 4️⃣ Observación de estado de conexión WebSocket.
+ * ViewModel profesional para ClientHomeFragment.
+ * - Maneja carga inicial de productos.
+ * - Observa eventos WS.
+ * - Expone LiveData limpios a la UI.
  */
 public class ClientHomeVM extends AndroidViewModel {
 
-    // 🔹 Repositorio de productos
+    private static final String TAG = "ClientHomeVM";
+
     private final ProductRepository repository;
+    private final GenericWebSocketManager<ProductWebSocketEvent> webSocketManager;
 
-    // 🔹Loading
-    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);
-    public LiveData<Boolean> isLoading = _isLoading;
-
-    // 🔹 Datos LiveData expuestos a la UI
     private final LiveData<List<Product>> products;
     private final LiveData<String> errorMessage;
 
-    // 🔹 Manager de WebSocket para actualizaciones en tiempo real
-    private final GenericWebSocketManager<ProductWebSocketEvent> webSocketManager;
-
     public ClientHomeVM(@NonNull Application application) {
         super(application);
-        // -----------------------------
-        // Inicializar servicios y token
-        // -----------------------------
+
         ProductApiService apiService = ApiClient.getClient(application)
                 .create(ProductApiService.class);
-        SessionManager session = SessionManager.getInstance(application);
-        String token = session.getToken();
+        String token = SessionManager.getInstance(application).getToken();
 
-        // -----------------------------
-        // Configurar WebSocket
-        // -----------------------------
-        String wsUrl = BuildConfig.WS_URL;
-
-        // 🔹 Crear WebSocket manager
+        // Configuración del WebSocket
         webSocketManager = new GenericWebSocketManager<>(
-                wsUrl,
+                BuildConfig.WS_URL,
                 token,
                 "/topic/products",
                 ProductWebSocketEvent.class
         );
 
-        // -----------------------------
-        // Crear repositorio
-        // -----------------------------
+        // Inicializar repositorio
         repository = new ProductRepository(apiService, webSocketManager);
 
-        // -----------------------------
-        // Exponer LiveData de repositorio
-        // -----------------------------
+        // Exponer LiveData
         products = repository.products;
         errorMessage = repository.errorMessage;
 
-
-        // ---- Cargar productos
+        // Cargar productos inicial
         loadProducts();
-
-
-
     }
 
-    // ❤️ Aquí se usa el loading
+    /** Carga inicial de productos */
+    public void loadProducts() {
+        repository.loadProductsWithCallback(() -> {
+            // Repository ya actualiza isLoading.
+        });
+    }
+
+    /** Conectar websocket */
     public void startWebSocket() {
         repository.connectWebSocket();
     }
 
-
-
-    public void loadProducts() {
-        _isLoading.setValue(true);
-
-        repository.loadProductsWithCallback(() -> {
-            _isLoading.postValue(false);
-        });
-    }
-
-
-
-
-    public void observeWebSocketState(@NonNull LifecycleOwner owner) {
-        webSocketManager.getConnectionState().observe(owner, state -> {
-            switch (state) {
-                case CONNECTED:
-                    Log.d("ClientHomeVM", "🟢 WS conectado");
-                    break;
-                case CONNECTING:
-                    Log.d("ClientHomeVM", "🕓 Intentando conectar...");
-                    break;
-                case DISCONNECTED:
-                    Log.d("ClientHomeVM", "🔴 Desconectado, reconectando...");
-                    webSocketManager.reconnectWithDelay(5000);
-                    break;
-                case ERROR:
-                    Log.d("ClientHomeVM", "⚠️ Error de conexión WS");
-                    break;
-            }
-        });
-    }
-
-
-    // -----------------------------
-    // Getters públicos para la UI
-    // -----------------------------
-
-    public LiveData<List<Product>> getProducts() { return products; }
-    public LiveData<String> getErrorMessage() { return errorMessage; }
-    public LiveData<Boolean> getIsLoading() { return isLoading; }
-
-    // 🔹 Limpiar recursos al destruir el ViewModel
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        Log.d("ClientHomeVM", "🧹 Cerrando WebSocket al limpiar el ViewModel");
-        repository.disconnectWebSocket();
-    }
-
+    /** Observar eventos WebSocket */
     public void observeWebSocketEvents(@NonNull LifecycleOwner owner) {
         repository.observeWebSocketEvents(owner);
     }
 
+    /** LiveData expuestos a UI */
+    public LiveData<List<Product>> getProducts() { return products; }
+    public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<Boolean> getIsLoading() { return repository.isLoading; }
 
+
+    /** Cleanup profesional: cerrar WS y scheduler */
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        Log.d(TAG, "🧹 Limpiando recursos WebSocket");
+        repository.shutdown();
+    }
 }

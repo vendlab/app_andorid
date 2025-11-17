@@ -42,7 +42,7 @@ public class Product {
     private int reviewsCount;
     private int sku;
 
-    private boolean newProduct;
+    private Boolean isNew; // ya existe
 
     // --------------------------
     // 🔹 Información adicional
@@ -62,7 +62,7 @@ public class Product {
         Product product = new Product();
         product.setId(event.getId());
         product.setName(event.getName());
-        product.setNewProduct(event.getNewProduct() != null && event.getNewProduct());
+        product.setIsNew(event.getIsNew() != null && event.getIsNew());
         product.setPrice(event.getPrice() != null ? event.getPrice() : 0.0);
 
         if (event.getImageUrl() != null && !event.getImageUrl().trim().isEmpty()) {
