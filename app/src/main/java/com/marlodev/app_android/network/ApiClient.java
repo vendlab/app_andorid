@@ -6,13 +6,16 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.concurrent.TimeUnit;
+import com.marlodev.app_android.BuildConfig;
+
 
 public final class ApiClient {
 
     private static volatile Retrofit retrofit;
     private static final Object LOCK = new Object();
-    private static String BASE_URL = "https://ecommerce-backend-o9y5.onrender.com/api/";
-//    private static String BASE_URL = "http://10.0.2.2:8080/api/";
+
+    private static String BASE_URL = BuildConfig.BASE_URL;
+
 
 
     private ApiClient() {}

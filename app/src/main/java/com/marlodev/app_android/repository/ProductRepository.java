@@ -2,6 +2,7 @@ package com.marlodev.app_android.repository;
 
 import android.util.Log;
 
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -12,8 +13,11 @@ import com.marlodev.app_android.network.ProductApiService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.annotations.NonNull;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,118 +32,156 @@ public class ProductRepository {
 
     private final ProductApiService apiService;
     private final GenericWebSocketManager<ProductWebSocketEvent> wsManager;
+
     private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);
     public LiveData<Boolean> isLoading = _isLoading;
 
     private final MutableLiveData<List<Product>> _products = new MutableLiveData<>(new ArrayList<>());
     public LiveData<List<Product>> products = _products;
 
-
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     public LiveData<String> errorMessage = _errorMessage;
 
-    private androidx.lifecycle.Observer<ProductWebSocketEvent> wsObserver;
+
+    // Scheduler para retry/backoff y reconexión WS
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public ProductRepository(ProductApiService apiService,
                              GenericWebSocketManager<ProductWebSocketEvent> wsManager) {
         this.apiService = apiService;
         this.wsManager = wsManager;
-        observeWebSocketEvents();
     }
 
     /** Observa eventos del WebSocket */
-    private void observeWebSocketEvents() {
-        wsObserver = this::handleWebSocketEvent;
-        wsManager.getEventLiveData().observeForever(wsObserver);
+    // ProductRepository.java
+
+    public void observeWebSocketEvents(@NonNull LifecycleOwner owner) {
+        wsManager.getEventLiveData().observe(owner, this::handleWebSocketEvent);
     }
+
 
     private void handleWebSocketEvent(ProductWebSocketEvent event) {
         if (event == null || event.getAction() == null) return;
 
-        List<Product> currentList = new ArrayList<>(Objects.requireNonNull(_products.getValue()));
+        List<Product> currentList = _products.getValue() != null ? _products.getValue() : new ArrayList<>();
         Product product = Product.fromWebSocketEvent(event);
+        if (product.getId() == null) return;
 
-        if (product.getId() == null) return; // ignorar productos sin ID
+        List<Product> updatedList = new ArrayList<>();
+        boolean found = false;
 
         switch (event.getAction()) {
             case "CREATE":
+                // Agregar al inicio si no existe
                 boolean exists = currentList.stream().anyMatch(p -> p.getId().equals(product.getId()));
                 if (!exists) {
-                    currentList.add(product);
+                    updatedList.add(product);
+                    updatedList.addAll(currentList);
                     Log.d(TAG, "🟢 Producto CREADO: " + product.getName());
+                } else {
+                    updatedList.addAll(currentList);
                 }
                 break;
 
             case "UPDATE":
             case "IMAGES_UPDATE":
-                boolean replaced = false;
-                for (int i = 0; i < currentList.size(); i++) {
-                    if (currentList.get(i).getId().equals(product.getId())) {
-                        currentList.set(i, product);
-                        replaced = true;
-                        break;
+                for (Product p : currentList) {
+                    if (p.getId().equals(product.getId())) {
+                        // Reemplazamos el producto completo con los datos nuevos
+                        updatedList.add(product);
+                        found = true;
+                    } else {
+                        updatedList.add(p);
                     }
                 }
-                if (!replaced) {
-                    currentList.add(product);
+                if (!found && event.getAction().equals("IMAGES_UPDATE")) {
+                    // Si no estaba en la lista, agregarlo al final
+                    updatedList.add(product);
                 }
                 Log.d(TAG, "🟡 Producto ACTUALIZADO: " + product.getName());
                 break;
 
             case "DELETE":
-                currentList.removeIf(p -> p.getId().equals(product.getId()));
+                for (Product p : currentList) {
+                    if (!p.getId().equals(product.getId())) {
+                        updatedList.add(p);
+                    }
+                }
                 Log.d(TAG, "🔴 Producto ELIMINADO: " + product.getId());
                 break;
 
             default:
+                updatedList.addAll(currentList);
                 Log.w(TAG, "⚪ Acción desconocida: " + event.getAction());
         }
 
-        _products.postValue(currentList);
+        // Postear nueva lista para que LiveData actualice la UI
+        _products.postValue(updatedList);
     }
 
-    /** Conexión WS con token */
+    /** Conexión WS */
     public void connectWebSocket() {
         wsManager.connect();
     }
 
-    /** Desconecta WS */
+    /** Desconexión WS */
+// Por esto:
     public void disconnectWebSocket() {
-        if (wsObserver != null) {
-            wsManager.getEventLiveData().removeObserver(wsObserver);
-            wsObserver = null;
-        }
         wsManager.disconnect();
     }
 
-    /** Carga inicial de productos vía API */
-    private void retryLoadProductsWithDelay(int attempt) {
-        int delay = Math.min(5000 * attempt, 20000); // hasta 20 seg máximo
-        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(this::loadProducts, delay);
+    /** Asegura que el WS esté conectado */
+    private void ensureWebSocketConnected() {
+        if (!wsManager.isConnected()) {
+            Log.d(TAG, "🔄 Reconectando WS...");
+            wsManager.connect();
+        }
     }
 
+    /** Reconexión automática periódica WS */
+    public void startWebSocketAutoReconnect() {
+        scheduler.scheduleAtFixedRate(this::ensureWebSocketConnected, 10, 10, TimeUnit.SECONDS);
+    }
+
+    /** Retry con backoff exponencial */
+    private void retryLoadProductsWithBackoff(int attempt) {
+        long delay = Math.min(2000L * (long) Math.pow(2, attempt), 20000L); // hasta 20s
+        Log.d(TAG, "⏱ Retry en " + delay + " ms (intento " + attempt + ")");
+        scheduler.schedule(() -> loadProducts(attempt + 1), delay, TimeUnit.MILLISECONDS);
+    }
+
+    /** Carga productos */
     public void loadProducts() {
+        loadProducts(1);
+    }
+
+    private void loadProducts(int attempt) {
+        _isLoading.postValue(true);
         apiService.getProducts().enqueue(new Callback<List<Product>>() {
             @Override
             public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                _isLoading.postValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     _products.postValue(response.body());
                     Log.d(TAG, "✅ Productos cargados: " + response.body().size());
                 } else {
-                    _errorMessage.postValue("Error al cargar los productos (" + response.code() + ")");
+                    _errorMessage.postValue("Error al cargar productos (" + response.code() + ")");
                     Log.e(TAG, "⚠️ Error al cargar productos: " + response.code());
+                    retryLoadProductsWithBackoff(attempt);
                 }
             }
 
             @Override
             public void onFailure(Call<List<Product>> call, Throwable t) {
-                Log.e(TAG, "❌ Falló la carga de productos: " + t.getMessage(), t);
-                _errorMessage.postValue("No se pudo conectar al servidor, reintentando...");
-                retryLoadProductsWithDelay(1);
+                _isLoading.postValue(false);
+                Log.e(TAG, "❌ Falló la carga: " + t.getMessage(), t);
+                _errorMessage.postValue("Error de conexión, reintentando...");
+                retryLoadProductsWithBackoff(attempt);
             }
-
         });
     }
+
+    /** Carga con callback */
     public void loadProductsWithCallback(Runnable onComplete) {
         apiService.getProducts().enqueue(new Callback<List<Product>>() {
             @Override
@@ -147,7 +189,7 @@ public class ProductRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     _products.postValue(response.body());
                 } else {
-                    _errorMessage.postValue("Error al cargar los productos (" + response.code() + ")");
+                    _errorMessage.postValue("Error al cargar productos (" + response.code() + ")");
                 }
                 onComplete.run();
             }
@@ -155,18 +197,16 @@ public class ProductRepository {
             @Override
             public void onFailure(Call<List<Product>> call, Throwable t) {
                 _errorMessage.postValue("Error de red");
-                retryLoadProductsWithDelay(1);
+                retryLoadProductsWithBackoff(1);
                 onComplete.run();
             }
         });
     }
 
     /** Obtener producto por ID */
-
     public LiveData<Product> getProductById(long id) {
         MutableLiveData<Product> liveData = new MutableLiveData<>();
 
-        // 1️⃣ Buscar localmente
         List<Product> list = _products.getValue();
         Product local = null;
 
@@ -179,10 +219,9 @@ public class ProductRepository {
 
         if (local != null) {
             liveData.postValue(local);
-            return liveData; // ⬅ No hace falta llamar a la API
+            return liveData;
         }
 
-        // 2️⃣ Solo si NO hay producto local, ir a la API
         apiService.getProductById(id).enqueue(new Callback<Product>() {
             @Override
             public void onResponse(Call<Product> call, Response<Product> response) {
@@ -202,5 +241,10 @@ public class ProductRepository {
         return liveData;
     }
 
-}
+    /** Cierra scheduler y WS para evitar leaks */
+    public void shutdown() {
+        scheduler.shutdownNow();
+        disconnectWebSocket();
+    }
 
+}

@@ -1,4 +1,4 @@
-package com.marlodev.app_android.adapter;
+package com.marlodev.app_android.adapter.client;
 
 import android.view.LayoutInflater;
 import android.view.View;

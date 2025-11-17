@@ -11,8 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.marlodev.app_android.adapter.PopularAdapter;
-import com.marlodev.app_android.adapter.TagAdapter;
+import com.marlodev.app_android.adapter.client.PopularAdapter;
+import com.marlodev.app_android.adapter.client.TagAdapter;
 import com.marlodev.app_android.databinding.FragmentClientHomeBinding;
 import com.marlodev.app_android.domain.Product;
 import com.marlodev.app_android.domain.TagsModel;
@@ -26,7 +26,6 @@ public class ClientHomeFragment extends Fragment {
     private FragmentClientHomeBinding binding;
     private ClientHomeVM clientHomeVM;
     private PopularAdapter popularAdapter;
-    private TagAdapter tagAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -34,43 +33,24 @@ public class ClientHomeFragment extends Fragment {
 
         clientHomeVM = new ViewModelProvider(requireActivity()).get(ClientHomeVM.class);
 
-        setupTags();
-        setupPopularAdapter();
+        // Observa LiveData de productos y errores
         observeViewModel();
+
+        // 🔹 Paso 5: Observers WS ligados al ciclo de vida
+        clientHomeVM.observeWebSocketEvents(getViewLifecycleOwner());
+        clientHomeVM.observeWebSocketState(getViewLifecycleOwner());
+
+        // 🔹 Paso 6: Conectar WebSocket
+        clientHomeVM.startWebSocket();
+
+        // Configura adapters (si quieres mantener setupPopularAdapter separado, también puedes llamarlo aquí)
+        setupPopularAdapter();
+
+
+
 
         return binding.getRoot();
     }
-
-    // --- TAGS ESTÁTICOS ---
-    private void setupTags() {
-        tagAdapter = new TagAdapter(getStaticTags());
-
-        binding.tagsView.setLayoutManager(
-                new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        );
-
-        binding.tagsView.setAdapter(tagAdapter);
-
-        // Listener de clicks
-        tagAdapter.setOnTagClickListener((tag, position) -> {
-            Toast.makeText(requireContext(), "Tag: " + tag.getTitle(), Toast.LENGTH_SHORT).show();
-
-            // Aquí podrías filtrar productos por categoría si deseas:
-            // clientHomeVM.filterByTag(tag.getTitle());
-        });
-    }
-
-
-    private List<TagsModel> getStaticTags() {
-        return List.of(
-                new TagsModel("Todos"),
-                new TagsModel("Bebidas"),
-                new TagsModel("Snacks"),
-                new TagsModel("Café"),
-                new TagsModel("Promos")
-        );
-    }
-
 
 
 
@@ -98,6 +78,7 @@ public class ClientHomeFragment extends Fragment {
         boolean hasData = products != null && !products.isEmpty();
 
         popularAdapter.setProducts(hasData ? products : List.of());
+
         binding.popularView.setVisibility(hasData ? View.VISIBLE : View.GONE);
     }
 

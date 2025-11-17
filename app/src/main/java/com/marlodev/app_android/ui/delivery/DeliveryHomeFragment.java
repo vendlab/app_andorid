@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.R;
-import com.marlodev.app_android.adapter.PedidoAdapter;
+import com.marlodev.app_android.adapter.client.PedidoAdapter;
 import com.marlodev.app_android.domain.Pedido;
 import com.marlodev.app_android.utils.SessionManager;
 

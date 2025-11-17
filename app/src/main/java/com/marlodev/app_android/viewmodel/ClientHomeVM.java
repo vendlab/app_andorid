@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -15,6 +16,9 @@ import com.marlodev.app_android.network.GenericWebSocketManager;
 import com.marlodev.app_android.network.ProductApiService;
 import com.marlodev.app_android.repository.ProductRepository;
 import com.marlodev.app_android.utils.SessionManager;
+import com.marlodev.app_android.BuildConfig;
+
+
 
 import java.util.List;
 
@@ -56,8 +60,7 @@ public class ClientHomeVM extends AndroidViewModel {
         // -----------------------------
         // Configurar WebSocket
         // -----------------------------
-//        String wsUrl = "ws://10.0.2.2:8080/ws-products";
-        String wsUrl = "wss://ecommerce-backend-o9y5.onrender.com/ws-products";
+        String wsUrl = BuildConfig.WS_URL;
 
         // 🔹 Crear WebSocket manager
         webSocketManager = new GenericWebSocketManager<>(
@@ -82,18 +85,14 @@ public class ClientHomeVM extends AndroidViewModel {
         // ---- Cargar productos
         loadProducts();
 
-        // -----------------------------
-        // Conectar WebSocket para updates en tiempo real
-        // -----------------------------
-        repository.connectWebSocket();
 
-        // -----------------------------
-        // Monitorear estado del WebSocket
-        // -----------------------------
-        observeWebSocketState();
+
     }
 
     // ❤️ Aquí se usa el loading
+    public void startWebSocket() {
+        repository.connectWebSocket();
+    }
 
 
 
@@ -107,9 +106,9 @@ public class ClientHomeVM extends AndroidViewModel {
 
 
 
-    // 🔹 Observa estado de conexión WebSocket y reconecta si es necesario
-    private void observeWebSocketState() {
-        webSocketManager.getConnectionState().observeForever(state -> {
+
+    public void observeWebSocketState(@NonNull LifecycleOwner owner) {
+        webSocketManager.getConnectionState().observe(owner, state -> {
             switch (state) {
                 case CONNECTED:
                     Log.d("ClientHomeVM", "🟢 WS conectado");
@@ -119,7 +118,7 @@ public class ClientHomeVM extends AndroidViewModel {
                     break;
                 case DISCONNECTED:
                     Log.d("ClientHomeVM", "🔴 Desconectado, reconectando...");
-                    webSocketManager.reconnectWithDelay(5000); // reconexión automática
+                    webSocketManager.reconnectWithDelay(5000);
                     break;
                 case ERROR:
                     Log.d("ClientHomeVM", "⚠️ Error de conexión WS");
@@ -127,6 +126,7 @@ public class ClientHomeVM extends AndroidViewModel {
             }
         });
     }
+
 
     // -----------------------------
     // Getters públicos para la UI
@@ -143,4 +143,10 @@ public class ClientHomeVM extends AndroidViewModel {
         Log.d("ClientHomeVM", "🧹 Cerrando WebSocket al limpiar el ViewModel");
         repository.disconnectWebSocket();
     }
+
+    public void observeWebSocketEvents(@NonNull LifecycleOwner owner) {
+        repository.observeWebSocketEvents(owner);
+    }
+
+
 }

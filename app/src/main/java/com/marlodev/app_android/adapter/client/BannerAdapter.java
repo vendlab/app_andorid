@@ -1,4 +1,4 @@
-package com.marlodev.app_android.adapter;
+package com.marlodev.app_android.adapter.client;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * Adapter para manejar un ViewPager2 que muestra banners (sliders) en la app.
  * Permite deslizar horizontalmente entre imágenes y hacer un loop infinito.
  */
-public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderViewHolder> {
+public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.SliderViewHolder> {
 
     private ArrayList<BannerModel> sliderItems; // Lista de banners a mostrar
     private ViewPager2 viewPager2;              // ViewPager2 que contiene este adapter
@@ -39,7 +39,7 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
     };
 
     // Constructor del adapter
-    public SliderAdapter(ArrayList<BannerModel> sliderItems, ViewPager2 viewPager2) {
+    public BannerAdapter(ArrayList<BannerModel> sliderItems, ViewPager2 viewPager2) {
         this.sliderItems = sliderItems;
         this.viewPager2 = viewPager2;
     }
@@ -49,7 +49,7 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
     // --------------------------
     @NonNull
     @Override
-    public SliderAdapter.SliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BannerAdapter.SliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext(); // Guardamos contexto para Glide
         // Inflamos el layout item_slider.xml
         View view = LayoutInflater.from(context).inflate(R.layout.item_slider, parent, false);
@@ -60,7 +60,7 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderAdapter.SliderView
     // 🔹 Bind de datos al item
     // --------------------------
     @Override
-    public void onBindViewHolder(@NonNull SliderAdapter.SliderViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BannerAdapter.SliderViewHolder holder, int position) {
         // Seteamos la imagen del banner actual
         holder.setImage(sliderItems.get(position));
 

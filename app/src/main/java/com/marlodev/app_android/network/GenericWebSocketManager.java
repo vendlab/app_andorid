@@ -60,6 +60,7 @@ public class GenericWebSocketManager<T> {
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
         stompClient.withClientHeartbeat(10000).withServerHeartbeat(10000);
 
+        // Observa cambios en la conexión
         stompClient.lifecycle().subscribe(lifecycleEvent -> {
             Log.d(TAG, "📡 Estado WS: " + lifecycleEvent.getType());
             switch (lifecycleEvent.getType()) {
@@ -106,7 +107,7 @@ public class GenericWebSocketManager<T> {
                 }, throwable -> Log.e(TAG, "❌ Error recibiendo evento WS", throwable));
     }
 
-    /** Reconexión controlada con backoff exponencial */
+    /** Reconexión automática con backoff exponencial */
     private void scheduleReconnect() {
         if (reconnecting) return; // evita múltiples hilos
         reconnecting = true;
@@ -114,8 +115,8 @@ public class GenericWebSocketManager<T> {
         scheduler.schedule(() -> {
             Log.i(TAG, "🔁 Intentando reconectar al WS...");
             connect();
-            retryDelay = Math.min(retryDelay * 2, 30); // aumenta hasta 30s
-            reconnecting = false; // permite siguiente reconexión si falla
+            retryDelay = Math.min(retryDelay * 2, 30); // backoff hasta 30s
+            reconnecting = false;
         }, retryDelay, TimeUnit.SECONDS);
     }
 
@@ -143,6 +144,7 @@ public class GenericWebSocketManager<T> {
             stompClient.disconnect();
             connectionState.postValue(ConnectionState.DISCONNECTED);
             reconnecting = false;
+            scheduler.shutdownNow(); // evita fugas de hilos
             Log.i(TAG, "❎ WebSocket desconectado");
         } catch (Exception e) {
             Log.e(TAG, "❌ Exception en disconnect()", e);
@@ -152,6 +154,11 @@ public class GenericWebSocketManager<T> {
     /** Reconexión manual con delay seguro */
     public void reconnectWithDelay(long delayMillis) {
         scheduler.schedule(this::connect, delayMillis, TimeUnit.MILLISECONDS);
+    }
+
+    /** Verifica si el WS está conectado */
+    public boolean isConnected() {
+        return connectionState.getValue() == ConnectionState.CONNECTED;
     }
 
     /** Eventos emitidos por el servidor */

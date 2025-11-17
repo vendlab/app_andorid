@@ -7,6 +7,7 @@ import lombok.Data;
  * Modelo que representa un evento recibido desde el WebSocket para productos.
  * Se utiliza para notificar cambios en tiempo real a la app.
  */
+
 @Data
 public class ProductWebSocketEvent {
 

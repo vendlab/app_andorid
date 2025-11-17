@@ -16,15 +16,26 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
+
     buildTypes {
-        release {
+        getByName("debug") {
+            isMinifyEnabled = false
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/\"")
+            buildConfigField("String", "WS_URL", "\"ws://10.0.2.2:8080/ws-products\"")
+        }
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://ecommerce-backend-o9y5.onrender.com/api/\"")
+            buildConfigField("String", "WS_URL", "\"wss://ecommerce-backend-o9y5.onrender.com/ws-products\"")
         }
     }
+
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -32,6 +43,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true   // <<< Habilita BuildConfig con tus campos personalizados
     }
 }
 

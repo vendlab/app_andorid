@@ -62,7 +62,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.marlodev.app_android.R;
-import com.marlodev.app_android.adapter.OrderAdapter;
+import com.marlodev.app_android.adapter.client.OrderAdapter;
 import com.marlodev.app_android.network.ApiClient;
 import com.marlodev.app_android.network.order.OrderApi;
 import com.marlodev.app_android.repository.OrderRepository;

@@ -1,6 +1,5 @@
-package com.marlodev.app_android.adapter;
+package com.marlodev.app_android.adapter.client;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

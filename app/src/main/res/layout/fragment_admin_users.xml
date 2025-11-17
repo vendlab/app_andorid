@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.admin.AdminUsersFragment">
+    tools:context=".ui.admin.AdminUsersFragment"
+    >
 
     <!--Apartado para la cabecera-->
     <RelativeLayout
@@ -13,7 +14,9 @@
         android:layout_height="wrap_content"
         android:background="@drawable/gb_gradient_green_transparent"
         android:paddingHorizontal="15dp"
-        android:paddingVertical="8dp">
+        android:paddingVertical="8dp"
+        android:padding="25dp"
+        >
 
         <TextView
             android:id="@+id/greeting_text"
@@ -60,7 +63,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/header_container"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:padding="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
