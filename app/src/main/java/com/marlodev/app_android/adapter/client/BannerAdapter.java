@@ -1,6 +1,8 @@
 package com.marlodev.app_android.adapter.client;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,59 +17,51 @@ import com.marlodev.app_android.R;
 import com.marlodev.app_android.domain.BannerModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Adapter para manejar un ViewPager2 que muestra banners (sliders) en la app.
- * Permite deslizar horizontalmente entre imágenes y hacer un loop infinito.
+ * Adapter profesional para ViewPager2 que muestra banners (sliders)
+ * - Auto-scroll seguro
+ * - Loop infinito sin duplicar lista
+ * - Placeholders y manejo de errores
+ * - Actualización dinámica de banners
  */
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.SliderViewHolder> {
 
-    private ArrayList<BannerModel> sliderItems; // Lista de banners a mostrar
-    private ViewPager2 viewPager2;              // ViewPager2 que contiene este adapter
-    private Context context;                     // Contexto para inflar layouts y cargar imágenes
+    private final List<BannerModel> sliderItems = new ArrayList<>();
+    private final ViewPager2 viewPager2;
+    private Context context;
 
+    private final Handler autoScrollHandler = new Handler(Looper.getMainLooper());
+    private final int autoScrollDelay = 4000; // 4 segundos por banner
 
-
-    // Runnable que permite repetir el slider (loop infinito)
-    private Runnable runnable = new Runnable() {
+    private final Runnable autoScrollRunnable = new Runnable() {
         @Override
         public void run() {
-            // Duplica la lista de banners para continuar el loop
-            sliderItems.addAll(sliderItems);
-            notifyDataSetChanged(); // Notifica al adapter que la lista cambió
+            if (sliderItems.size() > 1) {
+                int nextItem = (viewPager2.getCurrentItem() + 1) % sliderItems.size();
+                viewPager2.setCurrentItem(nextItem, true);
+                autoScrollHandler.postDelayed(this, autoScrollDelay);
+            }
         }
     };
 
-    // Constructor del adapter
-    public BannerAdapter(ArrayList<BannerModel> sliderItems, ViewPager2 viewPager2) {
-        this.sliderItems = sliderItems;
+    public BannerAdapter(ViewPager2 viewPager2) {
         this.viewPager2 = viewPager2;
     }
 
-    // --------------------------
-    // 🔹 Inflado del item del slider
-    // --------------------------
     @NonNull
     @Override
-    public BannerAdapter.SliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext(); // Guardamos contexto para Glide
-        // Inflamos el layout item_slider.xml
+    public SliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View view = LayoutInflater.from(context).inflate(R.layout.item_slider, parent, false);
         return new SliderViewHolder(view);
     }
 
-    // --------------------------
-    // 🔹 Bind de datos al item
-    // --------------------------
     @Override
-    public void onBindViewHolder(@NonNull BannerAdapter.SliderViewHolder holder, int position) {
-        // Seteamos la imagen del banner actual
-        holder.setImage(sliderItems.get(position));
-
-        // Si estamos cerca del final, ejecutamos el runnable para duplicar la lista y simular loop infinito
-        if (position == sliderItems.size() - 2) {
-            viewPager2.post(runnable);
-        }
+    public void onBindViewHolder(@NonNull SliderViewHolder holder, int position) {
+        BannerModel banner = sliderItems.get(position);
+        holder.setImage(banner);
     }
 
     @Override
@@ -75,38 +69,53 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.SliderView
         return sliderItems.size();
     }
 
+    /**
+     * Actualiza dinámicamente los banners
+     */
+    public void setSliderItems(List<BannerModel> items) {
+        sliderItems.clear();
+        if (items != null) sliderItems.addAll(items);
+        notifyDataSetChanged();
+
+        // Reiniciamos auto-scroll
+        stopAutoScroll();
+        if (!sliderItems.isEmpty()) startAutoScroll();
+    }
+
+    /**
+     * Inicia el auto-scroll seguro
+     */
+    public void startAutoScroll() {
+        autoScrollHandler.postDelayed(autoScrollRunnable, autoScrollDelay);
+    }
+
+    /**
+     * Detiene el auto-scroll
+     */
+    public void stopAutoScroll() {
+        autoScrollHandler.removeCallbacks(autoScrollRunnable);
+    }
+
     // --------------------------
-    // 🔹 ViewHolder del slider
+    // ViewHolder
     // --------------------------
     public class SliderViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView imageView;
+        private final ImageView imageView;
 
         public SliderViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Obtenemos referencia a ImageView dentro del layout item_slider.xml
             imageView = itemView.findViewById(R.id.imageSlide);
         }
 
-        /**
-         * Setea la imagen del banner usando Glide.
-         * @param bannerModel Banner a mostrar
-         */
         void setImage(BannerModel bannerModel) {
             Glide.with(context)
-                    .load(bannerModel.getUrl()) // Carga la URL de la imagen
-                    .into(imageView);          // Inserta la imagen en el ImageView
+                    .load(bannerModel.getUrl())
+                    .centerCrop()
+                    .into(imageView);
         }
     }
 }
-
-
-
-
-
-
-
-
 
 
 

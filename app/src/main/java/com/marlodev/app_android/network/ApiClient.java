@@ -13,17 +13,14 @@ public final class ApiClient {
 
     private static volatile Retrofit retrofit;
     private static final Object LOCK = new Object();
-
     private static String BASE_URL = BuildConfig.BASE_URL;
-
-
-
     private ApiClient() {}
 
     public static Retrofit getClient(Context context) {
         if (retrofit == null) {
             synchronized (LOCK) {
                 if (retrofit == null) {
+                    // Logging interceptor
                     HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
                     logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -37,7 +34,7 @@ public final class ApiClient {
                     retrofit = new Retrofit.Builder()
                             .baseUrl(BASE_URL)
                             .client(client)
-                            .addConverterFactory(GsonConverterFactory.create())
+                            .addConverterFactory(GsonConverterFactory.create(GsonProvider.getGson()))
                             .build();
                 }
             }

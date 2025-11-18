@@ -11,7 +11,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.marlodev.app_android.domain.BannerModel;
-import com.marlodev.app_android.domain.TagsModel;
+import com.marlodev.app_android.domain.Tag;
 
 import java.util.ArrayList;
 
@@ -23,11 +23,11 @@ public class MainRepository {
 
     /**
      * Carga las categorías (tags) desde Firebase.
-     * @return LiveData con lista de TagsModel para ser observado desde ViewModel
+     * @return LiveData con lista de Tag para ser observado desde ViewModel
      */
-    public LiveData<ArrayList<TagsModel>> loadTags() {
+    public LiveData<ArrayList<Tag>> loadTags() {
         // MutableLiveData para exponer los datos a la UI
-        MutableLiveData<ArrayList<TagsModel>> listData = new MutableLiveData<>();
+        MutableLiveData<ArrayList<Tag>> listData = new MutableLiveData<>();
 
         // Referencia a la ruta "tags" en Firebase
         DatabaseReference ref = firebaseDatabase.getReference("tags");
@@ -37,11 +37,11 @@ public class MainRepository {
 
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<TagsModel> list = new ArrayList<>();
+                ArrayList<Tag> list = new ArrayList<>();
                 // Iterar sobre cada hijo en la ruta "tags"
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    // Convertir snapshot a objeto TagsModel
-                    TagsModel item = childSnapshot.getValue(TagsModel.class);
+                    // Convertir snapshot a objeto Tag
+                    Tag item = childSnapshot.getValue(Tag.class);
                     if (item != null) list.add(item); // agregar si no es nulo
                 }
                 // Actualizar LiveData con la lista

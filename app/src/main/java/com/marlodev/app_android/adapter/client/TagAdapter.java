@@ -1,102 +1,92 @@
 package com.marlodev.app_android.adapter.client;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.marlodev.app_android.R;
-import com.marlodev.app_android.databinding.ItemTagBinding;
-import com.marlodev.app_android.domain.TagsModel;
+import com.marlodev.app_android.domain.Tag;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter profesional para RecyclerView de Tags.
+ * - Maneja clics
+ * - Maneja lista dinámica de Tags
+ */
 public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
 
-    private final List<TagsModel> items;
-    private int selectedPosition = RecyclerView.NO_POSITION;
+    private final List<Tag> tagList = new ArrayList<>();
+    private OnTagClickListener listener;
 
     public interface OnTagClickListener {
-        void onTagClick(TagsModel tag, int position);
+        void onTagClick(Tag tag);
     }
-
-    private OnTagClickListener listener;
 
     public void setOnTagClickListener(OnTagClickListener listener) {
         this.listener = listener;
     }
 
-    public TagAdapter(List<TagsModel> items) {
-        this.items = items;
-    }
-
+    // -----------------------------
+    // Adapter Methods
+    // -----------------------------
     @NonNull
     @Override
     public TagViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemTagBinding binding = ItemTagBinding.inflate(
-                LayoutInflater.from(parent.getContext()), parent, false
-        );
-        return new TagViewHolder(binding);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_tag, parent, false);
+        return new TagViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TagViewHolder holder, int position) {
-        holder.bind(items.get(position), position);
+        Tag tag = tagList.get(position);
+        holder.bind(tag);
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return tagList.size();
     }
 
+    // -----------------------------
+    // Actualización de lista
+    // -----------------------------
+    public void setTags(List<Tag> tags) {
+        tagList.clear();
+        if (tags != null) tagList.addAll(tags);
+        notifyDataSetChanged();
+    }
+
+    public Tag getTagAt(int position) {
+        return tagList.get(position);
+    }
+
+    // -----------------------------
+    // ViewHolder
+    // -----------------------------
     class TagViewHolder extends RecyclerView.ViewHolder {
 
-        private final ItemTagBinding binding;
+        private final TextView textTagName;
 
-        public TagViewHolder(@NonNull ItemTagBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
+        public TagViewHolder(@NonNull View itemView) {
+            super(itemView);
+            textTagName = itemView.findViewById(R.id.tagTitle);
+
+            itemView.setOnClickListener(v -> {
+                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
+                    listener.onTagClick(tagList.get(getAdapterPosition()));
+                }
+            });
         }
 
-        public void bind(TagsModel tag, int position) {
-
-            binding.titleTxt.setText(tag.getTitle());
-
-            boolean isSelected = (selectedPosition == position);
-
-            // Asignar estilos una sola vez por bind
-            binding.titleTxt.setBackgroundResource(
-                    isSelected ? R.drawable.bg_btn_green_prmary_select
-                            : R.drawable.bg_btn_white_50_opacity
-            );
-
-            binding.titleTxt.setTextColor(
-                    ContextCompat.getColor(itemView.getContext(),
-                            isSelected ? R.color.colorWhite : R.color.colorGrey800)
-            );
-
-            binding.getRoot().setOnClickListener(v -> {
-
-                int adapterPos = getBindingAdapterPosition();
-                if (adapterPos == RecyclerView.NO_POSITION) return;
-
-                int oldPosition = selectedPosition;
-                selectedPosition = adapterPos;
-
-                // Optimización: solo refrescar si cambió realmente
-                if (oldPosition != RecyclerView.NO_POSITION)
-                    notifyItemChanged(oldPosition);
-
-                notifyItemChanged(selectedPosition);
-
-                if (listener != null) {
-                    listener.onTagClick(tag, adapterPos);
-                }
-
-            });
-
+        void bind(Tag tag) {
+            textTagName.setText(tag.getName());
         }
     }
 }

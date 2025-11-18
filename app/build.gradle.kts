@@ -40,6 +40,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = true // ✅ Kotlin DSL
     }
     buildFeatures {
         viewBinding = true
@@ -104,4 +105,8 @@ dependencies {
     // --- Lombok ---
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
+
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
 }

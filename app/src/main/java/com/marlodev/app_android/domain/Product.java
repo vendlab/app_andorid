@@ -1,59 +1,39 @@
 package com.marlodev.app_android.domain;
 
-import com.google.firebase.database.PropertyName;
 import com.marlodev.app_android.model.ProductWebSocketEvent;
-import lombok.Data;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Modelo principal de producto para la aplicación.
- * Representa tanto los datos almacenados en Firebase/REST como los recibidos vía WebSocket.
- */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Product {
-
-    // --------------------------
-    // 🔹 Identificación y fechas
-    // --------------------------
     private Long id;
-    private int categoryId;
-    private String createdAt;
-    private String updatedAt;
-    private int store;
-
-    // --------------------------
-    // 🔹 Información visual
-    // --------------------------
-    private List<String> imageUrls;
-    private List<String> imagePublicIds;
-    private List<ProductImage> images;
-
-    // --------------------------
-    // 🔹 Información básica
-    // --------------------------
     private String name;
     private String description;
-    private double price;
-    private double oldPrice;
-    private int discountPercent;
-    private double rating;
-    private int reviewsCount;
-    private int sku;
+    private BigDecimal price;
+    private BigDecimal oldPrice;
+    private Integer discountPercent;
+    private Boolean isNew = false;
+    private Double rating = 0.0;
+    private Integer reviewsCount = 0;
+    private Integer categoryId;
+    private Integer storeId;
 
-    private Boolean isNew; // ya existe
-
-    // --------------------------
-    // 🔹 Información adicional
-    // --------------------------
-
-    // 🔹 Relaciones
-    private List<String> tags = new ArrayList<>();
-    private List<ProductExtra> extras = new ArrayList<>();
-    private List<ProductVariant> variants = new ArrayList<>(); // ✅ cambiado
-
-    // --------------------------
+    private List<ProductVariant> variants = new ArrayList<>();
+    private List<Extra> extras = new ArrayList<>();
+    private List<Tag> tags = new ArrayList<>();
+    private List<String> imageUrls = new ArrayList<>();
+    private List<String> imagePublicIds = new ArrayList<>();
+     // --------------------------
     // 🔹 Conversión desde evento WebSocket
     // --------------------------
     public static Product fromWebSocketEvent(ProductWebSocketEvent event) {
@@ -63,7 +43,7 @@ public class Product {
         product.setId(event.getId());
         product.setName(event.getName());
         product.setIsNew(event.getIsNew() != null && event.getIsNew());
-        product.setPrice(event.getPrice() != null ? event.getPrice() : 0.0);
+        product.setPrice(event.getPrice() != null ? event.getPrice() : BigDecimal.ZERO);
 
         if (event.getImageUrl() != null && !event.getImageUrl().trim().isEmpty()) {
             product.setImageUrls(List.of(event.getImageUrl()));

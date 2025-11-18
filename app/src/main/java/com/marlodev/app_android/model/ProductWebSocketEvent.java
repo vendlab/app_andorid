@@ -1,6 +1,9 @@
 package com.marlodev.app_android.model;
 
 import com.google.gson.Gson;
+
+import java.math.BigDecimal;
+
 import lombok.Data;
 
 @Data
@@ -11,7 +14,7 @@ public class ProductWebSocketEvent {
     // --------------------------
     private Long id;          // ID del producto afectado
     private String name;      // Nombre del producto
-    private Double price;     // Precio del producto (Gson parsea BigDecimal de backend a Double)
+    private BigDecimal price;     // Precio del producto (Gson parsea BigDecimal de backend a Double)
     private String imageUrl;  // URL de la imagen afectada
     private Boolean isNew;    // Mantener el mismo nombre que backend
     private String action;    // CREATE, UPDATE, DELETE, IMAGES_UPDATE
@@ -23,3 +26,5 @@ public class ProductWebSocketEvent {
         return new Gson().fromJson(json, ProductWebSocketEvent.class);
     }
 }
+
+

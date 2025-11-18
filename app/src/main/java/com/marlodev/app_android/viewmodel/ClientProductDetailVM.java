@@ -92,8 +92,9 @@ public class ClientProductDetailVM extends AndroidViewModel {
                 null,
                 null,
                 (int) quantity,
-                BigDecimal.valueOf(current.getPrice())
+                current.getPrice()
         );
+
 
         cartRepo.addItem(request, new CartRepository.SimpleCallback<OrderResponse>() {
             @Override

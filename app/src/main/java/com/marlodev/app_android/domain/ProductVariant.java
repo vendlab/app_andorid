@@ -1,29 +1,16 @@
 package com.marlodev.app_android.domain;
+import lombok.*;
 
-import java.util.List;
+import java.math.BigDecimal;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductVariant {
-    private List<ProductVariantSize> sizes;
-    private List<String> temperature;
-
-    public ProductVariant() {
-
-    }
-
-    public List<ProductVariantSize> getSizes() {
-        return sizes;
-    }
-
-    public void setSizes(List<ProductVariantSize> sizes) {
-        this.sizes = sizes;
-    }
-
-    public List<String> getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(List<String> temperature) {
-        this.temperature = temperature;
-    }
-
+    private Long id;
+    private String name;
+    private BigDecimal price;
+    private int stock;
+    private Long productId;
 }

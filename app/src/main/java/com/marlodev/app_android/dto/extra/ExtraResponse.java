@@ -1,4 +1,5 @@
-package com.marlodev.app_android.domain;
+package com.marlodev.app_android.dto.extra;
+
 import lombok.*;
 import java.math.BigDecimal;
 
@@ -6,7 +7,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Extra {
+public class ExtraResponse {
     private Long id;
     private String name;
     private BigDecimal price;

@@ -225,16 +225,25 @@
                     tools:layout_editor_absoluteY="999dp">
 
                     <androidx.recyclerview.widget.RecyclerView
-
-                        android:id="@+id/tagsView"
+                        android:id="@+id/tagRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:clipToPadding="false"
                         android:paddingStart="20dp"
                         android:paddingEnd="24dp"
+                        tools:listitem="@layout/item_tag"
+                        tools:itemCount="1"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
+                    <ProgressBar
+                        android:id="@+id/progressBarTags"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -252,6 +261,7 @@
                     android:layout_height="match_parent"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
+                    tools:listitem="@layout/item_slider"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -298,6 +308,8 @@
                     android:clipToPadding="false"
                     android:paddingStart="20dp"
                     android:paddingEnd="24dp"
+                    tools:listitem="@layout/item_product_popular"
+                    tools:itemCount="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
