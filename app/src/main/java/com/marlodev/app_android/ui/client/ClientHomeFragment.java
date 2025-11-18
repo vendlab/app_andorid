@@ -11,9 +11,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.marlodev.app_android.R;
+import com.marlodev.app_android.adapter.client.BannerAdapter;
 import com.marlodev.app_android.adapter.client.PopularAdapter;
 import com.marlodev.app_android.adapter.client.TagAdapter;
 import com.marlodev.app_android.databinding.FragmentClientHomeBinding;
+import com.marlodev.app_android.domain.Banner;
 import com.marlodev.app_android.domain.Product;
 import com.marlodev.app_android.domain.Tag;
 import com.marlodev.app_android.ui.home.customer.DetailActivity;
@@ -33,6 +37,7 @@ public class ClientHomeFragment extends Fragment {
     private ClientHomeVM clientHomeVM;
     private PopularAdapter popularAdapter;
     private TagAdapter tagAdapter;
+    private BannerAdapter bannerAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,7 +71,22 @@ public class ClientHomeFragment extends Fragment {
         );
         binding.tagRecyclerView.setAdapter(tagAdapter);
 
-        // Por ahora no filtramos al hacer clic en tags
+
+        // adapter banners
+        // BannerAdapter
+        bannerAdapter = new BannerAdapter(requireContext(), binding.bannerViewPager);
+        binding.bannerViewPager.setAdapter(bannerAdapter);
+
+// Vincular TabLayout con ViewPager2
+        new TabLayoutMediator(binding.bannerTabLayout, binding.bannerViewPager,
+                (tab, position) -> { /* no necesita texto */ }
+        ).attach();
+
+        bannerAdapter.startAutoScroll();
+        bannerAdapter.setOnBannerClickListener(banner -> {
+            Toast.makeText(requireContext(), "Banner: " + banner.getTitle(), Toast.LENGTH_SHORT).show();
+        });
+
     }
 
     /** Observa LiveData de ViewModel */
@@ -80,6 +100,14 @@ public class ClientHomeFragment extends Fragment {
         clientHomeVM.getTags().observe(getViewLifecycleOwner(), this::updateTags);
         clientHomeVM.getIsLoadingTags().observe(getViewLifecycleOwner(), this::showLoadingTags);
         clientHomeVM.getTagErrorMessage().observe(getViewLifecycleOwner(), this::showError);
+
+
+        // Banners ← AGREGAR
+        clientHomeVM.getBanners().observe(getViewLifecycleOwner(), this::updateBanners);
+        clientHomeVM.getIsLoadingBanners().observe(getViewLifecycleOwner(), loading ->
+                binding.progressBarBanners.setVisibility(Boolean.TRUE.equals(loading) ? View.VISIBLE : View.GONE)
+        );
+        clientHomeVM.getBannerErrorMessage().observe(getViewLifecycleOwner(), this::showError);
     }
 
     /** Actualiza RecyclerView de productos */
@@ -95,7 +123,12 @@ public class ClientHomeFragment extends Fragment {
         tagAdapter.setTags(hasData ? tags : List.of());
         binding.tagRecyclerView.setVisibility(hasData ? View.VISIBLE : View.GONE);
     }
-
+    /** Actualiza ViewPager2 de banners */
+    private void updateBanners(List<Banner> banners) {
+        boolean hasData = banners != null && !banners.isEmpty();
+        bannerAdapter.setSliderItems(hasData ? banners : List.of());
+        binding.bannerViewPager.setVisibility(hasData ? View.VISIBLE : View.GONE);
+    }
     /** Mostrar loading de productos */
     private void showLoadingProducts(Boolean loading) {
         binding.progressBarPopular.setVisibility(Boolean.TRUE.equals(loading) ? View.VISIBLE : View.GONE);

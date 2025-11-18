@@ -10,7 +10,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.marlodev.app_android.domain.BannerModel;
+import com.marlodev.app_android.domain.Banner;
 import com.marlodev.app_android.domain.Tag;
 
 import java.util.ArrayList;
@@ -59,20 +59,20 @@ public class MainRepository {
 
     /**
      * Carga los banners desde Firebase.
-     * @return LiveData con lista de BannerModel para ser observado desde ViewModel
+     * @return LiveData con lista de Banner para ser observado desde ViewModel
      */
-    public LiveData<ArrayList<BannerModel>> loadBanners() {
-        MutableLiveData<ArrayList<BannerModel>> listData = new MutableLiveData<>();
+    public LiveData<ArrayList<Banner>> loadBanners() {
+        MutableLiveData<ArrayList<Banner>> listData = new MutableLiveData<>();
         DatabaseReference ref = firebaseDatabase.getReference("banners");
 
         // Listener que se activa cuando hay cambios en los datos
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ArrayList<BannerModel> list = new ArrayList<>();
+                ArrayList<Banner> list = new ArrayList<>();
                 // Iterar sobre cada hijo en la ruta "banners"
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    BannerModel item = childSnapshot.getValue(BannerModel.class);
+                    Banner item = childSnapshot.getValue(Banner.class);
                     if (item != null) list.add(item);
                 }
                 // Actualizar LiveData con la lista
