@@ -33,4 +33,26 @@
         <item name="cornerSize">10dp</item>
     </style>
 
+
+
+    <style name="App.TabLayout.IndicatorDots" parent="Widget.MaterialComponents.TabLayout">
+        <!-- Elimina indicador -->
+        <item name="tabIndicatorHeight">0dp</item>
+
+        <!-- Estilo de fondo para cada tab -->
+        <item name="tabBackground">@drawable/tab_dot</item>
+
+        <!-- Tamaño real de cada tab (evita deformarlos) -->
+        <item name="tabMinWidth">20dp</item>
+        <item name="tabMaxWidth">20dp</item>
+
+        <!-- Padding interno para separación entre dots -->
+        <item name="tabPaddingStart">8dp</item>
+        <item name="tabPaddingEnd">8dp</item>
+
+        <!-- Para que los dots sean centrados y pequeños -->
+        <item name="tabInlineLabel">true</item>
+    </style>
+
+
 </resources>
