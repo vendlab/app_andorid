@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.imageview.ShapeableImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:minHeight="70dp"
-    android:background="@color/colorGrey400"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
-    android:id="@+id/imageSlide"
-    android:scaleType="centerCrop"
-    app:shapeAppearanceOverlay="@style/circleImageView"
-    android:layout_height="match_parent">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="15dp"
+        app:cardElevation="8dp"
+        app:cardMaxElevation="14dp"
+        app:cardUseCompatPadding="false"
+        app:strokeColor="@android:color/transparent"
+        app:strokeWidth="0dp">
 
-</com.google.android.material.imageview.ShapeableImageView>
-
+        <ImageView
+            android:id="@+id/imageSlide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"/>
+    </com.google.android.material.card.MaterialCardView>
+</FrameLayout>

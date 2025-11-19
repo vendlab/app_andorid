@@ -93,8 +93,8 @@ public class ClientHomeFragment extends Fragment {
                     View dot = view.findViewById(R.id.dotView);
 
                     ViewGroup.LayoutParams params = dot.getLayoutParams();
-                    params.width = dpToPx(20);  // rectángulo
-                    params.height = dpToPx(6);
+                    params.width = dpToPx(30);  // rectángulo
+                    params.height = dpToPx(9);
                     dot.setLayoutParams(params);
 
                     dot.setSelected(true);
@@ -108,8 +108,8 @@ public class ClientHomeFragment extends Fragment {
                     View dot = view.findViewById(R.id.dotView);
 
                     ViewGroup.LayoutParams params = dot.getLayoutParams();
-                    params.width = dpToPx(6);  // vuelve a círculo
-                    params.height = dpToPx(6);
+                    params.width = dpToPx(9);  // vuelve a círculo
+                    params.height = dpToPx(9);
                     dot.setLayoutParams(params);
 
                     dot.setSelected(false);

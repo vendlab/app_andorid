@@ -8,88 +8,80 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.CompositePageTransformer;
+import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.marlodev.app_android.R;
 import com.marlodev.app_android.domain.Banner;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adapter para mostrar banners en un ViewPager2 con efecto 3D y sombra pronunciada en el centro.
- * Auto-scroll desactivado por defecto.
- */
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.SliderViewHolder> {
 
-    // Lista de banners
     private final List<Banner> sliderItems = new ArrayList<>();
-    private final ViewPager2 viewPager2;
     private final Context context;
-
-    // Listener para clicks en banners
+    private final ViewPager2 viewPager2;
     private OnBannerClickListener clickListener;
 
-    /**
-     * Constructor del adapter
-     * @param context contexto de la activity/fragment
-     * @param viewPager2 el ViewPager2 que mostrará los banners
-     */
     public BannerAdapter(Context context, ViewPager2 viewPager2) {
         this.context = context;
         this.viewPager2 = viewPager2;
-
-        // Configura ViewPager2 (peek effect, 3D y sombra)
         setupViewPager();
     }
 
-    /**
-     * Configuración de ViewPager2 para peek effect, escala y sombra pronunciada en el centro.
-     */
     private void setupViewPager() {
-        // Permitir que las páginas se muestren parcialmente
         viewPager2.setClipToPadding(false);
         viewPager2.setClipChildren(false);
-        viewPager2.setOffscreenPageLimit(3);
+        viewPager2.setOffscreenPageLimit(2);
 
-        // Distancias en px según densidad
-        final float offsetPx = 40 * context.getResources().getDisplayMetrics().density;
-
-        // Transformación de página para efecto 3D y profundidad
-        viewPager2.setPageTransformer((page, position) -> {
-            // Movimiento horizontal
-            page.setTranslationX(-offsetPx * position);
-
-            // Escala vertical
-            float scale = 0.85f + (1 - Math.abs(position)) * 0.15f;
-            page.setScaleY(scale);
-
-            // Opacidad
-            page.setAlpha(0.5f + (1 - Math.abs(position)) * 0.5f);
-
-            // Profundidad Z
-            page.setZ(-Math.abs(position));
-
-            // Movimiento vertical para efecto detrás
-            page.setTranslationY(Math.abs(position) * 30);
-
-            // -------------------------------
-            // Sombra pronunciada para la página central
-            // -------------------------------
-            if (Math.abs(position) < 0.5f) {
-                page.setElevation(40f);       // sombra más pronunciada
-                page.setTranslationZ(40f);
-            } else {
-                page.setElevation(0f);
-                page.setTranslationZ(0f);
+        // Configurar RecyclerView interno
+        viewPager2.post(() -> {
+            if (viewPager2.getChildCount() > 0) {
+                View child = viewPager2.getChildAt(0);
+                if (child instanceof RecyclerView) {
+                    RecyclerView recyclerView = (RecyclerView) child;
+                    recyclerView.setClipToPadding(false);
+                    recyclerView.setClipChildren(false);
+                    recyclerView.setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
+                    recyclerView.setPadding(0, 0, 0, 0);
+                }
             }
         });
+
+        CompositePageTransformer transformer = new CompositePageTransformer();
+
+        // OPCIÓN 1: Margen MÍNIMO (2-4dp)
+        transformer.addTransformer(new MarginPageTransformer(2));
+
+        transformer.addTransformer((page, position) -> {
+            float absPos = Math.abs(position);
+
+            float scaleX = 0.85f + (1 - absPos) * 0.15f;
+            float scaleY = 0.90f + (1 - absPos) * 0.10f;
+            page.setScaleX(scaleX);
+            page.setScaleY(scaleY);
+
+            float alpha = 0.65f + (1 - absPos) * 0.35f;
+            page.setAlpha(alpha);
+
+            float elevation = (1 - absPos) * 100f;
+            page.setTranslationZ(elevation);
+
+            View cardContainer = page.findViewById(R.id.cardContainer);
+            if (cardContainer instanceof MaterialCardView) {
+                MaterialCardView card = (MaterialCardView) cardContainer;
+                float cardElevation = 6f + (1 - absPos) * 6f;
+                card.setCardElevation(cardElevation);
+            }
+        });
+
+        viewPager2.setPageTransformer(transformer);
     }
 
-    /**
-     * Inflar layout de item
-     */
     @NonNull
     @Override
     public SliderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -97,17 +89,14 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.SliderView
         return new SliderViewHolder(view);
     }
 
-    /**
-     * Bind de cada banner
-     */
     @Override
     public void onBindViewHolder(@NonNull SliderViewHolder holder, int position) {
         Banner banner = sliderItems.get(position);
-        holder.setImage(banner);
-
-        // Click listener
+        holder.bind(banner);
         holder.itemView.setOnClickListener(v -> {
-            if (clickListener != null) clickListener.onBannerClick(banner);
+            if (clickListener != null) {
+                clickListener.onBannerClick(banner);
+            }
         });
     }
 
@@ -116,34 +105,19 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.SliderView
         return sliderItems.size();
     }
 
-    /**
-     * Actualiza los banners y simula loop infinito duplicando la lista
-     */
     public void setSliderItems(List<Banner> items) {
         sliderItems.clear();
-        if (items != null && !items.isEmpty()) {
+        if (items != null) {
             sliderItems.addAll(items);
-            sliderItems.addAll(items); // duplicamos para simular loop infinito
         }
         notifyDataSetChanged();
-
-        // Iniciar en el medio para efecto loop
-        if (!sliderItems.isEmpty()) {
-            viewPager2.setCurrentItem(sliderItems.size() / 2, false);
-        }
     }
 
-    /**
-     * Configura el listener para clicks en banners
-     */
     public void setOnBannerClickListener(OnBannerClickListener listener) {
         this.clickListener = listener;
     }
 
-    // --------------------------
-    // ViewHolder
-    // --------------------------
-    public class SliderViewHolder extends RecyclerView.ViewHolder {
+    static class SliderViewHolder extends RecyclerView.ViewHolder {
         private final ImageView imageView;
 
         public SliderViewHolder(@NonNull View itemView) {
@@ -151,22 +125,16 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.SliderView
             imageView = itemView.findViewById(R.id.imageSlide);
         }
 
-        /**
-         * Carga la imagen del banner usando Glide
-         */
-        void setImage(Banner banner) {
-            Glide.with(context)
+        void bind(Banner banner) {
+            Glide.with(itemView.getContext())
                     .load(banner.getUrl())
                     .centerCrop()
-//                    .placeholder(R.drawable.banner_placeholder) // placeholder opcional
-//                    .error(R.drawable.banner_error) // error opcional
+                    .placeholder(R.color.colorGrey400)
+                    .error(R.color.colorGrey400)
                     .into(imageView);
         }
     }
 
-    /**
-     * Interface para clicks en banners
-     */
     public interface OnBannerClickListener {
         void onBannerClick(Banner banner);
     }
