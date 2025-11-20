@@ -62,6 +62,11 @@ public class ClientHomeFragment extends Fragment {
         initViewModel();
         setupAdapters();
         observeViewModel();
+
+        // Iniciar la conexión WebSocket. Gracias al ViewModel Scoped a la Activity,
+        // esto solo creará la conexión una vez.
+        clientHomeVM.startWebSocket();
+        clientHomeVM.observeWebSocketEvents(getViewLifecycleOwner());
     }
 
     private void initViewModel() {
@@ -74,7 +79,10 @@ public class ClientHomeFragment extends Fragment {
         TagRepository tagRepository = new TagRepository(tagApi);
         BannerRepository bannerRepository = new BannerRepository(bannerApi, new GenericWebSocketManager<>(BuildConfig.WS_URL, token, "/topic/banners", BannerWebSocketEvent.class));
         ClientHomeVMFactory factory = new ClientHomeVMFactory(productRepository, tagRepository, bannerRepository);
-        clientHomeVM = new ViewModelProvider(this, factory).get(ClientHomeVM.class);
+
+        // --- ✅ ARQUITECTURA CORRECTA: ViewModel Scoped a la Activity ---
+        // El ViewModel sobrevive a la recreación del fragmento, manteniendo los datos.
+        clientHomeVM = new ViewModelProvider(requireActivity(), factory).get(ClientHomeVM.class);
     }
 
     private void setupAdapters() {
@@ -88,22 +96,16 @@ public class ClientHomeFragment extends Fragment {
         binding.tagRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.tagRecyclerView.setAdapter(tagAdapter);
 
-        // --- ARQUITECTURA CORRECTA: Lógica encapsulada en el Adapter ---
-
-        // 1. Instanciar el adapter pasándole el ViewPager2. El constructor del adapter se encarga de TODA la configuración.
+        // --- Lógica del Banner encapsulada para prevenir el "layout fantasma" ---
         bannerAdapter = new BannerAdapter(requireContext(), binding.bannerViewPager);
-
-        // 2. Asignar el adaptador.
         binding.bannerViewPager.setAdapter(bannerAdapter);
 
-        // 3. Crear y establecer el estado de carga INICIAL para prevenir el "layout fantasma".
         List<Banner> initialSkeletons = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             initialSkeletons.add(new Banner(null, null, null, null, null, true));
         }
         bannerAdapter.setSliderItems(initialSkeletons);
 
-        // 4. El resto de la configuración (TabLayout, listeners) permanece aquí.
         new TabLayoutMediator(binding.bannerTabLayout, binding.bannerViewPager, (tab, position) -> {
             tab.setCustomView(R.layout.tab_custom_dot);
         }).attach();
@@ -142,6 +144,7 @@ public class ClientHomeFragment extends Fragment {
     }
 
     private void observeViewModel() {
+        // Observar los datos. El ViewModel Scoped a la Activity entregará los datos cacheados inmediatamente si existen.
         clientHomeVM.getProducts().observe(getViewLifecycleOwner(), popularAdapter::submitList);
         clientHomeVM.getTags().observe(getViewLifecycleOwner(), tagAdapter::submitList);
         clientHomeVM.getErrorMessage().observe(getViewLifecycleOwner(), this::showError);
@@ -154,9 +157,6 @@ public class ClientHomeFragment extends Fragment {
                 }
             }
         });
-
-        clientHomeVM.startWebSocket();
-        clientHomeVM.observeWebSocketEvents(getViewLifecycleOwner());
     }
 
     private void showError(String error) {
