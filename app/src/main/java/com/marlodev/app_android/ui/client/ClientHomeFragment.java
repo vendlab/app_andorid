@@ -1,19 +1,25 @@
 package com.marlodev.app_android.ui.client;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.CompositePageTransformer;
+import androidx.viewpager2.widget.MarginPageTransformer;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.marlodev.app_android.BuildConfig;
 import com.marlodev.app_android.R;
 import com.marlodev.app_android.adapter.client.BannerAdapter;
 import com.marlodev.app_android.adapter.client.PopularAdapter;
@@ -21,9 +27,20 @@ import com.marlodev.app_android.adapter.client.TagAdapter;
 import com.marlodev.app_android.databinding.FragmentClientHomeBinding;
 import com.marlodev.app_android.domain.Banner;
 import com.marlodev.app_android.domain.Product;
-import com.marlodev.app_android.domain.Tag;
-import com.marlodev.app_android.ui.home.customer.DetailActivity;
+import com.marlodev.app_android.model.BannerWebSocketEvent;
+import com.marlodev.app_android.model.ProductWebSocketEvent;
+import com.marlodev.app_android.network.ApiClient;
+import com.marlodev.app_android.network.BannerApiService;
+import com.marlodev.app_android.network.GenericWebSocketManager;
+import com.marlodev.app_android.network.ProductApiService;
+import com.marlodev.app_android.network.TagApiService;
+import com.marlodev.app_android.repository.BannerRepository;
+import com.marlodev.app_android.repository.ProductRepository;
+import com.marlodev.app_android.repository.TagRepository;
+import com.marlodev.app_android.ui.home.customer.ClientDetailActivity;
+import com.marlodev.app_android.utils.SessionManager;
 import com.marlodev.app_android.viewmodel.ClientHomeVM;
+import com.marlodev.app_android.viewmodel.ClientHomeVMFactory;
 
 import java.util.List;
 
@@ -36,10 +53,10 @@ public class ClientHomeFragment extends Fragment {
     private BannerAdapter bannerAdapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentClientHomeBinding.inflate(inflater, container, false);
-        clientHomeVM = new ViewModelProvider(requireActivity()).get(ClientHomeVM.class);
 
+        initViewModel();
         setupAdapters();
         observeViewModel();
 
@@ -49,9 +66,33 @@ public class ClientHomeFragment extends Fragment {
         return binding.getRoot();
     }
 
-    /** ==================== CONFIGURAR ADAPTERS ==================== */
+    private void initViewModel() {
+        Context context = requireContext().getApplicationContext();
+        String token = SessionManager.getInstance(context).getToken();
+
+        ProductApiService productApi = ApiClient.getClient(context).create(ProductApiService.class);
+        TagApiService tagApi = ApiClient.getClient(context).create(TagApiService.class);
+        BannerApiService bannerApi = ApiClient.getClient(context).create(BannerApiService.class);
+
+        ProductRepository productRepository = new ProductRepository(productApi,
+                new GenericWebSocketManager<>(
+                        BuildConfig.WS_URL, token, "/topic/products", ProductWebSocketEvent.class
+                )
+        );
+        TagRepository tagRepository = new TagRepository(tagApi);
+        BannerRepository bannerRepository = new BannerRepository(bannerApi,
+                new GenericWebSocketManager<>(
+                        BuildConfig.WS_URL, token, "/topic/banners", BannerWebSocketEvent.class
+                )
+        );
+
+        ClientHomeVMFactory factory = new ClientHomeVMFactory(productRepository, tagRepository, bannerRepository);
+        clientHomeVM = new ViewModelProvider(this, factory).get(ClientHomeVM.class);
+    }
+
+
     private void setupAdapters() {
-        // Productos
+        // Productos Populares
         popularAdapter = new PopularAdapter();
         binding.popularView.setLayoutManager(
                 new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -70,7 +111,23 @@ public class ClientHomeFragment extends Fragment {
         bannerAdapter = new BannerAdapter(requireContext(), binding.bannerViewPager);
         binding.bannerViewPager.setAdapter(bannerAdapter);
 
-        // Generar dots personalizados
+        // --- ✅ Restaurar la configuración profesional del ViewPager2 ---
+        binding.bannerViewPager.setClipToPadding(false);
+        binding.bannerViewPager.setClipChildren(false);
+        binding.bannerViewPager.setOffscreenPageLimit(3);
+
+        CompositePageTransformer compositeTransformer = new CompositePageTransformer();
+        compositeTransformer.addTransformer(new MarginPageTransformer(dpToPx(8)));
+        compositeTransformer.addTransformer((page, position) -> {
+            float r = 1 - Math.abs(position);
+            float scale = 0.85f + r * 0.15f;
+            page.setScaleY(scale);
+            page.setScaleX(scale);
+            page.setAlpha(0.5f + r * 0.5f);
+        });
+        binding.bannerViewPager.setPageTransformer(compositeTransformer);
+        // --- Fin de la restauración ---
+
         new TabLayoutMediator(binding.bannerTabLayout, binding.bannerViewPager,
                 (tab, position) -> {
                     View custom = LayoutInflater.from(requireContext())
@@ -79,24 +136,23 @@ public class ClientHomeFragment extends Fragment {
                 }
         ).attach();
 
-        // CLICK Banner
         bannerAdapter.setOnBannerClickListener(banner -> {
-            Toast.makeText(requireContext(), "Banner: " + banner.getTitle(), Toast.LENGTH_SHORT).show();
+            if (!banner.isSkeleton()) { // Solo reaccionar a clicks en banners reales
+                Snackbar.make(binding.getRoot(), "Banner: " + banner.getTitle(), Snackbar.LENGTH_SHORT).show();
+            }
         });
 
-        /** ==================== LISTENER PARA LOS DOTS ==================== */
+        // Listener para la animación de los dots del banner
         binding.bannerTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 View view = tab.getCustomView();
                 if (view != null) {
                     View dot = view.findViewById(R.id.dotView);
-
                     ViewGroup.LayoutParams params = dot.getLayoutParams();
-                    params.width = dpToPx(30);  // rectángulo
+                    params.width = dpToPx(30);
                     params.height = dpToPx(9);
                     dot.setLayoutParams(params);
-
                     dot.setSelected(true);
                 }
             }
@@ -106,12 +162,10 @@ public class ClientHomeFragment extends Fragment {
                 View view = tab.getCustomView();
                 if (view != null) {
                     View dot = view.findViewById(R.id.dotView);
-
                     ViewGroup.LayoutParams params = dot.getLayoutParams();
-                    params.width = dpToPx(9);  // vuelve a círculo
+                    params.width = dpToPx(9);
                     params.height = dpToPx(9);
                     dot.setLayoutParams(params);
-
                     dot.setSelected(false);
                 }
             }
@@ -120,76 +174,46 @@ public class ClientHomeFragment extends Fragment {
         });
     }
 
-    /** Convertir DP → PX */
-    private int dpToPx(int dp) {
-        return Math.round(dp * getResources().getDisplayMetrics().density);
-    }
-
-    /** ==================== OBSERVADORES ==================== */
     private void observeViewModel() {
-        clientHomeVM.getProducts().observe(getViewLifecycleOwner(), this::updatePopularProducts);
-        clientHomeVM.getIsLoadingProducts().observe(getViewLifecycleOwner(), this::showLoadingProducts);
-        clientHomeVM.getProductErrorMessage().observe(getViewLifecycleOwner(), this::showError);
+        // --- Productos, Tags y Banners ---
+        clientHomeVM.getProducts().observe(getViewLifecycleOwner(), popularAdapter::submitList);
+        clientHomeVM.getTags().observe(getViewLifecycleOwner(), tagAdapter::submitList);
+        clientHomeVM.getBanners().observe(getViewLifecycleOwner(), banners -> {
+            bannerAdapter.setSliderItems(banners != null ? banners : List.of());
+            if (banners != null && !banners.isEmpty() && !banners.get(0).isSkeleton()) {
+                if (binding.bannerTabLayout.getTabCount() > 0) {
+                    TabLayout.Tab tab = binding.bannerTabLayout.getTabAt(0);
+                    if (tab != null) {
+                        tab.select();
+                    }
+                }
+            }
+        });
 
-        clientHomeVM.getTags().observe(getViewLifecycleOwner(), this::updateTags);
-        clientHomeVM.getIsLoadingTags().observe(getViewLifecycleOwner(), this::showLoadingTags);
-        clientHomeVM.getTagErrorMessage().observe(getViewLifecycleOwner(), this::showError);
-
-        clientHomeVM.getBanners().observe(getViewLifecycleOwner(), this::updateBanners);
-        clientHomeVM.getIsLoadingBanners().observe(getViewLifecycleOwner(), loading ->
-                binding.progressBarBanners.setVisibility(Boolean.TRUE.equals(loading) ? View.VISIBLE : View.GONE)
-        );
-        clientHomeVM.getBannerErrorMessage().observe(getViewLifecycleOwner(), this::showError);
-    }
-
-    /** ==================== ACTUALIZAR UI ==================== */
-    private void updatePopularProducts(List<Product> products) {
-        boolean hasData = products != null && !products.isEmpty();
-        popularAdapter.setProducts(hasData ? products : List.of());
-        binding.popularView.setVisibility(hasData ? View.VISIBLE : View.GONE);
-    }
-
-    private void updateTags(List<Tag> tags) {
-        boolean hasData = tags != null && !tags.isEmpty();
-        tagAdapter.setTags(hasData ? tags : List.of());
-        binding.tagRecyclerView.setVisibility(hasData ? View.VISIBLE : View.GONE);
-    }
-
-    private void updateBanners(List<Banner> banners) {
-        boolean hasData = banners != null && !banners.isEmpty();
-        bannerAdapter.setSliderItems(hasData ? banners : List.of());
-        binding.bannerViewPager.setVisibility(hasData ? View.VISIBLE : View.GONE);
-
-        // 🔥 Fix: seleccionar el primer dot correctamente
-        if (binding.bannerTabLayout.getTabAt(0) != null) {
-            binding.bannerTabLayout.getTabAt(0).select();
-        }
-    }
-
-    private void showLoadingProducts(Boolean loading) {
-        binding.progressBarPopular.setVisibility(Boolean.TRUE.equals(loading) ? View.VISIBLE : View.GONE);
-    }
-
-    private void showLoadingTags(Boolean loading) {
-        binding.progressBarTags.setVisibility(Boolean.TRUE.equals(loading) ? View.VISIBLE : View.GONE);
+        // --- Observador de Errores Unificado ---
+        clientHomeVM.getErrorMessage().observe(getViewLifecycleOwner(), this::showError);
     }
 
     private void showError(String error) {
         if (error != null && !error.isBlank()) {
-            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), error, Snackbar.LENGTH_SHORT).show();
         }
     }
 
-    /** Abrir detalle de producto */
     private void openProductDetail(Product product) {
-        Intent intent = new Intent(requireContext(), DetailActivity.class);
+        if (product.isSkeleton()) return; // No hacer nada si se hace clic en un esqueleto
+        Intent intent = new Intent(requireContext(), ClientDetailActivity.class);
         intent.putExtra("productId", product.getId());
         startActivity(intent);
+    }
+
+    private int dpToPx(int dp) {
+        return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
+        binding = null; // Prevenir fugas de memoria
     }
 }

@@ -1,19 +1,14 @@
 package com.marlodev.app_android.domain;
 
-
 import java.util.Objects;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 /**
  * Modelo de banner profesional para ViewPager2.
- * - url: URL remota de la imagen en Cloudinary.
- * - id: identificador único del banner.
- * - order: orden de aparición.
+ * Incluye una bandera `isSkeleton` para la UI de carga.
  */
 @Data
 @NoArgsConstructor
@@ -26,6 +21,9 @@ public class Banner {
     private String url;
     private String publicId;
 
+    // Flag para indicar si este item es un placeholder de esqueleto.
+    @Builder.Default
+    private boolean isSkeleton = false;
 
     // --------------------------
     // 🔹 Utilidades profesionales

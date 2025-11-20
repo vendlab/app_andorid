@@ -11,26 +11,22 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
 import com.marlodev.app_android.MainActivity;
-import com.marlodev.app_android.R;
 import com.marlodev.app_android.adapter.client.PedidoAdapter;
+import com.marlodev.app_android.databinding.FragmentDeliveryHomeBinding;
 import com.marlodev.app_android.domain.Pedido;
 import com.marlodev.app_android.utils.SessionManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.marlodev.app_android.viewmodel.DeliveryViewModel;
 
 public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPedidoClickListener {
 
-    private RecyclerView recyclerPedidos;
+    private FragmentDeliveryHomeBinding binding;
+    private DeliveryViewModel viewModel;
     private PedidoAdapter pedidoAdapter;
-    private List<Pedido> listaPedidos;
     private OnPedidoSelectedListener listener;
-    private MaterialButton btnLogout;
 
     public interface OnPedidoSelectedListener {
         void onPedidoSelected(Pedido pedido);
@@ -50,44 +46,52 @@ public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPe
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_delivery_home, container, false);
-
-        // INICIALIZAR BOTÓN AQUÍ ⬇⬇⬇⬇
-        initViews(view);
-        setupLogoutButton();
-
-        recyclerPedidos = view.findViewById(R.id.recyclerViewPedidos);
-        recyclerPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        listaPedidos = new ArrayList<>();
-        listaPedidos.add(new Pedido(1, "Benjamin Rumay", "Jirón Del Comercio 456, Cajamarca, Perú", "1.2 km"));
-        listaPedidos.add(new Pedido(2, "Fany Palomino", "Avenida Los Héroes 1020, Cajamarca, Perú", "3.5 km"));
-        listaPedidos.add(new Pedido(3, "Hugo Silva", "Jirón Dos de Mayo 315, Cajamarca, Perú", "2.1 km"));
-
-        pedidoAdapter = new PedidoAdapter(listaPedidos, this);
-        recyclerPedidos.setAdapter(pedidoAdapter);
-
-        return view;
+        binding = FragmentDeliveryHomeBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
-    private void initViews(View root) {
-        btnLogout = root.findViewById(R.id.btnLogout);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        viewModel = new ViewModelProvider(this).get(DeliveryViewModel.class);
+
+        setupRecyclerView();
+        setupLogoutButton();
+        observeViewModel();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // Prevenir fugas de memoria
+    }
+
+    private void setupRecyclerView() {
+        pedidoAdapter = new PedidoAdapter(this);
+        binding.recyclerViewPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerViewPedidos.setAdapter(pedidoAdapter);
     }
 
     private void setupLogoutButton() {
-        btnLogout.setOnClickListener(v -> {
-            // Limpia la sesión
+        binding.btnLogout.setOnClickListener(v -> {
             SessionManager.getInstance(requireContext()).clear();
-
-            // Redirigir a MainActivity
             Intent intent = new Intent(requireContext(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-
             requireActivity().finish();
         });
     }
+
+    private void observeViewModel() {
+        viewModel.pedidos.observe(getViewLifecycleOwner(), pedidos -> {
+            // El Fragment solo se encarga de pasar la lista al adapter.
+            // El adapter y el ViewModel se encargan de la lógica del esqueleto.
+            pedidoAdapter.submitList(pedidos);
+        });
+    }
+
+    // --- Implementación de los clicks del adapter ---
 
     @Override
     public void onAceptarClick(Pedido pedido) {
@@ -96,6 +100,8 @@ public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPe
 
     @Override
     public void onDetalleClick(Pedido pedido) {
-        if (listener != null) listener.onPedidoSelected(pedido);
+        if (listener != null) {
+            listener.onPedidoSelected(pedido);
+        }
     }
 }

@@ -1,40 +1,28 @@
 package com.marlodev.app_android.domain;
 
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
 
 /**
  * Representa un pedido asignado o disponible para el delivery.
+ * Usa Lombok para un código más limpio y `equals` y `hashCode` automáticos.
+ * Incluye un campo `isSkeleton` para la UI de carga.
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Pedido implements Serializable {
 
-    private final int id;
-    private final String cliente;
-    private final String direccion;
-    private final String distancia;
+    private int id;
+    private String cliente;
+    private String direccion;
+    private String distancia;
 
-
-    public Pedido(int id, String cliente, String direccion, String distancia) {
-        this.id = id;
-        this.cliente = cliente;
-        this.direccion = direccion;
-        this.distancia = distancia;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getCliente() {
-        return cliente;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public String getDistancia() {
-        return distancia;
-    }
-
-    public String getEstado() { return null;}
+    // Flag para indicar si este item es un placeholder de esqueleto.
+    @Builder.Default
+    private boolean isSkeleton = false;
 }

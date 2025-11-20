@@ -108,5 +108,7 @@
 
     <string name="user_icon_description">Icono de usuario</string>
 
+    <!-- Recurso de formato de precio agregado profesionalmente -->
+    <string name="price_format">S/.%1$.2f</string>
 
 </resources>

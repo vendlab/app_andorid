@@ -1,8 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.App_android" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+
+    <!-- Tema base de la app (nocturno) -->
+    <style name="Base.Theme.app_android" parent="Theme.Material3.Dark.NoActionBar">
+        <!-- Colores primarios para el modo oscuro -->
+        <!-- (Puedes personalizarlos si quieres que sean diferentes al modo diurno) -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorGreen2</item>
+        <item name="colorOnPrimary">@color/colorGrey400</item>
+
+        <!-- Configuración para la barra de estado -->
+        <!-- DESHABILITA los iconos oscuros (usa iconos claros) en la barra de estado -->
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Colores para las barras (con Edge-to-Edge se vuelven transparentes) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
+
+    <!-- El tema principal hereda del base -->
+    <style name="Theme.app_android" parent="Base.Theme.app_android" />
 
 </resources>

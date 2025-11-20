@@ -33,7 +33,12 @@ public class Product {
     private List<Tag> tags = new ArrayList<>();
     private List<String> imageUrls = new ArrayList<>();
     private List<String> imagePublicIds = new ArrayList<>();
-     // --------------------------
+
+    // Flag para la UI de carga de esqueletos
+    @Builder.Default
+    private boolean isSkeleton = false;
+
+    // --------------------------
     // 🔹 Conversión desde evento WebSocket
     // --------------------------
     public static Product fromWebSocketEvent(ProductWebSocketEvent event) {

@@ -1,152 +1,159 @@
-
 package com.marlodev.app_android.viewmodel;
 
-import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.marlodev.app_android.domain.Banner;
 import com.marlodev.app_android.domain.Product;
 import com.marlodev.app_android.domain.Tag;
-import com.marlodev.app_android.model.BannerWebSocketEvent;
-import com.marlodev.app_android.model.ProductWebSocketEvent;
-import com.marlodev.app_android.network.ApiClient;
-import com.marlodev.app_android.network.BannerApiService;
-import com.marlodev.app_android.network.ProductApiService;
-import com.marlodev.app_android.network.TagApiService;
 import com.marlodev.app_android.repository.BannerRepository;
 import com.marlodev.app_android.repository.ProductRepository;
 import com.marlodev.app_android.repository.TagRepository;
-import com.marlodev.app_android.utils.SessionManager;
-import com.marlodev.app_android.BuildConfig;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * ViewModel profesional para ClientHomeFragment.
- * - Maneja productos y tags.
- * - Expone LiveData limpios.
- * - Observa WebSocket de productos.
+ * Implementa una arquitectura de carga de élite:
+ * - Garantiza un tiempo mínimo de visualización del esqueleto para evitar parpadeos (flashes).
+ * - Orquesta el estado de la UI de forma reactiva y robusta.
  */
-public class ClientHomeVM extends AndroidViewModel {
+public class ClientHomeVM extends ViewModel {
     private static final String TAG_LOG = "ClientHomeVM";
+    private static final long MIN_SKELETON_DISPLAY_TIME = 800L; // 800 ms
 
     private final ProductRepository productRepository;
     private final TagRepository tagRepository;
     private final BannerRepository bannerRepository;
 
-    private final LiveData<List<Product>> products;
-    private final LiveData<List<Tag>> tags;
-    private final LiveData<List<Banner>> banners;
-    private final LiveData<String> productErrorMessage;
-    private final LiveData<String> tagErrorMessage;
-    private final LiveData<String> bannerErrorMessage;
-    private final LiveData<Boolean> isLoadingProducts;
-    private final LiveData<Boolean> isLoadingTags;
-    private final LiveData<Boolean> isLoadingBanners;
+    // LiveData públicos que la UI observará.
+    private final MediatorLiveData<List<Product>> products = new MediatorLiveData<>();
+    private final MediatorLiveData<List<Tag>> tags = new MediatorLiveData<>();
+    private final MediatorLiveData<List<Banner>> banners = new MediatorLiveData<>();
 
-    public ClientHomeVM(@NonNull Application application) {
-        super(application);
+    private final MediatorLiveData<String> errorMessage = new MediatorLiveData<>();
 
-        String token = SessionManager.getInstance(application).getToken();
+    public ClientHomeVM(
+            @NonNull ProductRepository productRepository,
+            @NonNull TagRepository tagRepository,
+            @NonNull BannerRepository bannerRepository
+    ) {
+        this.productRepository = productRepository;
+        this.tagRepository = tagRepository;
+        this.bannerRepository = bannerRepository;
 
-        // Inicializar servicios
-        ProductApiService productApi = ApiClient.getClient(application).create(ProductApiService.class);
-        TagApiService tagApi = ApiClient.getClient(application).create(TagApiService.class);
-        BannerApiService bannerApi = ApiClient.getClient(application).create(BannerApiService.class);
+        loadInitialData();
+    }
 
-        // Repositorios
-        productRepository = new ProductRepository(productApi,
-                new com.marlodev.app_android.network.GenericWebSocketManager<>(
-                        BuildConfig.WS_URL,
-                        token,
-                        "/topic/products",
-                        ProductWebSocketEvent.class
-                )
+    public void loadInitialData() {
+        loadDataWithSkeleton(
+                products,
+                productRepository.products,
+                this::createProductSkeletonList,
+                productRepository::loadProducts
+        );
+        loadDataWithSkeleton(
+                tags,
+                tagRepository.tags,
+                this::createTagSkeletonList,
+                tagRepository::loadTags
+        );
+        loadDataWithSkeleton(
+                banners,
+                bannerRepository.banners,
+                this::createBannerSkeletonList,
+                bannerRepository::loadBanners
         );
 
-        tagRepository = new TagRepository(tagApi);
-
-        bannerRepository = new BannerRepository(bannerApi,
-                new com.marlodev.app_android.network.GenericWebSocketManager<>(
-                        BuildConfig.WS_URL,
-                        token,
-                        "/topic/banners",
-                        BannerWebSocketEvent.class
-                )
-        );
-
-        // LiveData expuestos
-        products = productRepository.products;
-        tags = tagRepository.tags;
-        banners = bannerRepository.banners;
-
-        productErrorMessage = productRepository.errorMessage;
-        tagErrorMessage = tagRepository.errorMessage;
-        bannerErrorMessage = bannerRepository.errorMessage;
-
-        isLoadingProducts = productRepository.isLoading;
-        isLoadingTags = tagRepository.isLoading;
-        isLoadingBanners = bannerRepository.isLoading;
-
-        // Cargar datos iniciales
-        loadProducts();
-        loadTags();
-        loadBanners();
+        // Centralizar errores
+        errorMessage.addSource(productRepository.errorMessage, error -> { if (error != null) errorMessage.setValue(error); });
+        errorMessage.addSource(tagRepository.errorMessage, error -> { if (error != null) errorMessage.setValue(error); });
+        errorMessage.addSource(bannerRepository.errorMessage, error -> { if (error != null) errorMessage.setValue(error); });
     }
 
-    /** Cargar productos inicial */
-    public void loadProducts() {
-        productRepository.loadProducts();
+    private <T> void loadDataWithSkeleton(
+            @NonNull MediatorLiveData<List<T>> uiLiveData,
+            @NonNull LiveData<List<T>> repoLiveData,
+            @NonNull SkeletonProvider<T> skeletonProvider,
+            @NonNull LoadFunction loadFunction
+    ) {
+        long startTime = System.currentTimeMillis();
+        uiLiveData.setValue(skeletonProvider.create(5)); // 1. Emitir esqueletos inmediatamente
+
+        AtomicBoolean dataArrived = new AtomicBoolean(false);
+
+        uiLiveData.addSource(repoLiveData, realData -> {
+            // CORRECCIÓN CRÍTICA: Ignorar la data nula O VACÍA para evitar la condición de carrera.
+            if (realData == null || realData.isEmpty() || dataArrived.get()) return;
+            dataArrived.set(true);
+
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            long remainingTime = MIN_SKELETON_DISPLAY_TIME - elapsedTime;
+
+            if (remainingTime > 0) {
+                new Handler(Looper.getMainLooper()).postDelayed(() -> uiLiveData.setValue(realData), remainingTime);
+            } else {
+                uiLiveData.setValue(realData);
+            }
+            uiLiveData.removeSource(repoLiveData);
+        });
+
+        loadFunction.load();
     }
 
-    /** Cargar tags inicial */
-    public void loadTags() {
-        tagRepository.loadTags();
+
+    @FunctionalInterface
+    interface SkeletonProvider<T> { List<T> create(int count); }
+    @FunctionalInterface
+    interface LoadFunction { void load(); }
+
+
+    private List<Product> createProductSkeletonList(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> Product.builder().isSkeleton(true).id((long) -i).build())
+                .collect(Collectors.toList());
     }
-    /** Cargar Banners inicial */
-    public void loadBanners() {
-        bannerRepository.loadBanners();
+    private List<Tag> createTagSkeletonList(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> Tag.builder().isSkeleton(true).id(-i).build())
+                .collect(Collectors.toList());
+    }
+    private List<Banner> createBannerSkeletonList(int count) {
+        return IntStream.range(0, count)
+                .mapToObj(i -> Banner.builder().isSkeleton(true).id((long) -i).build())
+                .collect(Collectors.toList());
     }
 
-    /** Conectar WebSocket de productos */
-    /** Conectar WebSocket de Banners */
+    public LiveData<List<Product>> getProducts() { return products; }
+    public LiveData<List<Tag>> getTags() { return tags; }
+    public LiveData<List<Banner>> getBanners() { return banners; }
+    public LiveData<String> getErrorMessage() { return errorMessage; }
+
+
     public void startWebSocket() {
         productRepository.connectWebSocket();
         bannerRepository.connectWebSocket();
     }
-
-
-    /** Observar eventos WebSocket de productos */
     public void observeWebSocketEvents(@NonNull LifecycleOwner owner) {
         productRepository.observeWebSocketEvents(owner);
         bannerRepository.observeWebSocketEvents(owner);
     }
 
-    /** Getters LiveData para UI */
-    public LiveData<List<Product>> getProducts() { return products; }
-    public LiveData<List<Tag>> getTags() { return tags; }
-    public LiveData<List<Banner>> getBanners() { return banners; }
-
-    public LiveData<String> getProductErrorMessage() { return productErrorMessage; }
-    public LiveData<String> getTagErrorMessage() { return tagErrorMessage; }
-    public LiveData<String> getBannerErrorMessage() { return bannerErrorMessage; }
-
-    public LiveData<Boolean> getIsLoadingProducts() { return isLoadingProducts; }
-    public LiveData<Boolean> getIsLoadingTags() { return isLoadingTags; }
-    public LiveData<Boolean> getIsLoadingBanners() { return isLoadingBanners; }
-
-    /** Limpiar recursos */
     @Override
     protected void onCleared() {
         super.onCleared();
         Log.d(TAG_LOG, "🧹 Limpiando recursos WebSocket y repositorios");
         productRepository.shutdown();
         bannerRepository.shutdown();
-        // tagRepository no tiene WS
     }
 }

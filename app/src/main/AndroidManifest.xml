@@ -45,7 +45,7 @@
             android:name=".ui.auth.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.home.customer.DetailActivity"
+            android:name=".ui.home.customer.ClientDetailActivity"
             android:exported="false" /> <!-- SplashActivity: launcher -->
         <activity
             android:name=".ui.splash.SplashActivity"

@@ -1,28 +1,22 @@
 package com.marlodev.app_android.adapter.client;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.marlodev.app_android.R;
+import com.marlodev.app_android.databinding.ItemTagBinding;
+import com.marlodev.app_android.databinding.ItemTagSkeletonBinding;
 import com.marlodev.app_android.domain.Tag;
 
-import java.util.ArrayList;
-import java.util.List;
+public class TagAdapter extends ListAdapter<Tag, RecyclerView.ViewHolder> {
 
-/**
- * Adapter profesional para RecyclerView de Tags.
- * - Maneja clics
- * - Maneja lista dinámica de Tags
- */
-public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
-
-    private final List<Tag> tagList = new ArrayList<>();
     private OnTagClickListener listener;
+
+    private static final int VIEW_TYPE_ITEM = 0;
+    private static final int VIEW_TYPE_SKELETON = 1;
 
     public interface OnTagClickListener {
         void onTagClick(Tag tag);
@@ -32,61 +26,59 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.TagViewHolder> {
         this.listener = listener;
     }
 
-    // -----------------------------
-    // Adapter Methods
-    // -----------------------------
+    public TagAdapter() {
+        super(new TagDiffCallback());
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return getItem(position).isSkeleton() ? VIEW_TYPE_SKELETON : VIEW_TYPE_ITEM;
+    }
+
     @NonNull
     @Override
-    public TagViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_tag, parent, false);
-        return new TagViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        if (viewType == VIEW_TYPE_SKELETON) {
+            ItemTagSkeletonBinding skeletonBinding = ItemTagSkeletonBinding.inflate(inflater, parent, false);
+            return new SkeletonViewHolder(skeletonBinding);
+        } else {
+            ItemTagBinding binding = ItemTagBinding.inflate(inflater, parent, false);
+            return new TagViewHolder(binding);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TagViewHolder holder, int position) {
-        Tag tag = tagList.get(position);
-        holder.bind(tag);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder.getItemViewType() == VIEW_TYPE_ITEM) {
+            TagViewHolder tagViewHolder = (TagViewHolder) holder;
+            tagViewHolder.bind(getItem(position), listener);
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return tagList.size();
-    }
+    // --- ViewHolders ---
 
-    // -----------------------------
-    // Actualización de lista
-    // -----------------------------
-    public void setTags(List<Tag> tags) {
-        tagList.clear();
-        if (tags != null) tagList.addAll(tags);
-        notifyDataSetChanged();
-    }
+    public static class TagViewHolder extends RecyclerView.ViewHolder {
+        private final ItemTagBinding binding;
 
-    public Tag getTagAt(int position) {
-        return tagList.get(position);
-    }
+        public TagViewHolder(@NonNull ItemTagBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
 
-    // -----------------------------
-    // ViewHolder
-    // -----------------------------
-    class TagViewHolder extends RecyclerView.ViewHolder {
-
-        private final TextView textTagName;
-
-        public TagViewHolder(@NonNull View itemView) {
-            super(itemView);
-            textTagName = itemView.findViewById(R.id.tagTitle);
-
+        void bind(Tag tag, OnTagClickListener listener) {
+            binding.tagTitle.setText(tag.getName());
             itemView.setOnClickListener(v -> {
-                if (listener != null && getAdapterPosition() != RecyclerView.NO_POSITION) {
-                    listener.onTagClick(tagList.get(getAdapterPosition()));
+                if (listener != null) {
+                    listener.onTagClick(tag);
                 }
             });
         }
+    }
 
-        void bind(Tag tag) {
-            textTagName.setText(tag.getName());
+    static class SkeletonViewHolder extends RecyclerView.ViewHolder {
+        public SkeletonViewHolder(ItemTagSkeletonBinding binding) {
+            super(binding.getRoot());
         }
     }
 }

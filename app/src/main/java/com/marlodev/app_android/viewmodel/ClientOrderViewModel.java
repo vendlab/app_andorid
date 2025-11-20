@@ -7,7 +7,11 @@ import androidx.lifecycle.ViewModel;
 import com.marlodev.app_android.model.order.OrderResponse;
 import com.marlodev.app_android.repository.OrderRepository;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class ClientOrderViewModel extends ViewModel {
 
@@ -29,7 +33,10 @@ public class ClientOrderViewModel extends ViewModel {
     public void loadActiveOrders() {
         repository.getActiveOrders(new OrderRepository.SimpleCallback<List<OrderResponse>>() {
             @Override
-            public void onSuccess(List<OrderResponse> result) { activeOrders.postValue(result); }
+            public void onSuccess(List<OrderResponse> result) {
+                sortOrdersByDate(result);
+                activeOrders.postValue(result);
+            }
             @Override
             public void onError(String message) { errorMessage.postValue(message); }
         });
@@ -38,9 +45,29 @@ public class ClientOrderViewModel extends ViewModel {
     public void loadHistoryOrders() {
         repository.getOrderHistory(new OrderRepository.SimpleCallback<List<OrderResponse>>() {
             @Override
-            public void onSuccess(List<OrderResponse> result) { historyOrders.postValue(result); }
+            public void onSuccess(List<OrderResponse> result) {
+                sortOrdersByDate(result);
+                historyOrders.postValue(result);
+            }
             @Override
             public void onError(String message) { errorMessage.postValue(message); }
+        });
+    }
+
+    private void sortOrdersByDate(List<OrderResponse> orders) {
+        if (orders == null) return;
+
+        SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+        isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        orders.sort((o1, o2) -> {
+            try {
+                Date d1 = isoFormat.parse(o1.getCreatedAt());
+                Date d2 = isoFormat.parse(o2.getCreatedAt());
+                return d2.compareTo(d1); // DESC: most recent first
+            } catch (Exception e) {
+                return 0;
+            }
         });
     }
 }

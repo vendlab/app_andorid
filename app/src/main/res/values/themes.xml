@@ -1,58 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources  xmlns:tools="http://schemas.android.com/tools">
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Tema base -->
+    <!-- Tema base de la app (diurno) -->
     <style name="Base.Theme.app_android" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Colores primarios y de la marca -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorGreen2</item>
         <item name="colorOnPrimary">@color/colorGrey400</item>
-        <item name="android:statusBarColor">@color/colorGreen2</item>
-        <item name="android:windowLightStatusBar">true</item> <!-- íconos oscuros -->
-        <item name="android:navigationBarColor">@color/colorGrey100</item>
 
+        <!-- Configuración para la barra de estado -->
+        <!-- Habilita los iconos oscuros en la barra de estado (para fondos claros) -->
+        <item name="android:windowLightStatusBar">true</item>
 
-
+        <!-- Colores para las barras (con Edge-to-Edge se vuelven transparentes) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
     <!-- Tema principal de la app -->
     <style name="Theme.app_android" parent="Base.Theme.app_android" />
 
-
-
-
     <!-- Tema para SplashActivity -->
     <style name="Theme.MyApp.Splash" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@drawable/color_green_gradient</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Forzamos iconos claros porque el fondo del splash es oscuro -->
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
+    <!-- Otros estilos -->
     <style name="circleImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">10dp</item>
     </style>
 
-
-
     <style name="App.TabLayout.IndicatorDots" parent="Widget.MaterialComponents.TabLayout">
-        <!-- Elimina indicador -->
         <item name="tabIndicatorHeight">0dp</item>
-
-        <!-- Estilo de fondo para cada tab -->
         <item name="tabBackground">@drawable/tab_dot</item>
-
-        <!-- Tamaño real de cada tab (evita deformarlos) -->
         <item name="tabMinWidth">20dp</item>
         <item name="tabMaxWidth">20dp</item>
-
-        <!-- Padding interno para separación entre dots -->
         <item name="tabPaddingStart">8dp</item>
         <item name="tabPaddingEnd">8dp</item>
-
-        <!-- Para que los dots sean centrados y pequeños -->
         <item name="tabInlineLabel">true</item>
     </style>
-
 
 </resources>

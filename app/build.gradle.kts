@@ -19,10 +19,12 @@ android {
 
 
     buildTypes {
-        getByName("debug") {
-            isMinifyEnabled = false
+        getByName("debug") {isMinifyEnabled = false
+            // --- URL PARA DESARROLLO/LOCAL ---
             buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/\"")
             buildConfigField("String", "WS_URL", "\"ws://10.0.2.2:8080/ws-products\"")
+//            buildConfigField("String", "BASE_URL", "\"https://ecommerce-backend-o9y5.onrender.com/api/\"")
+//            buildConfigField("String", "WS_URL", "\"wss://ecommerce-backend-o9y5.onrender.com/ws-products\"")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -30,8 +32,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://ecommerce-backend-o9y5.onrender.com/api/\"")
-            buildConfigField("String", "WS_URL", "\"wss://ecommerce-backend-o9y5.onrender.com/ws-products\"")
+            // --- URL PARA PRODUCCIÓN ---
+//            buildConfigField("String", "BASE_URL", "\"https://ecommerce-backend-o9y5.onrender.com/api/\"")
+//            buildConfigField("String", "WS_URL", "\"wss://ecommerce-backend-o9y5.onrender.com/ws-products\"")
         }
     }
 

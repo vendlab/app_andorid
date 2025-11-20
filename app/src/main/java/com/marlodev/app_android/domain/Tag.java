@@ -6,10 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+
 /**
  * Modelo de dominio para Tag.
- * Se usa en la app Android, independiente del DTO.
- * Puede incluir referencias a productos o relaciones si es necesario.
+ * Incluye una bandera `isSkeleton` para la UI de carga.
  */
 @Data
 @NoArgsConstructor
@@ -20,4 +20,8 @@ public class Tag {
     private Integer id;
     private String name;
     private LocalDateTime createdAt;
+
+    // Flag para indicar si este item es un placeholder de esqueleto.
+    @Builder.Default
+    private boolean isSkeleton = false;
 }

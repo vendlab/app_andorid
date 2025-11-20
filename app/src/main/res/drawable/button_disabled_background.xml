@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Fondo sólido para el placeholder del botón -->
+    <solid android:color="@color/colorGrey400" />
+
+    <!-- Esquinas redondeadas para que coincida con el estilo de los botones -->
+    <corners android:radius="8dp" />
+
+</shape>

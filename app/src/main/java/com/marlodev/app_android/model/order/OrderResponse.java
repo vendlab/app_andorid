@@ -1,93 +1,89 @@
 package com.marlodev.app_android.model.order;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.math.BigDecimal;
 import java.util.List;
 
-public class OrderResponse {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderResponse implements Parcelable {
 
     private Long id;
     private Integer userId;
     private String username;
-    private String status;          // Enum como string
-
+    private String status;
     private String message;
-    private BigDecimal totalAmount;     // BigDecimal → double
-    private String createdAt;       // ZonedDateTime → String
+    private BigDecimal totalAmount;
+    private String createdAt;
     private String updatedAt;
     private List<CartItemResponse> items;
 
-
-
-
-    public Long getId() {
-        return id;
+    protected OrderResponse(Parcel in) {
+        if (in.readByte() == 0) {
+            id = null;
+        } else {
+            id = in.readLong();
+        }
+        if (in.readByte() == 0) {
+            userId = null;
+        } else {
+            userId = in.readInt();
+        }
+        username = in.readString();
+        status = in.readString();
+        message = in.readString();
+        totalAmount = new BigDecimal(in.readString());
+        createdAt = in.readString();
+        updatedAt = in.readString();
+        items = in.createTypedArrayList(CartItemResponse.CREATOR);
     }
 
-    public Integer getUserId() {
-        return userId;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        if (id == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeLong(id);
+        }
+        if (userId == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(userId);
+        }
+        dest.writeString(username);
+        dest.writeString(status);
+        dest.writeString(message);
+        dest.writeString(totalAmount.toString());
+        dest.writeString(createdAt);
+        dest.writeString(updatedAt);
+        dest.writeTypedList(items);
     }
 
-    public String getUsername() {
-        return username;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public String getStatus() {
-        return status;
-    }
+    public static final Creator<OrderResponse> CREATOR = new Creator<OrderResponse>() {
+        @Override
+        public OrderResponse createFromParcel(Parcel in) {
+            return new OrderResponse(in);
+        }
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public List<CartItemResponse> getItems() {
-        return items;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public void setItems(List<CartItemResponse> items) {
-        this.items = items;
-    }
+        @Override
+        public OrderResponse[] newArray(int size) {
+            return new OrderResponse[size];
+        }
+    };
 }
