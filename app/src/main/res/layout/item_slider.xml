@@ -1,29 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:clipToPadding="false">
+    app:cardCornerRadius="15dp"
+    app:cardElevation="8dp"
+    app:cardMaxElevation="14dp"
+    app:cardUseCompatPadding="false"
+    app:strokeColor="@android:color/transparent"
+    app:strokeWidth="0dp">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardContainer"
+    <ImageView
+        android:id="@+id/imageSlide"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="8dp"
-        app:cardMaxElevation="14dp"
-        app:cardUseCompatPadding="false"
-        app:strokeColor="@android:color/transparent"
-        app:strokeWidth="0dp">
+        android:scaleType="centerCrop"/>
 
-        <ImageView
-            android:id="@+id/imageSlide"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"/>
-    </com.google.android.material.card.MaterialCardView>
-</FrameLayout>
+</com.google.android.material.card.MaterialCardView>

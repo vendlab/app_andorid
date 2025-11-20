@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -108,25 +109,59 @@ public class ClientHomeFragment extends Fragment {
         binding.tagRecyclerView.setAdapter(tagAdapter);
 
         // Banners
-        bannerAdapter = new BannerAdapter(requireContext(), binding.bannerViewPager);
+        bannerAdapter = new BannerAdapter(requireContext());
         binding.bannerViewPager.setAdapter(bannerAdapter);
 
-        // --- ✅ Restaurar la configuración profesional del ViewPager2 ---
-        binding.bannerViewPager.setClipToPadding(false);
-        binding.bannerViewPager.setClipChildren(false);
-        binding.bannerViewPager.setOffscreenPageLimit(3);
+        // --- ✅ CLONACIÓN FINAL de la lógica de animación profesional ---
+        binding.bannerViewPager.setOffscreenPageLimit(3); // Imprescindible para el peek a ambos lados
 
-        CompositePageTransformer compositeTransformer = new CompositePageTransformer();
-        compositeTransformer.addTransformer(new MarginPageTransformer(dpToPx(8)));
-        compositeTransformer.addTransformer((page, position) -> {
-            float r = 1 - Math.abs(position);
-            float scale = 0.85f + r * 0.15f;
-            page.setScaleY(scale);
-            page.setScaleX(scale);
-            page.setAlpha(0.5f + r * 0.5f);
+        // Configuración del RecyclerView interno (clave para evitar bugs visuales)
+        binding.bannerViewPager.post(() -> {
+            if (binding.bannerViewPager.getChildCount() > 0) {
+                View child = binding.bannerViewPager.getChildAt(0);
+                if (child instanceof RecyclerView) {
+                    RecyclerView recyclerView = (RecyclerView) child;
+                    recyclerView.setClipToPadding(false);
+                    recyclerView.setClipChildren(false);
+                    recyclerView.setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
+                }
+            }
         });
-        binding.bannerViewPager.setPageTransformer(compositeTransformer);
-        // --- Fin de la restauración ---
+
+        CompositePageTransformer transformer = new CompositePageTransformer();
+
+        // Margen sutil entre páginas, clonado de su lógica original
+        transformer.addTransformer(new MarginPageTransformer(dpToPx(4)));
+
+        // CLON EXACTO de la coreografía de animación que funcionaba
+        transformer.addTransformer((page, position) -> {
+            float absPos = Math.abs(position);
+
+            // Escala (lógica original para que el centro sea grande)
+            float scaleX = 0.85f + (1 - absPos) * 0.15f;
+            float scaleY = 0.90f + (1 - absPos) * 0.10f;
+            page.setScaleX(scaleX);
+            page.setScaleY(scaleY);
+
+            // Opacidad (lógica original)
+            float alpha = 0.65f + (1 - absPos) * 0.35f;
+            page.setAlpha(alpha);
+
+            // Elevación 3D (lógica original para la sombra y el orden Z)
+            float elevation = (1 - absPos) * 100f;
+            page.setTranslationZ(elevation);
+
+            // Elevación de la tarjeta (lógica original para la sombra de Material)
+            View cardContainer = page.findViewById(R.id.cardContainer);
+            if (cardContainer instanceof MaterialCardView) {
+                MaterialCardView card = (MaterialCardView) cardContainer;
+                float cardElevation = 6f + (1 - absPos) * 6f;
+                card.setCardElevation(cardElevation);
+            }
+        });
+
+        binding.bannerViewPager.setPageTransformer(transformer);
+        // --- Fin de la clonación ---
 
         new TabLayoutMediator(binding.bannerTabLayout, binding.bannerViewPager,
                 (tab, position) -> {

@@ -26,14 +26,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:background="@color/colorGrey100">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-
-
+            android:clipChildren="false"
+            android:clipToPadding="false"
             >
             <!--        Contenedor de fondo verde-->
 
@@ -255,12 +257,9 @@
                     android:layout_height="180dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:paddingStart="33dp"
-                    android:paddingTop="0dp"
-                    android:paddingEnd="33dp"
-                    android:paddingBottom="0dp"
+                    android:paddingStart="40dp"
+                    android:paddingEnd="40dp"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:layout_editor_absoluteX="0dp"
                     tools:listitem="@layout/item_slider" />
 
                 <com.google.android.material.tabs.TabLayout

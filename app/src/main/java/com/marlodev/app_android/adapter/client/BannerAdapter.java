@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.marlodev.app_android.R;
@@ -27,9 +26,8 @@ public class BannerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private static final int VIEW_TYPE_ITEM = 0;
     private static final int VIEW_TYPE_SKELETON = 1;
 
-    public BannerAdapter(Context context, ViewPager2 viewPager2) {
+    public BannerAdapter(Context context) {
         this.context = context;
-        // La configuración del ViewPager2 se puede mover al Fragmento si es necesario.
     }
 
     public void setOnBannerClickListener(OnBannerClickListener listener) {
