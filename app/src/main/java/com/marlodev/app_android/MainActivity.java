@@ -51,19 +51,25 @@ public class MainActivity extends AppCompatActivity {
      */
     private void setupEdgeToEdgeDisplay() {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        getWindow().setStatusBarColor(Color.TRANSPARENT); // Barra de estado transparente
-        getWindow().setNavigationBarColor(Color.TRANSPARENT); // Barra de navegación transparente
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (view, insets) -> {
-            // Aplicar padding a la raíz para que el contenido no se solape con las barras
             int left = insets.getSystemWindowInsetLeft();
             int top = insets.getSystemWindowInsetTop();
             int right = insets.getSystemWindowInsetRight();
             int bottom = insets.getSystemWindowInsetBottom();
-            
-            view.setPadding(left, top, right, 0); // Dejar padding inferior para el ChipNavigationBar
-            binding.bottomNavigation.setPadding(0, 0, 0, bottom); // Aplicar padding solo a la barra de nav
 
+            // Aplicar los insets como padding a la vista raíz.
+            // Esto crea un "área segura" para todo el contenido de la actividad.
+            // El padding inferior empujará la ChipNavigationBar hacia arriba para que no se solape
+            // con la barra de navegación del sistema.
+            view.setPadding(left, top, right, bottom);
+
+            // Ya no es necesario (y era incorrecto) aplicar padding directamente a la barra de navegación.
+            // El padding de la vista raíz ya la posiciona correctamente.
+
+            // Devolvemos los insets para que otros listeners (si los hubiera) puedan usarlos.
             return insets;
         });
     }
