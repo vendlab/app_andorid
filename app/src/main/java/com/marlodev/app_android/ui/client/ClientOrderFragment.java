@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,12 +36,7 @@ public class ClientOrderFragment extends Fragment {
         binding = FragmentClientOrderBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
 
-        // Adjust padding according to system bars
-        ViewCompat.setOnApplyWindowInsetsListener(view, (v, insets) -> {
-            var systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        // Lógica de UI simplificada. Toda la complejidad de insets ha sido eliminada.
 
         initAdapters();
         initViewModel();

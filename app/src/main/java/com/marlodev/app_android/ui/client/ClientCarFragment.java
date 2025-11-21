@@ -8,8 +8,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,18 +34,15 @@ public class ClientCarFragment extends Fragment {
             @Nullable Bundle savedInstanceState
     ) {
         binding = FragmentClienteCarritoBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
-            var systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        // Lógica de UI simplificada. Toda la complejidad de insets ha sido eliminada.
 
         setupViewModel();
         setupRecyclerView();
         setupListeners();
 
-        return binding.getRoot();
+        return view;
     }
 
     private void setupViewModel() {

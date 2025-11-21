@@ -22,10 +22,6 @@ public class ClientPerfilFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static ClientPerfilFragment newInstance() {
-        return new ClientPerfilFragment();
-    }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentClientPerfilBinding.inflate(inflater, container, false);
@@ -35,6 +31,8 @@ public class ClientPerfilFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Lógica de UI simplificada. Toda la complejidad ha sido eliminada.
 
         loadUserData();
         setupLogoutButton();
@@ -46,10 +44,6 @@ public class ClientPerfilFragment extends Fragment {
         binding = null; // Prevenir fugas de memoria
     }
 
-    /**
-     * Carga y muestra los datos del usuario desde la sesión.
-     * De manera profesional y segura, maneja los posibles valores nulos.
-     */
     private void loadUserData() {
         SessionManager sessionManager = SessionManager.getInstance(requireContext());
         String email = sessionManager.getEmail();
@@ -65,19 +59,12 @@ public class ClientPerfilFragment extends Fragment {
         binding.tvRole.setText(String.format("Rol: %s", role != null ? role : "Invitado"));
     }
 
-    /**
-     * Configura el listener del botón de cierre de sesión.
-     */
     private void setupLogoutButton() {
         binding.btnLogout.setOnClickListener(v -> {
             SessionManager.getInstance(requireContext()).clear();
-
-            // Redirigir a MainActivity, limpiando la pila de actividades
             Intent intent = new Intent(requireContext(), MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-
-            // Finalizar la actividad contenedora para asegurar que no se pueda volver atrás
             requireActivity().finish();
         });
     }
