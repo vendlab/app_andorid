@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="-8dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardUseCompatPadding="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/icon_alerta"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_warning"
+                tools:ignore="ContentDescription" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_toStartOf="@id/tag_alerta"
+                android:layout_toEndOf="@id/icon_alerta"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_nombre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="Granos de Café Arábica" />
+
+                <TextView
+                    android:id="@+id/tv_ultimo_reabastecimiento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textSize="11sp"
+                    tools:ignore="SmallSp"
+                    tools:text="Reabastecido hace 3 días" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tag_alerta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:textSize="11sp"
+                tools:ignore="SmallSp"
+                tools:text="Crítico" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:id="@+id/label_actual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stock actual:" />
+
+            <TextView
+                android:id="@+id/tv_stock_actual"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold"
+                tools:text="2 kg" />
+
+            <TextView
+                android:id="@+id/label_minimo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/label_actual"
+                android:text="Stock mínimo:" />
+
+            <TextView
+                android:id="@+id/tv_stock_minimo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/label_actual"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold"
+                tools:text="10 kg" />
+        </RelativeLayout>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="8dp"
+            android:max="100"
+            android:progressBackgroundTint="#EAEAEA"
+            tools:progress="20" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_solicitar_reposicion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.6"
+                android:backgroundTint="@color/colorBlack"
+                android:text="Solicitar Reposición"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btn_detalles"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Detalles"
+                android:textAllCaps="false"
+                android:textColor="@color/colorBlack"
+                android:textSize="11sp"
+                app:strokeColor="#C8C8C8" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

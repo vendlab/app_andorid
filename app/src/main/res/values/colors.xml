@@ -45,6 +45,9 @@
     <color name="colorBrown">#5A3F0C</color>
     <color name="colorGreenLight">#E6F4D9</color>
     <color name="colorGrey">#D9D9D9</color>
+    <!-- Nuevos colores para las alertas -->
+    <color name="colorCritico">#D32F2F</color>
+    <color name="colorAdvertencia">#FBC02D</color>
 
 
 </resources>
