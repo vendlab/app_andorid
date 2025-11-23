@@ -8,13 +8,10 @@
         <item name="colorPrimaryDark">@color/colorGreen2</item>
         <item name="colorOnPrimary">@color/colorGrey400</item>
 
-        <!-- Configuración para la barra de estado -->
-        <!-- Habilita los iconos oscuros en la barra de estado (para fondos claros) -->
-        <item name="android:windowLightStatusBar">true</item>
-
-        <!-- Colores para las barras (con Edge-to-Edge se vuelven transparentes) -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- Configuración para las barras del sistema -->
+        <!-- El sistema determinará automáticamente el color de los iconos basado en el contraste -->
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorBlack</item>
     </style>
 
     <!-- Tema principal de la app -->

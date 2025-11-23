@@ -59,12 +59,13 @@ public class ClientHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Lógica de UI simplificada. Toda la complejidad de insets ha sido eliminada.
+
         initViewModel();
         setupAdapters();
         observeViewModel();
 
-        // Iniciar la conexión WebSocket. Gracias al ViewModel Scoped a la Activity,
-        // esto solo creará la conexión una vez.
         clientHomeVM.startWebSocket();
         clientHomeVM.observeWebSocketEvents(getViewLifecycleOwner());
     }
@@ -80,13 +81,10 @@ public class ClientHomeFragment extends Fragment {
         BannerRepository bannerRepository = new BannerRepository(bannerApi, new GenericWebSocketManager<>(BuildConfig.WS_URL, token, "/topic/banners", BannerWebSocketEvent.class));
         ClientHomeVMFactory factory = new ClientHomeVMFactory(productRepository, tagRepository, bannerRepository);
 
-        // --- ✅ ARQUITECTURA CORRECTA: ViewModel Scoped a la Activity ---
-        // El ViewModel sobrevive a la recreación del fragmento, manteniendo los datos.
         clientHomeVM = new ViewModelProvider(requireActivity(), factory).get(ClientHomeVM.class);
     }
 
     private void setupAdapters() {
-        // Popular Products & Tags
         popularAdapter = new PopularAdapter();
         binding.popularView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.popularView.setAdapter(popularAdapter);
@@ -96,15 +94,8 @@ public class ClientHomeFragment extends Fragment {
         binding.tagRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.tagRecyclerView.setAdapter(tagAdapter);
 
-        // --- Lógica del Banner encapsulada para prevenir el "layout fantasma" ---
         bannerAdapter = new BannerAdapter(requireContext(), binding.bannerViewPager);
         binding.bannerViewPager.setAdapter(bannerAdapter);
-
-        List<Banner> initialSkeletons = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            initialSkeletons.add(new Banner(null, null, null, null, null, true));
-        }
-        bannerAdapter.setSliderItems(initialSkeletons);
 
         new TabLayoutMediator(binding.bannerTabLayout, binding.bannerViewPager, (tab, position) -> {
             tab.setCustomView(R.layout.tab_custom_dot);
@@ -144,7 +135,6 @@ public class ClientHomeFragment extends Fragment {
     }
 
     private void observeViewModel() {
-        // Observar los datos. El ViewModel Scoped a la Activity entregará los datos cacheados inmediatamente si existen.
         clientHomeVM.getProducts().observe(getViewLifecycleOwner(), popularAdapter::submitList);
         clientHomeVM.getTags().observe(getViewLifecycleOwner(), tagAdapter::submitList);
         clientHomeVM.getErrorMessage().observe(getViewLifecycleOwner(), this::showError);
@@ -152,9 +142,15 @@ public class ClientHomeFragment extends Fragment {
         clientHomeVM.getBanners().observe(getViewLifecycleOwner(), banners -> {
             if (banners != null && !banners.isEmpty()) {
                 bannerAdapter.setSliderItems(banners);
-                if (binding.bannerTabLayout.getTabCount() > 0) {
-                    binding.bannerTabLayout.selectTab(binding.bannerTabLayout.getTabAt(0));
+            } else {
+                List<Banner> skeletons = new ArrayList<>();
+                for (int i = 0; i < 5; i++) {
+                    skeletons.add(new Banner(null, null, null, null, null, true));
                 }
+                bannerAdapter.setSliderItems(skeletons);
+            }
+            if (binding.bannerTabLayout.getTabCount() > 0) {
+                binding.bannerTabLayout.selectTab(binding.bannerTabLayout.getTabAt(0));
             }
         });
     }

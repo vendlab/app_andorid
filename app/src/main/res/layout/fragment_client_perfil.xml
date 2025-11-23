@@ -9,7 +9,7 @@ android:fitsSystemWindows="false"
 android:background="@color/colorGrey100"
 tools:context=".ui.client.ClientPerfilFragment">
 
-<!-- ScrollView para todo el contenido -->
+<!-- Componente revertido a ScrollView para máxima limpieza y simplicidad -->
 <ScrollView
     android:id="@+id/scrollView"
     android:layout_width="0dp"
@@ -28,6 +28,7 @@ tools:context=".ui.client.ClientPerfilFragment">
 
         <!-- Banner superior con imagen y degradado -->
         <FrameLayout
+            android:id="@+id/header_banner" 
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:clipToPadding="false">
