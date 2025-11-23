@@ -9,7 +9,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="welcome_admin">
-        <font color="#000000"><b> Buenas tardes, Carla</b></font>
+        <font color="#000000"><b> Buenas tardes, Nicol</b></font>
     </string>
 
     <string name="description_admin">Administradora Kaphiy Perú</string>
@@ -110,5 +110,7 @@
 
     <!-- Recurso de formato de precio agregado profesionalmente -->
     <string name="price_format">S/.%1$.2f</string>
+
+
 
 </resources>

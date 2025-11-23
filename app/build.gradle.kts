@@ -21,10 +21,10 @@ android {
     buildTypes {
         getByName("debug") {isMinifyEnabled = false
             // --- URL PARA DESARROLLO/LOCAL ---
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/\"")
-            buildConfigField("String", "WS_URL", "\"ws://10.0.2.2:8080/ws-products\"")
-//            buildConfigField("String", "BASE_URL", "\"https://ecommerce-backend-o9y5.onrender.com/api/\"")
-//            buildConfigField("String", "WS_URL", "\"wss://ecommerce-backend-o9y5.onrender.com/ws-products\"")
+//            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/api/\"")
+//            buildConfigField("String", "WS_URL", "\"ws://10.0.2.2:8080/ws-products\"")
+            buildConfigField("String", "BASE_URL", "\"https://ecommerce-backend-o9y5.onrender.com/api/\"")
+            buildConfigField("String", "WS_URL", "\"wss://ecommerce-backend-o9y5.onrender.com/ws-products\"")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -111,5 +111,9 @@ dependencies {
 
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
+    //Grafico de barras
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
 
 }

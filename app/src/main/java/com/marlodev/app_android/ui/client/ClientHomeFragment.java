@@ -165,6 +165,8 @@ public class ClientHomeFragment extends Fragment {
         }
     }
 
+
+    //esta es la navegacion al product detail
     private void openProductDetail(Product product) {
         if (product.isSkeleton()) return;
         Intent intent = new Intent(requireContext(), ClientDetailActivity.class);

@@ -61,6 +61,24 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.app_android" />
+
+<!--        Nuevo producto-->
+        <activity android:name=".ui.admin.NewProductActivity" />
+
+        <!--        Editar producto-->
+        <activity android:name=".ui.admin.EditProductActivity" />
+
+<!--        Cick en perfil de usuario admin-->
+        <activity android:name=".ui.admin.UserAdminActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
+
+        <activity android:name=".ui.admin.NotificationsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+
     </application>
 
 </manifest>
