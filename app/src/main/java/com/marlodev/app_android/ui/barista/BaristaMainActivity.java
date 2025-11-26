@@ -71,8 +71,6 @@ public class BaristaMainActivity extends AppCompatActivity {
                 fragment = new BaristaHomeFragment();
             } else if (id == R.id.menu_detalle_barista) {
                 fragment = new BaristaDetalleFragment();
-            } else if (id == R.id.menu_historial_barista) {
-                fragment = new BaristaHistorialFragment();
             } else if (id == R.id.menu_notificaciones_barista) {
                 fragment = new BaristaNotificacionesFragment();
             } else if (id == R.id.menu_perfil_barista) {
@@ -93,7 +91,7 @@ public class BaristaMainActivity extends AppCompatActivity {
     // Abre el perfil si hay sesión, o redirige al login si es invitado.
     private void openProfileOrGuest() {
         if (sessionManager.isLoggedIn()) {
-            loadFragment(new BaristaHistorialFragment());
+            loadFragment(new BaristaPerfilFragment());
         } else {
             Toast.makeText(this, "Inicia sesión para acceder al perfil", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, LoginActivity.class));
