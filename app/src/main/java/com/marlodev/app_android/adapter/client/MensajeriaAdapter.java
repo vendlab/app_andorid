@@ -1,4 +1,4 @@
-package com.marlodev.app_android.adapter;
+package com.marlodev.app_android.adapter.client;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +13,7 @@ import com.marlodev.app_android.domain.ChatMessage;
 
 import java.util.List;
 
-public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class MensajeriaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_SENT = 1;
     private static final int TYPE_RECEIVED = 2;
@@ -21,7 +21,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ChatMessage> mensajes;
     private String remitenteActual; // "delivery", "cliente", "tienda"
 
-    public ChatAdapter(List<ChatMessage> mensajes, String remitenteActual) {
+    public MensajeriaAdapter(List<ChatMessage> mensajes, String remitenteActual) {
         this.mensajes = mensajes;
         this.remitenteActual = remitenteActual;
     }

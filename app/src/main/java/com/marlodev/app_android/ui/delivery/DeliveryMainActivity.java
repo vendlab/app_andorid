@@ -33,7 +33,7 @@ public class DeliveryMainActivity extends AppCompatActivity implements DeliveryH
         homeFragment = new DeliveryHomeFragment();
         historialFragment = new DeliveryHistorialFragment();
         gananciasFragment = new DeliveryGananciasFragment();
-        mensajeriaFragment = new DeliveryMensajeriaFragment();
+        mensajeriaFragment = new DeliveryChatListFragment();
         perfilFragment = new DeliveryPerfilFragment();
 
         // Agregamos todos los fragmentos pero mostramos solo Home
@@ -82,7 +82,7 @@ public class DeliveryMainActivity extends AppCompatActivity implements DeliveryH
     }
 
     private void openDetallePedido(Pedido pedido) {
-        DeliveryHistorialFragment detalleFragment = new DeliveryHistorialFragment();
+        DeliveryDetallePedidoFragment detalleFragment = new DeliveryDetallePedidoFragment();
         Bundle args = new Bundle();
         args.putSerializable("pedido", pedido);
         detalleFragment.setArguments(args);

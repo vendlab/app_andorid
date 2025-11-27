@@ -17,7 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.marlodev.app_android.MainActivity;
 import com.marlodev.app_android.adapter.client.PedidoAdapter;
 import com.marlodev.app_android.databinding.FragmentDeliveryHomeBinding;
+import com.marlodev.app_android.domain.ChatPreview;
 import com.marlodev.app_android.domain.Pedido;
+import com.marlodev.app_android.repository.ChatRepository;
 import com.marlodev.app_android.utils.SessionManager;
 import com.marlodev.app_android.viewmodel.DeliveryViewModel;
 
@@ -86,7 +88,6 @@ public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPe
     private void observeViewModel() {
         viewModel.pedidos.observe(getViewLifecycleOwner(), pedidos -> {
             // El Fragment solo se encarga de pasar la lista al adapter.
-            // El adapter y el ViewModel se encargan de la lógica del esqueleto.
             pedidoAdapter.submitList(pedidos);
         });
     }
@@ -95,7 +96,38 @@ public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPe
 
     @Override
     public void onAceptarClick(Pedido pedido) {
-        Toast.makeText(getContext(), "Pedido de " + pedido.getCliente() + " aceptado", Toast.LENGTH_SHORT).show();
+
+        // marcar como aceptado
+        pedido.setAceptado(true);
+
+        Toast.makeText(getContext(),
+                "Pedido de " + pedido.getCliente() + " aceptado",
+                Toast.LENGTH_SHORT
+        ).show();
+
+        // ----------- AGREGAR CHATS AL ACEPTAR EL PEDIDO ----------
+        // Chat con el cliente
+        ChatPreview chatCliente = new ChatPreview(
+                "pedido_" + pedido.getIdPedido() + "_cliente",
+                pedido.getCliente(),
+                "Inicia un chat con el cliente",
+                "Ahora",
+                "cliente",
+                pedido.getIdPedido()
+        );
+
+        // Chat con la tienda
+        ChatPreview chatTienda = new ChatPreview(
+                "pedido_" + pedido.getIdPedido() + "_tienda",
+                pedido.getNombreTienda(),
+                "Inicia un chat con la tienda",
+                "Ahora",
+                "tienda",
+                pedido.getIdPedido()
+        );
+
+        ChatRepository.getInstance().agregarChat(chatCliente);
+        ChatRepository.getInstance().agregarChat(chatTienda);
     }
 
     @Override

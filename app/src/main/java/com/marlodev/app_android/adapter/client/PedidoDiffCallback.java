@@ -11,7 +11,7 @@ public class PedidoDiffCallback extends DiffUtil.ItemCallback<Pedido> {
 
     @Override
     public boolean areItemsTheSame(@NonNull Pedido oldItem, @NonNull Pedido newItem) {
-        return oldItem.getId() == newItem.getId();
+        return oldItem.getIdPedido() == newItem.getIdPedido();
     }
 
     @Override
