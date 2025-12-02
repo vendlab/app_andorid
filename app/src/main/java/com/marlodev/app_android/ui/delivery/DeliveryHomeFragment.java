@@ -59,7 +59,6 @@ public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPe
         viewModel = new ViewModelProvider(this).get(DeliveryViewModel.class);
 
         setupRecyclerView();
-        setupLogoutButton();
         observeViewModel();
     }
 
@@ -73,16 +72,6 @@ public class DeliveryHomeFragment extends Fragment implements PedidoAdapter.OnPe
         pedidoAdapter = new PedidoAdapter(this);
         binding.recyclerViewPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerViewPedidos.setAdapter(pedidoAdapter);
-    }
-
-    private void setupLogoutButton() {
-        binding.btnLogout.setOnClickListener(v -> {
-            SessionManager.getInstance(requireContext()).clear();
-            Intent intent = new Intent(requireContext(), MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            requireActivity().finish();
-        });
     }
 
     private void observeViewModel() {
