@@ -9,75 +9,50 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.marlodev.app_android.R;
-import com.marlodev.app_android.domain.PedidoEntregado;
+import com.marlodev.app_android.domain.Pedido;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.ViewHolder> {
 
-    private final List<PedidoEntregado> pedidos;
-    private final SimpleDateFormat formatoEntrada = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-    private final SimpleDateFormat formatoDia = new SimpleDateFormat("dd", Locale.getDefault());
-    private final SimpleDateFormat formatoMes = new SimpleDateFormat("MMM", new Locale("es", "ES"));
-
-    public HistorialAdapter(List<PedidoEntregado> pedidos) {
-        this.pedidos = pedidos;
-    }
+    private List<Pedido> lista = new ArrayList<>();
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_pedido_entregado, parent, false);
+                .inflate(R.layout.item_historial_pedido, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        PedidoEntregado pedido = pedidos.get(position);
+        Pedido p = lista.get(position);
 
-        // Extraer día y mes de la fecha
-        try {
-            Date fecha = formatoEntrada.parse(pedido.getFecha());
-            if (fecha != null) {
-                holder.txtDia.setText(formatoDia.format(fecha));
-                holder.txtMes.setText(formatoMes.format(fecha).toUpperCase());
-            }
-        } catch (ParseException e) {
-            holder.txtDia.setText("--");
-            holder.txtMes.setText("--");
-        }
-
-        // Mostrar hora
-        holder.txtHora.setText(pedido.getHora());
-
-        // Mostrar precio y propina con formato
-        holder.txtPrecio.setText(String.format(Locale.getDefault(), "S/ %.2f", pedido.getPrecio()));
-        holder.txtPropina.setText(String.format(Locale.getDefault(), "S/ %.2f", pedido.getPropina()));
-
-        // Mostrar cliente
-        holder.txtCliente.setText("Cliente: " + pedido.getCliente());
+        holder.txtNombre.setText(p.getCliente());
+        holder.txtFecha.setText(p.getFechaEntrega());
+        holder.txtMonto.setText("Monto: S/ " + p.getTotal());
+        holder.txtPropina.setText("Propina: S/ " + p.getPropina());
     }
 
     @Override
-    public int getItemCount() {
-        return pedidos.size();
+    public int getItemCount() { return lista.size(); }
+
+    public void submitList(List<Pedido> newList) {
+        lista = newList;
+        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtDia, txtHora, txtPrecio, txtMes, txtCliente, txtPropina;
+
+        TextView txtNombre, txtFecha, txtMonto, txtPropina;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            txtDia = itemView.findViewById(R.id.txtDia);
-            txtHora = itemView.findViewById(R.id.txtHora);
-            txtPrecio = itemView.findViewById(R.id.txtPrecio);
-            txtMes = itemView.findViewById(R.id.txtMes);
-            txtCliente = itemView.findViewById(R.id.txtCliente);
+            txtNombre = itemView.findViewById(R.id.txtNombreCliente);
+            txtFecha = itemView.findViewById(R.id.txtFecha);
+            txtMonto = itemView.findViewById(R.id.txtMonto);
             txtPropina = itemView.findViewById(R.id.txtPropina);
         }
     }

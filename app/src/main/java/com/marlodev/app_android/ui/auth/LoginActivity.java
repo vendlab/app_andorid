@@ -2,9 +2,12 @@ package com.marlodev.app_android.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     private AuthViewModel authViewModel;
     private SessionManager sessionManager;
     private TextView txtRegistrarse;
+    private ImageView ivTogglePassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +44,9 @@ public class LoginActivity extends AppCompatActivity {
         initViews();
         initViewModel();
 
-        // Si ya hay sesión activa, saltar el login
+        // Activar el toggle del ojo
+        setupPasswordToggle(etPassword, ivTogglePassword);
+
         if (sessionManager.isLoggedIn()) {
             navigateToRoleHome(sessionManager.getRole());
             finish();
@@ -49,7 +55,6 @@ public class LoginActivity extends AppCompatActivity {
 
         btnLogin.setOnClickListener(v -> attemptLogin());
 
-        // Acción de ir a pantalla de registro
         txtRegistrarse.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
@@ -59,6 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     private void initViews() {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
         btnLogin = findViewById(R.id.btnLogin);
         progressBar = findViewById(R.id.progressBar);
         txtRegistrarse = findViewById(R.id.txtRegistrarse);
@@ -145,4 +151,26 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    private void setupPasswordToggle(EditText editText, ImageView toggleIcon) {
+
+        toggleIcon.setOnClickListener(v -> {
+
+            boolean isHidden =
+                    editText.getTransformationMethod() instanceof PasswordTransformationMethod;
+
+            if (isHidden) {
+                // Mostrar contraseña
+                editText.setTransformationMethod(null);
+                toggleIcon.setImageResource(R.drawable.icon_eye_open);
+            } else {
+                // Ocultar contraseña
+                editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                toggleIcon.setImageResource(R.drawable.icon_eye_closed);
+            }
+
+            editText.setSelection(editText.getText().length());
+        });
+    }
+
 }

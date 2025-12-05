@@ -2,8 +2,11 @@ package com.marlodev.app_android.ui.auth;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -20,6 +23,7 @@ public class RegisterActivity extends AppCompatActivity {
     private MaterialButton btnRegister;
     private ProgressBar progressBar;
     private AuthViewModel authViewModel;
+    private ImageView ivTogglePassword, ivToggleConfirmPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,22 +33,30 @@ public class RegisterActivity extends AppCompatActivity {
         initViews();
         initViewModel();
 
-        // Botón registrar
+        // 🔹 Activar los ojitos de ver/ocultar contraseña
+        setupPasswordToggle(etPassword, ivTogglePassword);
+        setupPasswordToggle(etConfirmPassword, ivToggleConfirmPassword);
+
+        // Registrar
         btnRegister.setOnClickListener(v -> attemptRegister());
 
-        // Enlace "Iniciar sesión"
-        findViewById(R.id.tvLogin).setOnClickListener(v -> {
-            finish(); // Cierra RegisterActivity y vuelve al Login
-        });
+        // Volver al login
+        findViewById(R.id.tvLogin).setOnClickListener(v -> finish());
     }
+
     private void initViews() {
         etNombre = findViewById(R.id.etNombre);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
+        ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
+
         btnRegister = findViewById(R.id.btnRegister);
         progressBar = findViewById(R.id.progressBar);
     }
+
     private void initViewModel() {
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
@@ -53,12 +65,13 @@ public class RegisterActivity extends AppCompatActivity {
 
             if (response != null && response.isSuccess()) {
                 Toast.makeText(this, "Registro exitoso", Toast.LENGTH_SHORT).show();
-                finish(); // Volver al login
+                finish();
             } else {
                 Toast.makeText(this, "No se pudo registrar", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     private void attemptRegister() {
         String nombre = etNombre.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
@@ -81,7 +94,31 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
             return;
         }
+
         progressBar.setVisibility(View.VISIBLE);
         authViewModel.register(nombre, email, password);
     }
+
+    // 🔹 Función para mostrar/ocultar contraseña
+    private void setupPasswordToggle(EditText editText, ImageView toggleIcon) {
+
+        toggleIcon.setOnClickListener(v -> {
+
+            boolean isHidden = editText.getTransformationMethod() instanceof PasswordTransformationMethod;
+
+            if (isHidden) {
+                // Mostrar contraseña
+                editText.setTransformationMethod(null);
+                toggleIcon.setImageResource(R.drawable.icon_eye_open);
+            } else {
+                // Ocultar contraseña
+                editText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                toggleIcon.setImageResource(R.drawable.icon_eye_closed);
+            }
+
+            // Mantener cursor al final
+            editText.setSelection(editText.getText().length());
+        });
+    }
+
 }

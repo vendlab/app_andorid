@@ -8,13 +8,11 @@
     android:background="@color/colorGrey100"
     android:padding="0dp">
 
-    <!-- 💚 Encabezado con imagen -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="240dp"
         android:background="@drawable/ic_launcher_background_lr">
 
-        <!-- Imagen derecha -->
         <ImageView
             android:id="@+id/imgLogoRight"
             android:layout_width="180dp"
@@ -27,7 +25,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Imagen izquierda -->
         <ImageView
             android:id="@+id/imgLogoLeft"
             android:layout_width="143dp"
@@ -42,7 +39,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 🧾 Formulario -->
     <LinearLayout
         android:background="@drawable/bg_rounded_top"
         android:layout_width="match_parent"
@@ -62,7 +58,6 @@
             android:layout_marginTop="25dp"
             android:layout_marginBottom="20dp" />
 
-        <!-- ✉️ Correo -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,8 +65,8 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginTop="10dp"
-            android:textColor="#000000"
-            />
+            android:textColor="#000000"/>
+
         <EditText
             android:id="@+id/etEmail"
             android:layout_width="match_parent"
@@ -87,7 +82,6 @@
             android:textColor="#000000"
             android:textSize="16sp"/>
 
-        <!-- 🔑 Contraseña -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -95,29 +89,40 @@
             android:textSize="14sp"
             android:layout_marginTop="10dp"
             android:textStyle="bold"
-            android:textColor="#000000"
-            />
-        <EditText
-            android:id="@+id/etPassword"
+            android:textColor="#000000"/>
+
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginTop="16dp"
-            android:hint="Ingresa tu contraseña"
-            android:paddingStart="16dp"
-            android:drawableStart="@drawable/icon_password"
-            android:drawablePadding="10dp"
-            android:paddingEnd="16dp"
-            android:textColorHint="@color/colorGrey800"
-            android:background="@drawable/bg_input_rounded"
-            android:inputType="textPassword"
-            android:textColor="#000000"
-            android:textSize="16sp"/>
+            android:layout_marginTop="16dp">
 
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Ingresa tu contraseña"
+                android:paddingStart="16dp"
+                android:paddingEnd="50dp"
+                android:drawableStart="@drawable/icon_password"
+                android:drawablePadding="10dp"
+                android:background="@drawable/bg_input_rounded"
+                android:inputType="textPassword"
+                android:textColor="#000000"
+                android:textColorHint="@color/colorGrey800"
+                android:textSize="16sp"/>
 
+            <ImageView
+                android:id="@+id/ivTogglePassword"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/icon_eye_closed"
+                android:clickable="true"
+                android:focusable="true" />
+        </RelativeLayout>
 
-
-
-        <!-- 🚪 Botón -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
@@ -129,7 +134,6 @@
             android:textSize="16sp"
             app:cornerRadius="28dp" />
 
-        <!-- 🌀 ProgressBar simple debajo del botón -->
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyle"
@@ -140,7 +144,6 @@
             android:indeterminateTint="#A5C35D"
             android:visibility="gone"/>
 
-        <!-- 🔗 Enlace de registro -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -165,7 +168,6 @@
                 android:textSize="14sp"
                 android:clickable="true"
                 android:focusable="true" />
-    </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
-
